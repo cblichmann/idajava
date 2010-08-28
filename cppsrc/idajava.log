@@ -1,0 +1,43 @@
+﻿Build started 21.12.2009 18:22:53.
+Project "C:\Dev\idajava\cppsrc\idajava.vcxproj" on node 1 (build target(s)).
+_PrepareForBuild:
+  Creating "Debug\idajava.unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /IC:\Dev\idajava\cppsrc\..\..\external\idasdk_5_6\include /IC:\Dev\idajava\cppsrc\..\external\idasdk_5_6\include /I"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include" /I"C:\Program Files\Java\jdk1.6.0_17\include" /I"C:\Program Files\Java\jdk1.6.0_17\include\win32" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D IDAPLUGINTEST_EXPORTS /D __NT__ /D __IDP__ /D _WINDLL /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt src\idajava_main.cpp src\idajava_natives.cpp src\idajava_natives_wrap.cxx src\idajava_pluginclass.cpp src\javavmcreator.cpp
+  javavmcreator.cpp
+  idajava_pluginclass.cpp
+  idajava_natives_wrap.cxx
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(4858): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(4876): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(4894): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(7365): error C2664: 'open_disasm_window' : cannot convert parameter 2 from 'const qvector<T> *' to 'const areavec_t *'
+          with
+          [
+              T=area_t
+          ]
+          Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(13045): error C3861: 'register_extlang': identifier not found
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(33430): error C2440: '=' : cannot convert from 'char **' to 'const char **'
+          Conversion loses qualifiers
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(33458): error C2440: '=' : cannot convert from 'char **' to 'const char **'
+          Conversion loses qualifiers
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(33557): error C2440: '=' : cannot convert from 'char **' to 'const char **'
+          Conversion loses qualifiers
+c:\dev\idajava\cppsrc\src\idajava_natives_wrap.cxx(33613): error C2440: '=' : cannot convert from 'char **' to 'const char **'
+          Conversion loses qualifiers
+  idajava_natives.cpp
+c:\dev\external\idasdk_5_6\include\pro.h(338): warning C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+          c:\program files (x86)\microsoft visual studio 10.0\vc\include\time.inl(86) : see declaration of 'ctime'
+c:\dev\external\idasdk_5_6\include\pro.h(343): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+          c:\program files (x86)\microsoft visual studio 10.0\vc\include\time.inl(112) : see declaration of 'localtime'
+  idajava_main.cpp
+c:\dev\external\idasdk_5_6\include\pro.h(338): warning C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+          c:\program files (x86)\microsoft visual studio 10.0\vc\include\time.inl(86) : see declaration of 'ctime'
+c:\dev\external\idasdk_5_6\include\pro.h(343): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+          c:\program files (x86)\microsoft visual studio 10.0\vc\include\time.inl(112) : see declaration of 'localtime'
+  Generating Code...
+Done Building Project "C:\Dev\idajava\cppsrc\idajava.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:17.85
