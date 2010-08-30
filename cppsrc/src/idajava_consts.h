@@ -27,16 +27,18 @@
 	" (c)2007-2010 Christian Blichmann"
 
 // Default log levels
-#define LOGLEVEL_INFO    0
-#define LOGLEVEL_VERBOSE 1
-#define LOGLEVEL_DEBUG   2
+enum
+{
+	LOGLEVEL_INFO = 0,
+	LOGLEVEL_VERBOSE,
+	LOGLEVEL_DEBUG
+};
 
 /**
  * Cookie value to differentiate between IDA forms and IdaJava form in UI
  * notification messages.
  */
-// "IDAJ"
-#define HOOKDATA_IDAJAVA_COOKIE 0x4944414A
+const intptr_t HOOKDATA_IDAJAVA_COOKIE(0x4944414A); // "IDAJ"
 
 /** The plugin's registry root under HKEY_CURRENT_USER */
 #define REGKEY_HKCU_PLUGIN_ROOT "Software\\blichmann.de\\IdaJava\\" \

@@ -13,6 +13,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="SWIG">
+      <UniqueIdentifier>{e31b59d7-71c3-40b2-a483-a61587ed73a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\idajava_consts.h">
@@ -27,7 +30,10 @@
     <ClInclude Include="src\idajava_pluginclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\javavmcreator.h">
+    <ClInclude Include="src\idajava_jvm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\idajava_windows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,18 +44,97 @@
     <ClCompile Include="src\idajava_natives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\idajava_natives_wrap.cxx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\idajava_pluginclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\javavmcreator.cpp">
+    <ClCompile Include="src\idajava_jvm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\idajava_windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\idajava_idaapi_wrap.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\idajava_natives.i" />
-    <None Include="src\operators.i" />
+    <None Include="src\area.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\ua.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\auto.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\bytes.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\diskio.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\expr.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\fixup.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\fpro.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\frame.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\funcs.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\help.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\ida.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\idajava_idaapi.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\idajava_natives.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\idp.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\ints.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\kernwin.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\llong.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\loader.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\nalt.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\name.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\offset.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\operators.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\pro.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\segment.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\struct.i">
+      <Filter>SWIG</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -565,6 +565,11 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.get_predef_cmt(info, wrktyp, buf, bufsize);
   }
 
+  public static SWIGTYPE_p_Forms__TForm create_tform(String caption, int[] OUTPUT) {
+    long cPtr = IdaJavaJNI.create_tform(caption, OUTPUT);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_Forms__TForm(cPtr, false);
+  }
+
   public static int askaddr(long[] OUTPUT, String format) {
     return IdaJavaJNI.askaddr(OUTPUT, format);
   }
@@ -645,8 +650,8 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.set_xml__SWIG_0(path, name, value);
   }
 
-  public static boolean get_xml(String path, SWIGTYPE_p_idc_value_t value) {
-    return IdaJavaJNI.get_xml(path, SWIGTYPE_p_idc_value_t.getCPtr(value));
+  public static boolean get_xml(String path, idc_value_t value) {
+    return IdaJavaJNI.get_xml(path, idc_value_t.getCPtr(value), value);
   }
 
   public static boolean del_xml(String path) {
@@ -723,11 +728,6 @@ public class IdaJava implements IdaJavaConstants {
 
   public static boolean del_menu_item(String menupath) {
     return IdaJavaJNI.del_menu_item(menupath);
-  }
-
-  public static SWIGTYPE_p_Forms__TForm create_tform(String caption, SWIGTYPE_p_int handle) {
-    long cPtr = IdaJavaJNI.create_tform(caption, SWIGTYPE_p_int.getCPtr(handle));
-    return (cPtr == 0) ? null : new SWIGTYPE_p_Forms__TForm(cPtr, false);
   }
 
   public static int get_tform_handle(SWIGTYPE_p_Forms__TForm form) {
@@ -949,8 +949,8 @@ public class IdaJava implements IdaJavaConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_Forms__TForm(cPtr, false);
   }
 
-  public static SWIGTYPE_p_Forms__TForm open_frame_window(SWIGTYPE_p_func_t pfn, long offset) {
-    long cPtr = IdaJavaJNI.open_frame_window(SWIGTYPE_p_func_t.getCPtr(pfn), offset);
+  public static SWIGTYPE_p_Forms__TForm open_frame_window(func_t pfn, long offset) {
+    long cPtr = IdaJavaJNI.open_frame_window(func_t.getCPtr(pfn), pfn, offset);
     return (cPtr == 0) ? null : new SWIGTYPE_p_Forms__TForm(cPtr, false);
   }
 
@@ -984,8 +984,8 @@ public class IdaJava implements IdaJavaConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_Forms__TForm(cPtr, false);
   }
 
-  public static SWIGTYPE_p_Forms__TForm open_disasm_window(String window_title, SWIGTYPE_p_areavec_t ranges) {
-    long cPtr = IdaJavaJNI.open_disasm_window__SWIG_0(window_title, SWIGTYPE_p_areavec_t.getCPtr(ranges));
+  public static SWIGTYPE_p_Forms__TForm open_disasm_window(String window_title, areavec_t ranges) {
+    long cPtr = IdaJavaJNI.open_disasm_window__SWIG_0(window_title, areavec_t.getCPtr(ranges), ranges);
     return (cPtr == 0) ? null : new SWIGTYPE_p_Forms__TForm(cPtr, false);
   }
 
@@ -1020,30 +1020,30 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.choose_name(title);
   }
 
-  public static long choose_stkvar_xref(SWIGTYPE_p_func_t pfn, SWIGTYPE_p_member_t mptr) {
-    return IdaJavaJNI.choose_stkvar_xref(SWIGTYPE_p_func_t.getCPtr(pfn), SWIGTYPE_p_member_t.getCPtr(mptr));
+  public static long choose_stkvar_xref(func_t pfn, member_t mptr) {
+    return IdaJavaJNI.choose_stkvar_xref(func_t.getCPtr(pfn), pfn, member_t.getCPtr(mptr), mptr);
   }
 
   public static long choose_xref(long to) {
     return IdaJavaJNI.choose_xref(to);
   }
 
-  public static SWIGTYPE_p_enum_t choose_enum(String title, SWIGTYPE_p_enum_t default_id) {
-    return new SWIGTYPE_p_enum_t(IdaJavaJNI.choose_enum(title, SWIGTYPE_p_enum_t.getCPtr(default_id)), true);
+  public static long choose_enum(String title, long default_id) {
+    return IdaJavaJNI.choose_enum(title, default_id);
   }
 
-  public static SWIGTYPE_p_enum_t choose_enum_by_value(String title, SWIGTYPE_p_enum_t default_id, long value, SWIGTYPE_p_unsigned_char serial) {
-    return new SWIGTYPE_p_enum_t(IdaJavaJNI.choose_enum_by_value(title, SWIGTYPE_p_enum_t.getCPtr(default_id), value, SWIGTYPE_p_unsigned_char.getCPtr(serial)), true);
+  public static long choose_enum_by_value(String title, long default_id, long value, SWIGTYPE_p_unsigned_char serial) {
+    return IdaJavaJNI.choose_enum_by_value(title, default_id, value, SWIGTYPE_p_unsigned_char.getCPtr(serial));
   }
 
-  public static SWIGTYPE_p_func_t choose_func(String title, long default_ea) {
+  public static func_t choose_func(String title, long default_ea) {
     long cPtr = IdaJavaJNI.choose_func(title, default_ea);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_func_t(cPtr, false);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
   }
 
-  public static SWIGTYPE_p_segment_t choose_segm(String title, long default_ea) {
+  public static segment_t choose_segm(String title, long default_ea) {
     long cPtr = IdaJavaJNI.choose_segm(title, default_ea);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_segment_t(cPtr, false);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
   }
 
   public static SWIGTYPE_p_segreg_t choose_segreg(String title) {
@@ -1051,9 +1051,9 @@ public class IdaJava implements IdaJavaConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_segreg_t(cPtr, false);
   }
 
-  public static SWIGTYPE_p_struc_t choose_struc(String title) {
+  public static struc_t choose_struc(String title) {
     long cPtr = IdaJavaJNI.choose_struc(title);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_struc_t(cPtr, false);
+    return (cPtr == 0) ? null : new struc_t(cPtr, false);
   }
 
   public static boolean add_chooser_command(String chooser_caption, String cmd_caption, SWIGTYPE_p_chooser_cb_t chooser_cb, int menu_index, int icon, int flags) {
@@ -1223,6 +1223,257 @@ public class IdaJava implements IdaJavaConstants {
 
   public static String askfile_c(int savefile, String defval, String format) {
     return IdaJavaJNI.askfile_c(savefile, defval, format);
+  }
+
+  public static int enum_processor_modules(SWIGTYPE_p_f_p_q_const__char_p_void__int func, SWIGTYPE_p_void ud, String answer, long answer_size, SWIGTYPE_p_p_extlang_t el) {
+    return IdaJavaJNI.enum_processor_modules__SWIG_0(SWIGTYPE_p_f_p_q_const__char_p_void__int.getCPtr(func), SWIGTYPE_p_void.getCPtr(ud), answer, answer_size, SWIGTYPE_p_p_extlang_t.getCPtr(el));
+  }
+
+  public static int enum_processor_modules(SWIGTYPE_p_f_p_q_const__char_p_void__int func, SWIGTYPE_p_void ud, String answer, long answer_size) {
+    return IdaJavaJNI.enum_processor_modules__SWIG_1(SWIGTYPE_p_f_p_q_const__char_p_void__int.getCPtr(func), SWIGTYPE_p_void.getCPtr(ud), answer, answer_size);
+  }
+
+  public static int enum_plugins(SWIGTYPE_p_f_p_q_const__char_p_void__int func, SWIGTYPE_p_void ud, String answer, long answer_size, SWIGTYPE_p_p_extlang_t el) {
+    return IdaJavaJNI.enum_plugins__SWIG_0(SWIGTYPE_p_f_p_q_const__char_p_void__int.getCPtr(func), SWIGTYPE_p_void.getCPtr(ud), answer, answer_size, SWIGTYPE_p_p_extlang_t.getCPtr(el));
+  }
+
+  public static int enum_plugins(SWIGTYPE_p_f_p_q_const__char_p_void__int func, SWIGTYPE_p_void ud, String answer, long answer_size) {
+    return IdaJavaJNI.enum_plugins__SWIG_1(SWIGTYPE_p_f_p_q_const__char_p_void__int.getCPtr(func), SWIGTYPE_p_void.getCPtr(ud), answer, answer_size);
+  }
+
+  public static load_info_t build_loaders_list(SWIGTYPE_p_linput_t li) {
+    long cPtr = IdaJavaJNI.build_loaders_list(SWIGTYPE_p_linput_t.getCPtr(li));
+    return (cPtr == 0) ? null : new load_info_t(cPtr, false);
+  }
+
+  public static void free_loaders_list(load_info_t list) {
+    IdaJavaJNI.free_loaders_list(load_info_t.getCPtr(list), list);
+  }
+
+  public static String get_loader_name_from_dll(String dllname) {
+    return IdaJavaJNI.get_loader_name_from_dll(dllname);
+  }
+
+  public static int get_loader_name(String buf, long bufsize) {
+    return IdaJavaJNI.get_loader_name(buf, bufsize);
+  }
+
+  public static boolean init_loader_options(SWIGTYPE_p_linput_t li, load_info_t loader) {
+    return IdaJavaJNI.init_loader_options(SWIGTYPE_p_linput_t.getCPtr(li), load_info_t.getCPtr(loader), loader);
+  }
+
+  public static boolean load_binary_file(String filename, SWIGTYPE_p_linput_t li, int _neflags, int fileoff, long basepara, long binoff, long nbytes) {
+    return IdaJavaJNI.load_binary_file(filename, SWIGTYPE_p_linput_t.getCPtr(li), _neflags, fileoff, basepara, binoff, nbytes);
+  }
+
+  public static boolean load_nonbinary_file(String filename, SWIGTYPE_p_linput_t li, String sysdlldir, int _neflags, load_info_t loader) {
+    return IdaJavaJNI.load_nonbinary_file(filename, SWIGTYPE_p_linput_t.getCPtr(li), sysdlldir, _neflags, load_info_t.getCPtr(loader), loader);
+  }
+
+  public static int getOFILE_MAP() {
+    return IdaJavaJNI.OFILE_MAP_get();
+  }
+
+  public static int getOFILE_EXE() {
+    return IdaJavaJNI.OFILE_EXE_get();
+  }
+
+  public static int getOFILE_IDC() {
+    return IdaJavaJNI.OFILE_IDC_get();
+  }
+
+  public static int getOFILE_LST() {
+    return IdaJavaJNI.OFILE_LST_get();
+  }
+
+  public static int getOFILE_ASM() {
+    return IdaJavaJNI.OFILE_ASM_get();
+  }
+
+  public static int getOFILE_DIF() {
+    return IdaJavaJNI.OFILE_DIF_get();
+  }
+
+  public static int gen_file(int otype, SWIGTYPE_p_FILE fp, long ea1, long ea2, int flags) {
+    return IdaJavaJNI.gen_file(otype, SWIGTYPE_p_FILE.getCPtr(fp), ea1, ea2, flags);
+  }
+
+  public static int file2base(SWIGTYPE_p_linput_t li, int pos, long ea1, long ea2, int patchable) {
+    return IdaJavaJNI.file2base(SWIGTYPE_p_linput_t.getCPtr(li), pos, ea1, ea2, patchable);
+  }
+
+  public static int mem2base(SWIGTYPE_p_void memptr, long ea1, long ea2, int fpos) {
+    return IdaJavaJNI.mem2base(SWIGTYPE_p_void.getCPtr(memptr), ea1, ea2, fpos);
+  }
+
+  public static int base2file(SWIGTYPE_p_FILE fp, int pos, long ea1, long ea2) {
+    return IdaJavaJNI.base2file(SWIGTYPE_p_FILE.getCPtr(fp), pos, ea1, ea2);
+  }
+
+  public static int load_loader_module(SWIGTYPE_p_linput_t li, String lname, String fname, boolean is_remote) {
+    return IdaJavaJNI.load_loader_module(SWIGTYPE_p_linput_t.getCPtr(li), lname, fname, is_remote);
+  }
+
+  public static void create_filename_cmt() {
+    IdaJavaJNI.create_filename_cmt();
+  }
+
+  public static filetype_t get_basic_file_type(SWIGTYPE_p_linput_t li) {
+    return filetype_t.swigToEnum(IdaJavaJNI.get_basic_file_type(SWIGTYPE_p_linput_t.getCPtr(li)));
+  }
+
+  public static long get_file_type_name(String buf, long bufsize) {
+    return IdaJavaJNI.get_file_type_name(buf, bufsize);
+  }
+
+  public static void import_module(String module, String windir, long modnode, SWIGTYPE_p_f_p_linput_t_p_impinfo_t__int importer, String ostype) {
+    IdaJavaJNI.import_module(module, windir, modnode, SWIGTYPE_p_f_p_linput_t_p_impinfo_t__int.getCPtr(importer), ostype);
+  }
+
+  public static int load_ids_module(String fname) {
+    return IdaJavaJNI.load_ids_module(fname);
+  }
+
+  public static boolean hook_to_notification_point(hook_type_t hook_type, SWIGTYPE_p_f_p_void_int_va_list__int cb, SWIGTYPE_p_void user_data) {
+    return IdaJavaJNI.hook_to_notification_point(hook_type.swigValue(), SWIGTYPE_p_f_p_void_int_va_list__int.getCPtr(cb), SWIGTYPE_p_void.getCPtr(user_data));
+  }
+
+  public static int unhook_from_notification_point(hook_type_t hook_type, SWIGTYPE_p_f_p_void_int_va_list__int cb, SWIGTYPE_p_void user_data) {
+    return IdaJavaJNI.unhook_from_notification_point__SWIG_0(hook_type.swigValue(), SWIGTYPE_p_f_p_void_int_va_list__int.getCPtr(cb), SWIGTYPE_p_void.getCPtr(user_data));
+  }
+
+  public static int unhook_from_notification_point(hook_type_t hook_type, SWIGTYPE_p_f_p_void_int_va_list__int cb) {
+    return IdaJavaJNI.unhook_from_notification_point__SWIG_1(hook_type.swigValue(), SWIGTYPE_p_f_p_void_int_va_list__int.getCPtr(cb));
+  }
+
+  public static int invoke_callbacks(hook_type_t hook_type, int notification_code, SWIGTYPE_p_va_list va) {
+    return IdaJavaJNI.invoke_callbacks(hook_type.swigValue(), notification_code, SWIGTYPE_p_va_list.getCPtr(va));
+  }
+
+  public static String get_plugin_options(String plugin) {
+    return IdaJavaJNI.get_plugin_options(plugin);
+  }
+
+  public static int load_dll_or_say(String file, idadll_t dllmem) {
+    return IdaJavaJNI.load_dll_or_say(file, idadll_t.getCPtr(dllmem), dllmem);
+  }
+
+  public static void free_dll(idadll_t dllmem) {
+    IdaJavaJNI.free_dll(idadll_t.getCPtr(dllmem), dllmem);
+  }
+
+  public static String get_idp_desc(String file, String buf, long bufsize) {
+    return IdaJavaJNI.get_idp_desc(file, buf, bufsize);
+  }
+
+  public static plugin_info_t get_plugins() {
+    long cPtr = IdaJavaJNI.get_plugins();
+    return (cPtr == 0) ? null : new plugin_info_t(cPtr, false);
+  }
+
+  public static plugin_t load_plugin(String name) {
+    long cPtr = IdaJavaJNI.load_plugin(name);
+    return (cPtr == 0) ? null : new plugin_t(cPtr, false);
+  }
+
+  public static boolean run_plugin(plugin_t ptr, int arg) {
+    return IdaJavaJNI.run_plugin(plugin_t.getCPtr(ptr), ptr, arg);
+  }
+
+  public static boolean load_and_run_plugin(String name, int arg) {
+    return IdaJavaJNI.load_and_run_plugin(name, arg);
+  }
+
+  public static boolean invoke_plugin(plugin_info_t ptr) {
+    return IdaJavaJNI.invoke_plugin(plugin_info_t.getCPtr(ptr), ptr);
+  }
+
+  public static long get_debugger_plugins(SWIGTYPE_p_p_dbg_info_t array) {
+    return IdaJavaJNI.get_debugger_plugins(SWIGTYPE_p_p_dbg_info_t.getCPtr(array));
+  }
+
+  public static void init_plugins(int flag) {
+    IdaJavaJNI.init_plugins(flag);
+  }
+
+  public static void term_plugins(int flag) {
+    IdaJavaJNI.term_plugins(flag);
+  }
+
+  public static void save_fileregions() {
+    IdaJavaJNI.save_fileregions();
+  }
+
+  public static int get_fileregion_offset(long ea) {
+    return IdaJavaJNI.get_fileregion_offset(ea);
+  }
+
+  public static long get_fileregion_ea(int offset) {
+    return IdaJavaJNI.get_fileregion_ea(offset);
+  }
+
+  public static int gen_exe_file(SWIGTYPE_p_FILE fp) {
+    return IdaJavaJNI.gen_exe_file(SWIGTYPE_p_FILE.getCPtr(fp));
+  }
+
+  public static int reload_file(String file, boolean is_remote) {
+    return IdaJavaJNI.reload_file(file, is_remote);
+  }
+
+  public static void setCommand_line_file(String value) {
+    IdaJavaJNI.command_line_file_set(value);
+  }
+
+  public static String getCommand_line_file() {
+    return IdaJavaJNI.command_line_file_get();
+  }
+
+  public static void setDatabase_idb(String value) {
+    IdaJavaJNI.database_idb_set(value);
+  }
+
+  public static String getDatabase_idb() {
+    return IdaJavaJNI.database_idb_get();
+  }
+
+  public static boolean is_database_ext(String ext) {
+    return IdaJavaJNI.is_database_ext(ext);
+  }
+
+  public static void setDatabase_flags(long value) {
+    IdaJavaJNI.database_flags_set(value);
+  }
+
+  public static long getDatabase_flags() {
+    return IdaJavaJNI.database_flags_get();
+  }
+
+  public static boolean is_temp_database() {
+    return IdaJavaJNI.is_temp_database();
+  }
+
+  public static int getDBCHK_NONE() {
+    return IdaJavaJNI.DBCHK_NONE_get();
+  }
+
+  public static int getDBCHK_OK() {
+    return IdaJavaJNI.DBCHK_OK_get();
+  }
+
+  public static int getDBCHK_BAD() {
+    return IdaJavaJNI.DBCHK_BAD_get();
+  }
+
+  public static int getDBCHK_NEW() {
+    return IdaJavaJNI.DBCHK_NEW_get();
+  }
+
+  public static int flush_buffers() {
+    return IdaJavaJNI.flush_buffers();
+  }
+
+  public static boolean save_database(String outfile, boolean delete_unpacked) {
+    return IdaJavaJNI.save_database(outfile, delete_unpacked);
   }
 
   public static int enumerate_files(String answer, long answer_size, String path, String fname, SWIGTYPE_p_f_p_q_const__char_p_void__int func, SWIGTYPE_p_void ud) {
@@ -1451,6 +1702,3874 @@ public class IdaJava implements IdaJavaConstants {
     return linput_type_t.swigToEnum(IdaJavaJNI.get_linput_type(SWIGTYPE_p_linput_t.getCPtr(li)));
   }
 
+  public static boolean CompileLine(String line, String errbuf, long errbufsize, SWIGTYPE_p_f_p_q_const__char__unsigned_int getname_func) {
+    return IdaJavaJNI.CompileLine__SWIG_0(line, errbuf, errbufsize, SWIGTYPE_p_f_p_q_const__char__unsigned_int.getCPtr(getname_func));
+  }
+
+  public static boolean CompileLine(String line, String errbuf, long errbufsize) {
+    return IdaJavaJNI.CompileLine__SWIG_1(line, errbuf, errbufsize);
+  }
+
+  public static boolean ExecuteLine(String line, String func, SWIGTYPE_p_f_p_q_const__char__unsigned_int getname_func, int argsnum, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.ExecuteLine(line, func, SWIGTYPE_p_f_p_q_const__char__unsigned_int.getCPtr(getname_func), argsnum, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static SWIGTYPE_p_error_t VarLong(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarLong(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarInt64(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarInt64(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarNum(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarNum(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarString2(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarString2(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarFloat(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarFloat(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarObject(idc_value_t v, SWIGTYPE_p_idc_class_t icls) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarObject__SWIG_0(idc_value_t.getCPtr(v), v, SWIGTYPE_p_idc_class_t.getCPtr(icls)), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarObject(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarObject__SWIG_1(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarCopy(idc_value_t dst, idc_value_t src) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarCopy(idc_value_t.getCPtr(dst), dst, idc_value_t.getCPtr(src), src), true);
+  }
+
+  public static void VarFree(idc_value_t v) {
+    IdaJavaJNI.VarFree(idc_value_t.getCPtr(v), v);
+  }
+
+  public static void VarSwap(idc_value_t v1, idc_value_t v2) {
+    IdaJavaJNI.VarSwap(idc_value_t.getCPtr(v1), v1, idc_value_t.getCPtr(v2), v2);
+  }
+
+  public static SWIGTYPE_p_error_t VarGetClassName(idc_value_t obj, SWIGTYPE_p__qstringT_char_t name) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarGetClassName(idc_value_t.getCPtr(obj), obj, SWIGTYPE_p__qstringT_char_t.getCPtr(name)), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarGetAttr(idc_value_t obj, String attr, idc_value_t res, boolean may_use_getattr) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarGetAttr__SWIG_0(idc_value_t.getCPtr(obj), obj, attr, idc_value_t.getCPtr(res), res, may_use_getattr), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarGetAttr(idc_value_t obj, String attr, idc_value_t res) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarGetAttr__SWIG_1(idc_value_t.getCPtr(obj), obj, attr, idc_value_t.getCPtr(res), res), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarSetAttr(idc_value_t obj, String attr, idc_value_t value, boolean may_use_setattr) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarSetAttr__SWIG_0(idc_value_t.getCPtr(obj), obj, attr, idc_value_t.getCPtr(value), value, may_use_setattr), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarSetAttr(idc_value_t obj, String attr, idc_value_t value) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarSetAttr__SWIG_1(idc_value_t.getCPtr(obj), obj, attr, idc_value_t.getCPtr(value), value), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarDelAttr(idc_value_t obj, String attr) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarDelAttr(idc_value_t.getCPtr(obj), obj, attr), true);
+  }
+
+  public static String VarFirstAttr(idc_value_t obj) {
+    return IdaJavaJNI.VarFirstAttr(idc_value_t.getCPtr(obj), obj);
+  }
+
+  public static String VarLastAttr(idc_value_t obj) {
+    return IdaJavaJNI.VarLastAttr(idc_value_t.getCPtr(obj), obj);
+  }
+
+  public static String VarNextAttr(idc_value_t obj, String attr) {
+    return IdaJavaJNI.VarNextAttr(idc_value_t.getCPtr(obj), obj, attr);
+  }
+
+  public static String VarPrevAttr(idc_value_t obj, String attr) {
+    return IdaJavaJNI.VarPrevAttr(idc_value_t.getCPtr(obj), obj, attr);
+  }
+
+  public static SWIGTYPE_p_error_t VarAssign(idc_value_t dst, idc_value_t src) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarAssign(idc_value_t.getCPtr(dst), dst, idc_value_t.getCPtr(src), src), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarMove(idc_value_t dst, idc_value_t src) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarMove(idc_value_t.getCPtr(dst), dst, idc_value_t.getCPtr(src), src), true);
+  }
+
+  public static void VarPrint(SWIGTYPE_p__qstringT_char_t out, idc_value_t v, String name, int indent) {
+    IdaJavaJNI.VarPrint__SWIG_0(SWIGTYPE_p__qstringT_char_t.getCPtr(out), idc_value_t.getCPtr(v), v, name, indent);
+  }
+
+  public static void VarPrint(SWIGTYPE_p__qstringT_char_t out, idc_value_t v, String name) {
+    IdaJavaJNI.VarPrint__SWIG_1(SWIGTYPE_p__qstringT_char_t.getCPtr(out), idc_value_t.getCPtr(v), v, name);
+  }
+
+  public static void VarPrint(SWIGTYPE_p__qstringT_char_t out, idc_value_t v) {
+    IdaJavaJNI.VarPrint__SWIG_2(SWIGTYPE_p__qstringT_char_t.getCPtr(out), idc_value_t.getCPtr(v), v);
+  }
+
+  public static SWIGTYPE_p_error_t VarGetSlice(idc_value_t v, long i1, long i2, idc_value_t res, int flags) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarGetSlice__SWIG_0(idc_value_t.getCPtr(v), v, i1, i2, idc_value_t.getCPtr(res), res, flags), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarGetSlice(idc_value_t v, long i1, long i2, idc_value_t res) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarGetSlice__SWIG_1(idc_value_t.getCPtr(v), v, i1, i2, idc_value_t.getCPtr(res), res), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarSetSlice(idc_value_t v, long i1, long i2, idc_value_t in, int flags) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarSetSlice__SWIG_0(idc_value_t.getCPtr(v), v, i1, i2, idc_value_t.getCPtr(in), in, flags), true);
+  }
+
+  public static SWIGTYPE_p_error_t VarSetSlice(idc_value_t v, long i1, long i2, idc_value_t in) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarSetSlice__SWIG_1(idc_value_t.getCPtr(v), v, i1, i2, idc_value_t.getCPtr(in), in), true);
+  }
+
+  public static SWIGTYPE_p_idc_class_t add_idc_class(String name, SWIGTYPE_p_idc_class_t arg1) {
+    long cPtr = IdaJavaJNI.add_idc_class__SWIG_0(name, SWIGTYPE_p_idc_class_t.getCPtr(arg1));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_idc_class_t(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_idc_class_t add_idc_class(String name) {
+    long cPtr = IdaJavaJNI.add_idc_class__SWIG_1(name);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_idc_class_t(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_idc_class_t find_idc_class(String name) {
+    long cPtr = IdaJavaJNI.find_idc_class(name);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_idc_class_t(cPtr, false);
+  }
+
+  public static boolean set_idc_method(SWIGTYPE_p_idc_class_t icls, String fullfuncname) {
+    return IdaJavaJNI.set_idc_method(SWIGTYPE_p_idc_class_t.getCPtr(icls), fullfuncname);
+  }
+
+  public static String set_idc_getattr(SWIGTYPE_p_idc_class_t icls, String fullfuncname) {
+    return IdaJavaJNI.set_idc_getattr(SWIGTYPE_p_idc_class_t.getCPtr(icls), fullfuncname);
+  }
+
+  public static String set_idc_setattr(SWIGTYPE_p_idc_class_t icls, String fullfuncname) {
+    return IdaJavaJNI.set_idc_setattr(SWIGTYPE_p_idc_class_t.getCPtr(icls), fullfuncname);
+  }
+
+  public static String set_idc_dtor(SWIGTYPE_p_idc_class_t icls, String fullfuncname) {
+    return IdaJavaJNI.set_idc_dtor(SWIGTYPE_p_idc_class_t.getCPtr(icls), fullfuncname);
+  }
+
+  public static idc_value_t VarDeref(idc_value_t v, int vref_flags) {
+    long cPtr = IdaJavaJNI.VarDeref(idc_value_t.getCPtr(v), v, vref_flags);
+    return (cPtr == 0) ? null : new idc_value_t(cPtr, false);
+  }
+
+  public static boolean VarRef(idc_value_t ref, idc_value_t v) {
+    return IdaJavaJNI.VarRef(idc_value_t.getCPtr(ref), ref, idc_value_t.getCPtr(v), v);
+  }
+
+  public static idc_value_t add_idc_gvar(String name) {
+    long cPtr = IdaJavaJNI.add_idc_gvar(name);
+    return (cPtr == 0) ? null : new idc_value_t(cPtr, false);
+  }
+
+  public static idc_value_t find_idc_gvar(String name) {
+    long cPtr = IdaJavaJNI.find_idc_gvar(name);
+    return (cPtr == 0) ? null : new idc_value_t(cPtr, false);
+  }
+
+  public static void setIDCFuncs(funcset_t value) {
+    IdaJavaJNI.IDCFuncs_set(funcset_t.getCPtr(value), value);
+  }
+
+  public static funcset_t getIDCFuncs() {
+    long cPtr = IdaJavaJNI.IDCFuncs_get();
+    return (cPtr == 0) ? null : new funcset_t(cPtr, false);
+  }
+
+  public static boolean set_idc_func_ex(String name, SWIGTYPE_p_f_p_idc_value_t_p_idc_value_t__error_t fp, String args, int extfunc_flags) {
+    return IdaJavaJNI.set_idc_func_ex(name, SWIGTYPE_p_f_p_idc_value_t_p_idc_value_t__error_t.getCPtr(fp), args, extfunc_flags);
+  }
+
+  public static void setExtlang(extlang_t value) {
+    IdaJavaJNI.extlang_set(extlang_t.getCPtr(value), value);
+  }
+
+  public static extlang_t getExtlang() {
+    long cPtr = IdaJavaJNI.extlang_get();
+    return (cPtr == 0) ? null : new extlang_t(cPtr, false);
+  }
+
+  public static boolean install_extlang(extlang_t el) {
+    return IdaJavaJNI.install_extlang(extlang_t.getCPtr(el), el);
+  }
+
+  public static boolean remove_extlang(extlang_t el) {
+    return IdaJavaJNI.remove_extlang(extlang_t.getCPtr(el), el);
+  }
+
+  public static boolean select_extlang(extlang_t el) {
+    return IdaJavaJNI.select_extlang(extlang_t.getCPtr(el), el);
+  }
+
+  public static String get_extlang_fileext() {
+    return IdaJavaJNI.get_extlang_fileext();
+  }
+
+  public static SWIGTYPE_p_qvectorT_extlang_t_const_p_t get_extlangs() {
+    long cPtr = IdaJavaJNI.get_extlangs();
+    return (cPtr == 0) ? null : new SWIGTYPE_p_qvectorT_extlang_t_const_p_t(cPtr, false);
+  }
+
+  public static extlang_t find_extlang_by_ext(String ext) {
+    long cPtr = IdaJavaJNI.find_extlang_by_ext(ext);
+    return (cPtr == 0) ? null : new extlang_t(cPtr, false);
+  }
+
+  public static String get_idcpath() {
+    return IdaJavaJNI.get_idcpath();
+  }
+
+  public static boolean set_header_path(String path, boolean add) {
+    return IdaJavaJNI.set_header_path(path, add);
+  }
+
+  public static String get_idc_filename(String buf, long bufsize, String file) {
+    return IdaJavaJNI.get_idc_filename(buf, bufsize, file);
+  }
+
+  public static boolean dosysfile(boolean complain_if_no_file, String file) {
+    return IdaJavaJNI.dosysfile(complain_if_no_file, file);
+  }
+
+  public static boolean calcexpr_long(long where, String line, SWIGTYPE_p_int res, String errbuf, long errbufsize) {
+    return IdaJavaJNI.calcexpr_long__SWIG_0(where, line, SWIGTYPE_p_int.getCPtr(res), errbuf, errbufsize);
+  }
+
+  public static boolean calcexpr_long(long where, String line, SWIGTYPE_p_unsigned_int res, String errbuf, long errbufsize) {
+    return IdaJavaJNI.calcexpr_long__SWIG_1(where, line, SWIGTYPE_p_unsigned_int.getCPtr(res), errbuf, errbufsize);
+  }
+
+  public static boolean calcexpr(long where, String line, idc_value_t rv, String errbuf, long errbufsize) {
+    return IdaJavaJNI.calcexpr(where, line, idc_value_t.getCPtr(rv), rv, errbuf, errbufsize);
+  }
+
+  public static boolean calc_idc_expr(long where, String buf, idc_value_t rv, String errbuf, long errbufsize) {
+    return IdaJavaJNI.calc_idc_expr(where, buf, idc_value_t.getCPtr(rv), rv, errbuf, errbufsize);
+  }
+
+  public static boolean execute(String line) {
+    return IdaJavaJNI.execute(line);
+  }
+
+  public static boolean CompileEx(String file, int cpl_flags, String errbuf, long errbufsize) {
+    return IdaJavaJNI.CompileEx(file, cpl_flags, errbuf, errbufsize);
+  }
+
+  public static boolean Compile(String file, String errbuf, long errbufsize) {
+    return IdaJavaJNI.Compile(file, errbuf, errbufsize);
+  }
+
+  public static boolean extlang_compile_file_exists(extlang_t el) {
+    return IdaJavaJNI.extlang_compile_file_exists__SWIG_0(extlang_t.getCPtr(el), el);
+  }
+
+  public static boolean extlang_compile_file_exists() {
+    return IdaJavaJNI.extlang_compile_file_exists__SWIG_1();
+  }
+
+  public static boolean compile_script_file(String file, String errbuf, long errbufsize) {
+    return IdaJavaJNI.compile_script_file(file, errbuf, errbufsize);
+  }
+
+  public static boolean extlang_compile_file(String file, String errbuf, long errbufsize, SWIGTYPE_p_p_extlang_t el) {
+    return IdaJavaJNI.extlang_compile_file(file, errbuf, errbufsize, SWIGTYPE_p_p_extlang_t.getCPtr(el));
+  }
+
+  public static boolean compile_script_func(String name, long current_ea, String expr, String errbuf, long errbufsize) {
+    return IdaJavaJNI.compile_script_func(name, current_ea, expr, errbuf, errbufsize);
+  }
+
+  public static boolean Run(String fname, int argsnum, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.Run(fname, argsnum, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static boolean run_script_func(String fname, int argsnum, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.run_script_func(fname, argsnum, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static boolean create_idc_object(String name, int argsnum, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.create_idc_object(name, argsnum, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static boolean extlang_get_attr_exists() {
+    return IdaJavaJNI.extlang_get_attr_exists();
+  }
+
+  public static boolean get_script_attr(idc_value_t obj, String attr, idc_value_t result) {
+    return IdaJavaJNI.get_script_attr(idc_value_t.getCPtr(obj), obj, attr, idc_value_t.getCPtr(result), result);
+  }
+
+  public static boolean extlang_set_attr_exists() {
+    return IdaJavaJNI.extlang_set_attr_exists();
+  }
+
+  public static boolean set_script_attr(idc_value_t obj, String attr, idc_value_t value) {
+    return IdaJavaJNI.set_script_attr(idc_value_t.getCPtr(obj), obj, attr, idc_value_t.getCPtr(value), value);
+  }
+
+  public static boolean extlang_create_object_exists() {
+    return IdaJavaJNI.extlang_create_object_exists();
+  }
+
+  public static boolean create_script_object(String name, int nargs, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.create_script_object(name, nargs, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static boolean call_idc_method(idc_value_t obj, String name, int nargs, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.call_idc_method(idc_value_t.getCPtr(obj), obj, name, nargs, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static boolean extlang_call_method_exists() {
+    return IdaJavaJNI.extlang_call_method_exists();
+  }
+
+  public static boolean call_script_method(idc_value_t obj, String name, int nargs, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.call_script_method(idc_value_t.getCPtr(obj), obj, name, nargs, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static boolean ExecuteFile(String file, String func, int argsnum, idc_value_t args, idc_value_t result, String errbuf, long errbufsize) {
+    return IdaJavaJNI.ExecuteFile(file, func, argsnum, idc_value_t.getCPtr(args), args, idc_value_t.getCPtr(result), result, errbuf, errbufsize);
+  }
+
+  public static void set_idc_func_body(String name, int narg, SWIGTYPE_p_unsigned_char body, long len) {
+    IdaJavaJNI.set_idc_func_body(name, narg, SWIGTYPE_p_unsigned_char.getCPtr(body), len);
+  }
+
+  public static SWIGTYPE_p_unsigned_char get_idc_func_body(String name, SWIGTYPE_p_int narg, SWIGTYPE_p_size_t len) {
+    long cPtr = IdaJavaJNI.get_idc_func_body(name, SWIGTYPE_p_int.getCPtr(narg), SWIGTYPE_p_size_t.getCPtr(len));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_error_t VarString(idc_value_t v) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.VarString(idc_value_t.getCPtr(v), v), true);
+  }
+
+  public static boolean set_idc_func(String name, SWIGTYPE_p_f_p_idc_value_t_p_idc_value_t__error_t fp, String args) {
+    return IdaJavaJNI.set_idc_func(name, SWIGTYPE_p_f_p_idc_value_t_p_idc_value_t__error_t.getCPtr(fp), args);
+  }
+
+  public static boolean construct_macro(boolean enable, SWIGTYPE_p_f_r_insn_t_bool__bool build_macro) {
+    return IdaJavaJNI.construct_macro(enable, SWIGTYPE_p_f_r_insn_t_bool__bool.getCPtr(build_macro));
+  }
+
+  public static long get_operand_immvals(long ea, int n, SWIGTYPE_p_unsigned_int v) {
+    return IdaJavaJNI.get_operand_immvals(ea, n, SWIGTYPE_p_unsigned_int.getCPtr(v));
+  }
+
+  public static void setCmd(SWIGTYPE_p_insn_t value) {
+    IdaJavaJNI.cmd_set(SWIGTYPE_p_insn_t.getCPtr(value));
+  }
+
+  public static SWIGTYPE_p_insn_t getCmd() {
+    long cPtr = IdaJavaJNI.cmd_get();
+    return (cPtr == 0) ? null : new SWIGTYPE_p_insn_t(cPtr, false);
+  }
+
+  public static void setLookback(int value) {
+    IdaJavaJNI.lookback_set(value);
+  }
+
+  public static int getLookback() {
+    return IdaJavaJNI.lookback_get();
+  }
+
+  public static void setUFlag(long value) {
+    IdaJavaJNI.uFlag_set(value);
+  }
+
+  public static long getUFlag() {
+    return IdaJavaJNI.uFlag_get();
+  }
+
+  public static long dataSeg_opreg(int opnum, int rgnum) {
+    return IdaJavaJNI.dataSeg_opreg(opnum, rgnum);
+  }
+
+  public static long dataSeg_op(int opnum) {
+    return IdaJavaJNI.dataSeg_op(opnum);
+  }
+
+  public static long dataSeg() {
+    return IdaJavaJNI.dataSeg();
+  }
+
+  public static long codeSeg(long addr, int opnum) {
+    return IdaJavaJNI.codeSeg(addr, opnum);
+  }
+
+  public static short ua_next_byte() {
+    return IdaJavaJNI.ua_next_byte();
+  }
+
+  public static int ua_next_word() {
+    return IdaJavaJNI.ua_next_word();
+  }
+
+  public static long ua_next_long() {
+    return IdaJavaJNI.ua_next_long();
+  }
+
+  public static SWIGTYPE_p_ulonglong ua_next_qword() {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.ua_next_qword(), true);
+  }
+
+  public static void init_output_buffer(String buf, long bufsize) {
+    IdaJavaJNI.init_output_buffer(buf, bufsize);
+  }
+
+  public static String term_output_buffer() {
+    return IdaJavaJNI.term_output_buffer();
+  }
+
+  public static int out_snprintf(String format) {
+    return IdaJavaJNI.out_snprintf(format);
+  }
+
+  public static String set_output_ptr(String ptr) {
+    return IdaJavaJNI.set_output_ptr(ptr);
+  }
+
+  public static String get_output_ptr() {
+    return IdaJavaJNI.get_output_ptr();
+  }
+
+  public static void out_insert(String ptr, String string) {
+    IdaJavaJNI.out_insert(ptr, string);
+  }
+
+  public static int OutMnem(int width, String postfix) {
+    return IdaJavaJNI.OutMnem__SWIG_0(width, postfix);
+  }
+
+  public static int OutMnem(int width) {
+    return IdaJavaJNI.OutMnem__SWIG_1(width);
+  }
+
+  public static int OutMnem() {
+    return IdaJavaJNI.OutMnem__SWIG_2();
+  }
+
+  public static void OutBadInstruction() {
+    IdaJavaJNI.OutBadInstruction();
+  }
+
+  public static int out_one_operand(int n) {
+    return IdaJavaJNI.out_one_operand(n);
+  }
+
+  public static long OutValue(SWIGTYPE_p_op_t x, int outflags) {
+    return IdaJavaJNI.OutValue__SWIG_0(SWIGTYPE_p_op_t.getCPtr(x), outflags);
+  }
+
+  public static long OutValue(SWIGTYPE_p_op_t x) {
+    return IdaJavaJNI.OutValue__SWIG_1(SWIGTYPE_p_op_t.getCPtr(x));
+  }
+
+  public static void out_symbol(char c) {
+    IdaJavaJNI.out_symbol(c);
+  }
+
+  public static void out_line(String str, short color) {
+    IdaJavaJNI.out_line(str, color);
+  }
+
+  public static void out_keyword(String str) {
+    IdaJavaJNI.out_keyword(str);
+  }
+
+  public static void out_register(String str) {
+    IdaJavaJNI.out_register(str);
+  }
+
+  public static void out_tagon(short tag) {
+    IdaJavaJNI.out_tagon(tag);
+  }
+
+  public static void out_tagoff(short tag) {
+    IdaJavaJNI.out_tagoff(tag);
+  }
+
+  public static void out_addr_tag(long ea) {
+    IdaJavaJNI.out_addr_tag(ea);
+  }
+
+  public static void out_colored_register_line(String str) {
+    IdaJavaJNI.out_colored_register_line(str);
+  }
+
+  public static void OutLine(String s) {
+    IdaJavaJNI.OutLine(s);
+  }
+
+  public static void OutChar(char c) {
+    IdaJavaJNI.OutChar(c);
+  }
+
+  public static void OutLong(long Word, char radix) {
+    IdaJavaJNI.OutLong(Word, radix);
+  }
+
+  public static void OutImmChar(SWIGTYPE_p_op_t x) {
+    IdaJavaJNI.OutImmChar(SWIGTYPE_p_op_t.getCPtr(x));
+  }
+
+  public static boolean showAsChar(SWIGTYPE_p_void ptr, String buf, int size) {
+    return IdaJavaJNI.showAsChar(SWIGTYPE_p_void.getCPtr(ptr), buf, size);
+  }
+
+  public static boolean out_real(SWIGTYPE_p_void v, int size, String buf, long bufsize) {
+    return IdaJavaJNI.out_real(SWIGTYPE_p_void.getCPtr(v), size, buf, bufsize);
+  }
+
+  public static void setVoidop(int value) {
+    IdaJavaJNI.voidop_set(value);
+  }
+
+  public static int getVoidop() {
+    return IdaJavaJNI.voidop_get();
+  }
+
+  public static void out_long(int v, char radix) {
+    IdaJavaJNI.out_long(v, radix);
+  }
+
+  public static boolean out_name_expr(SWIGTYPE_p_op_t x, long ea, int off) {
+    return IdaJavaJNI.out_name_expr__SWIG_0(SWIGTYPE_p_op_t.getCPtr(x), ea, off);
+  }
+
+  public static boolean out_name_expr(SWIGTYPE_p_op_t x, long ea) {
+    return IdaJavaJNI.out_name_expr__SWIG_1(SWIGTYPE_p_op_t.getCPtr(x), ea);
+  }
+
+  public static boolean ua_dodata2(int opoff, long ea, int dtype) {
+    return IdaJavaJNI.ua_dodata2(opoff, ea, dtype);
+  }
+
+  public static boolean ua_stkvar2(SWIGTYPE_p_op_t x, int v, int flags) {
+    return IdaJavaJNI.ua_stkvar2(SWIGTYPE_p_op_t.getCPtr(x), v, flags);
+  }
+
+  public static void ua_add_cref(int opoff, long to, SWIGTYPE_p_cref_t type) {
+    IdaJavaJNI.ua_add_cref(opoff, to, SWIGTYPE_p_cref_t.getCPtr(type));
+  }
+
+  public static void ua_add_dref(int opoff, long to, SWIGTYPE_p_dref_t type) {
+    IdaJavaJNI.ua_add_dref(opoff, to, SWIGTYPE_p_dref_t.getCPtr(type));
+  }
+
+  public static long ua_add_off_drefs(SWIGTYPE_p_op_t x, SWIGTYPE_p_dref_t type) {
+    return IdaJavaJNI.ua_add_off_drefs(SWIGTYPE_p_op_t.getCPtr(x), SWIGTYPE_p_dref_t.getCPtr(type));
+  }
+
+  public static long ua_add_off_drefs2(SWIGTYPE_p_op_t x, SWIGTYPE_p_dref_t type, int outf) {
+    return IdaJavaJNI.ua_add_off_drefs2(SWIGTYPE_p_op_t.getCPtr(x), SWIGTYPE_p_dref_t.getCPtr(type), outf);
+  }
+
+  public static long get_dtyp_flag(char dtype) {
+    return IdaJavaJNI.get_dtyp_flag(dtype);
+  }
+
+  public static long get_dtyp_size(char dtype) {
+    return IdaJavaJNI.get_dtyp_size(dtype);
+  }
+
+  public static char get_dtyp_by_size(long size) {
+    return IdaJavaJNI.get_dtyp_by_size(size);
+  }
+
+  public static int create_insn(long ea) {
+    return IdaJavaJNI.create_insn(ea);
+  }
+
+  public static int decode_insn(long ea) {
+    return IdaJavaJNI.decode_insn(ea);
+  }
+
+  public static boolean ua_outop2(long ea, String buf, long bufsize, int n, int flags) {
+    return IdaJavaJNI.ua_outop2__SWIG_0(ea, buf, bufsize, n, flags);
+  }
+
+  public static boolean ua_outop2(long ea, String buf, long bufsize, int n) {
+    return IdaJavaJNI.ua_outop2__SWIG_1(ea, buf, bufsize, n);
+  }
+
+  public static String ua_mnem(long ea, String buf, long bufsize) {
+    return IdaJavaJNI.ua_mnem(ea, buf, bufsize);
+  }
+
+  public static long decode_prev_insn(long ea) {
+    return IdaJavaJNI.decode_prev_insn(ea);
+  }
+
+  public static long decode_preceding_insn(long ea, SWIGTYPE_p_bool p_farref) {
+    return IdaJavaJNI.decode_preceding_insn(ea, SWIGTYPE_p_bool.getCPtr(p_farref));
+  }
+
+  public static long guess_table_address() {
+    return IdaJavaJNI.guess_table_address();
+  }
+
+  public static long guess_table_size(long jump_table) {
+    return IdaJavaJNI.guess_table_size(jump_table);
+  }
+
+  public static int get_spoiled_reg(SWIGTYPE_p_unsigned_int regs, long n) {
+    return IdaJavaJNI.get_spoiled_reg(SWIGTYPE_p_unsigned_int.getCPtr(regs), n);
+  }
+
+  public static void ua_dodata(long ea, int dtype) {
+    IdaJavaJNI.ua_dodata(ea, dtype);
+  }
+
+  public static boolean ua_outop(long ea, String buf, long bufsize, int n) {
+    return IdaJavaJNI.ua_outop(ea, buf, bufsize, n);
+  }
+
+  public static boolean ua_stkvar(SWIGTYPE_p_op_t x, int v) {
+    return IdaJavaJNI.ua_stkvar(SWIGTYPE_p_op_t.getCPtr(x), v);
+  }
+
+  public static int ua_ana0(long ea) {
+    return IdaJavaJNI.ua_ana0(ea);
+  }
+
+  public static int ua_code(long ea) {
+    return IdaJavaJNI.ua_code(ea);
+  }
+
+  public static int get_true_segm_name(segment_t s, String OUTPUT, long bufsize) {
+    return IdaJavaJNI.get_true_segm_name(segment_t.getCPtr(s), s, OUTPUT, bufsize);
+  }
+
+  public static void setSegs(areacb_t value) {
+    IdaJavaJNI.segs_set(areacb_t.getCPtr(value), value);
+  }
+
+  public static areacb_t getSegs() {
+    long cPtr = IdaJavaJNI.segs_get();
+    return (cPtr == 0) ? null : new areacb_t(cPtr, false);
+  }
+
+  public static boolean is_visible_segm(segment_t s) {
+    return IdaJavaJNI.is_visible_segm(segment_t.getCPtr(s), s);
+  }
+
+  public static boolean is_finally_visible_segm(segment_t s) {
+    return IdaJavaJNI.is_finally_visible_segm(segment_t.getCPtr(s), s);
+  }
+
+  public static void set_visible_segm(segment_t s, boolean visible) {
+    IdaJavaJNI.set_visible_segm(segment_t.getCPtr(s), s, visible);
+  }
+
+  public static boolean is_spec_segm(short seg_type) {
+    return IdaJavaJNI.is_spec_segm(seg_type);
+  }
+
+  public static boolean is_spec_ea(long ea) {
+    return IdaJavaJNI.is_spec_ea(ea);
+  }
+
+  public static boolean is_segm_locked(segment_t segm) {
+    return IdaJavaJNI.is_segm_locked(segment_t.getCPtr(segm), segm);
+  }
+
+  public static boolean getn_selector(int n, SWIGTYPE_p_unsigned_int sel, SWIGTYPE_p_unsigned_int base) {
+    return IdaJavaJNI.getn_selector(n, SWIGTYPE_p_unsigned_int.getCPtr(sel), SWIGTYPE_p_unsigned_int.getCPtr(base));
+  }
+
+  public static int get_selector_qty() {
+    return IdaJavaJNI.get_selector_qty();
+  }
+
+  public static long setup_selector(long segbase) {
+    return IdaJavaJNI.setup_selector(segbase);
+  }
+
+  public static long allocate_selector(long segbase) {
+    return IdaJavaJNI.allocate_selector(segbase);
+  }
+
+  public static long find_free_selector() {
+    return IdaJavaJNI.find_free_selector();
+  }
+
+  public static int set_selector(long selector, long paragraph) {
+    return IdaJavaJNI.set_selector(selector, paragraph);
+  }
+
+  public static void del_selector(long selector) {
+    IdaJavaJNI.del_selector(selector);
+  }
+
+  public static long ask_selector(long selector) {
+    return IdaJavaJNI.ask_selector(selector);
+  }
+
+  public static long sel2ea(long selector) {
+    return IdaJavaJNI.sel2ea(selector);
+  }
+
+  public static long find_selector(long base) {
+    return IdaJavaJNI.find_selector(base);
+  }
+
+  public static segment_t get_segm_by_sel(long selector) {
+    long cPtr = IdaJavaJNI.get_segm_by_sel(selector);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static int add_segm_ex(segment_t s, String name, String sclass, int flags) {
+    return IdaJavaJNI.add_segm_ex(segment_t.getCPtr(s), s, name, sclass, flags);
+  }
+
+  public static int add_segm(long para, long start, long end, String name, String sclass) {
+    return IdaJavaJNI.add_segm(para, start, end, name, sclass);
+  }
+
+  public static int del_segm(long ea, int flags) {
+    return IdaJavaJNI.del_segm(ea, flags);
+  }
+
+  public static int get_segm_qty() {
+    return IdaJavaJNI.get_segm_qty();
+  }
+
+  public static segment_t getseg(long ea) {
+    long cPtr = IdaJavaJNI.getseg(ea);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static segment_t getnseg(int n) {
+    long cPtr = IdaJavaJNI.getnseg(n);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static segment_t get_next_seg(long ea) {
+    long cPtr = IdaJavaJNI.get_next_seg(ea);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static segment_t get_prev_seg(long ea) {
+    long cPtr = IdaJavaJNI.get_prev_seg(ea);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static segment_t get_first_seg() {
+    long cPtr = IdaJavaJNI.get_first_seg();
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static segment_t get_last_seg() {
+    long cPtr = IdaJavaJNI.get_last_seg();
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static segment_t get_segm_by_name(String name) {
+    long cPtr = IdaJavaJNI.get_segm_by_name(name);
+    return (cPtr == 0) ? null : new segment_t(cPtr, false);
+  }
+
+  public static int set_segm_end(long ea, long newend, int flags) {
+    return IdaJavaJNI.set_segm_end(ea, newend, flags);
+  }
+
+  public static int set_segm_start(long ea, long newstart, int flags) {
+    return IdaJavaJNI.set_segm_start(ea, newstart, flags);
+  }
+
+  public static int move_segm_start(long ea, long newstart, int mode) {
+    return IdaJavaJNI.move_segm_start(ea, newstart, mode);
+  }
+
+  public static int move_segm(segment_t s, long to, int flags) {
+    return IdaJavaJNI.move_segm__SWIG_0(segment_t.getCPtr(s), s, to, flags);
+  }
+
+  public static int move_segm(segment_t s, long to) {
+    return IdaJavaJNI.move_segm__SWIG_1(segment_t.getCPtr(s), s, to);
+  }
+
+  public static int rebase_program(int delta, int flags) {
+    return IdaJavaJNI.rebase_program(delta, flags);
+  }
+
+  public static int change_segment_status(segment_t s, boolean is_deb_segm) {
+    return IdaJavaJNI.change_segment_status(segment_t.getCPtr(s), s, is_deb_segm);
+  }
+
+  public static boolean take_memory_snapshot(boolean only_loader_segs) {
+    return IdaJavaJNI.take_memory_snapshot(only_loader_segs);
+  }
+
+  public static boolean is_miniidb() {
+    return IdaJavaJNI.is_miniidb();
+  }
+
+  public static boolean set_segm_base(segment_t s, long newbase) {
+    return IdaJavaJNI.set_segm_base(segment_t.getCPtr(s), s, newbase);
+  }
+
+  public static void save_groups() {
+    IdaJavaJNI.save_groups();
+  }
+
+  public static void term_groups() {
+    IdaJavaJNI.term_groups();
+  }
+
+  public static int set_group_selector(long grp, long sel) {
+    return IdaJavaJNI.set_group_selector(grp, sel);
+  }
+
+  public static long get_group_selector(long grpsel) {
+    return IdaJavaJNI.get_group_selector(grpsel);
+  }
+
+  public static boolean add_segment_translation(long segstart, long mappedseg) {
+    return IdaJavaJNI.add_segment_translation(segstart, mappedseg);
+  }
+
+  public static boolean set_segment_translations(long segstart, SWIGTYPE_p_unsigned_int transmap) {
+    return IdaJavaJNI.set_segment_translations(segstart, SWIGTYPE_p_unsigned_int.getCPtr(transmap));
+  }
+
+  public static boolean del_segment_translations(long ea) {
+    return IdaJavaJNI.del_segment_translations(ea);
+  }
+
+  public static SWIGTYPE_p_unsigned_int get_segment_translations(long segstart, SWIGTYPE_p_unsigned_int buf, int bufsize) {
+    long cPtr = IdaJavaJNI.get_segment_translations(segstart, SWIGTYPE_p_unsigned_int.getCPtr(buf), bufsize);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
+  }
+
+  public static String get_segment_cmt(segment_t s, boolean repeatable) {
+    return IdaJavaJNI.get_segment_cmt(segment_t.getCPtr(s), s, repeatable);
+  }
+
+  public static void set_segment_cmt(segment_t s, String cmt, boolean repeatable) {
+    IdaJavaJNI.set_segment_cmt(segment_t.getCPtr(s), s, cmt, repeatable);
+  }
+
+  public static void del_segment_cmt(segment_t s, boolean repeatable) {
+    IdaJavaJNI.del_segment_cmt(segment_t.getCPtr(s), s, repeatable);
+  }
+
+  public static void std_gen_segm_footer(long ea) {
+    IdaJavaJNI.std_gen_segm_footer(ea);
+  }
+
+  public static int vset_segm_name(segment_t s, String format, SWIGTYPE_p_va_list va) {
+    return IdaJavaJNI.vset_segm_name(segment_t.getCPtr(s), s, format, SWIGTYPE_p_va_list.getCPtr(va));
+  }
+
+  public static int set_segm_name(segment_t s, String format) {
+    return IdaJavaJNI.set_segm_name(segment_t.getCPtr(s), s, format);
+  }
+
+  public static int get_segm_name(segment_t s, String buf, long bufsize) {
+    return IdaJavaJNI.get_segm_name__SWIG_0(segment_t.getCPtr(s), s, buf, bufsize);
+  }
+
+  public static int get_segm_name(long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_segm_name__SWIG_1(ea, buf, bufsize);
+  }
+
+  public static int get_segm_class(segment_t s, String buf, long bufsize) {
+    return IdaJavaJNI.get_segm_class(segment_t.getCPtr(s), s, buf, bufsize);
+  }
+
+  public static int set_segm_class(segment_t s, String sclass) {
+    return IdaJavaJNI.set_segm_class(segment_t.getCPtr(s), s, sclass);
+  }
+
+  public static short segtype(long ea) {
+    return IdaJavaJNI.segtype(ea);
+  }
+
+  public static String get_segment_alignment(short align) {
+    return IdaJavaJNI.get_segment_alignment(align);
+  }
+
+  public static String get_segment_combination(short comb) {
+    return IdaJavaJNI.get_segment_combination(comb);
+  }
+
+  public static long get_segm_para(segment_t s) {
+    return IdaJavaJNI.get_segm_para(segment_t.getCPtr(s), s);
+  }
+
+  public static long get_segm_base(segment_t s) {
+    return IdaJavaJNI.get_segm_base(segment_t.getCPtr(s), s);
+  }
+
+  public static boolean set_segm_addressing(segment_t s, long bitness) {
+    return IdaJavaJNI.set_segm_addressing(segment_t.getCPtr(s), s, bitness);
+  }
+
+  public static boolean is_debugger_segm(long ea) {
+    return IdaJavaJNI.is_debugger_segm(ea);
+  }
+
+  public static boolean is_ephemeral_segm(long ea) {
+    return IdaJavaJNI.is_ephemeral_segm(ea);
+  }
+
+  public static long correct_address(long ea, long from, long to, long size) {
+    return IdaJavaJNI.correct_address(ea, from, to, size);
+  }
+
+  public static int segm_adjust_diff(segment_t s, int delta) {
+    return IdaJavaJNI.segm_adjust_diff(segment_t.getCPtr(s), s, delta);
+  }
+
+  public static long segm_adjust_ea(segment_t s, long ea) {
+    return IdaJavaJNI.segm_adjust_ea(segment_t.getCPtr(s), s, ea);
+  }
+
+  public static void setNet_patch(SWIGTYPE_p_netnode value) {
+    IdaJavaJNI.net_patch_set(SWIGTYPE_p_netnode.getCPtr(value));
+  }
+
+  public static SWIGTYPE_p_netnode getNet_patch() {
+    return new SWIGTYPE_p_netnode(IdaJavaJNI.net_patch_get(), true);
+  }
+
+  public static void setImport_node(SWIGTYPE_p_netnode value) {
+    IdaJavaJNI.import_node_set(SWIGTYPE_p_netnode.getCPtr(value));
+  }
+
+  public static SWIGTYPE_p_netnode getImport_node() {
+    return new SWIGTYPE_p_netnode(IdaJavaJNI.import_node_get(), true);
+  }
+
+  public static void set_aflags0(long ea, long flags) {
+    IdaJavaJNI.set_aflags0(ea, flags);
+  }
+
+  public static long get_aflags0(long ea) {
+    return IdaJavaJNI.get_aflags0(ea);
+  }
+
+  public static void del_aflags0(long ea) {
+    IdaJavaJNI.del_aflags0(ea);
+  }
+
+  public static void set_aflags(long ea, long flags) {
+    IdaJavaJNI.set_aflags(ea, flags);
+  }
+
+  public static void set_abits(long ea, long bits) {
+    IdaJavaJNI.set_abits(ea, bits);
+  }
+
+  public static void clr_abits(long ea, long bits) {
+    IdaJavaJNI.clr_abits(ea, bits);
+  }
+
+  public static long get_aflags(long ea) {
+    return IdaJavaJNI.get_aflags(ea);
+  }
+
+  public static void del_aflags(long ea) {
+    IdaJavaJNI.del_aflags(ea);
+  }
+
+  public static void set_visible_item(long ea, boolean visible) {
+    IdaJavaJNI.set_visible_item(ea, visible);
+  }
+
+  public static boolean is_visible_item(long ea) {
+    return IdaJavaJNI.is_visible_item(ea);
+  }
+
+  public static boolean is_finally_visible_item(long ea) {
+    return IdaJavaJNI.is_finally_visible_item(ea);
+  }
+
+  public static void set_source_linnum(long ea, long lnnum) {
+    IdaJavaJNI.set_source_linnum(ea, lnnum);
+  }
+
+  public static long get_source_linnum(long ea) {
+    return IdaJavaJNI.get_source_linnum(ea);
+  }
+
+  public static void del_source_linnum(long ea) {
+    IdaJavaJNI.del_source_linnum(ea);
+  }
+
+  public static char get_str_type_code(long strtype) {
+    return IdaJavaJNI.get_str_type_code(strtype);
+  }
+
+  public static char get_str_term1(int strtype) {
+    return IdaJavaJNI.get_str_term1(strtype);
+  }
+
+  public static char get_str_term2(int strtype) {
+    return IdaJavaJNI.get_str_term2(strtype);
+  }
+
+  public static boolean is_unicode(int strtype) {
+    return IdaJavaJNI.is_unicode(strtype);
+  }
+
+  public static boolean is_pascal(int strtype) {
+    return IdaJavaJNI.is_pascal(strtype);
+  }
+
+  public static void set_item_color(long ea, long color) {
+    IdaJavaJNI.set_item_color(ea, color);
+  }
+
+  public static long get_item_color(long ea) {
+    return IdaJavaJNI.get_item_color(ea);
+  }
+
+  public static void del_item_color(long ea) {
+    IdaJavaJNI.del_item_color(ea);
+  }
+
+  public static short getREF_OFF8() {
+    return IdaJavaJNI.REF_OFF8_get();
+  }
+
+  public static short getREF_OFF16() {
+    return IdaJavaJNI.REF_OFF16_get();
+  }
+
+  public static short getREF_OFF32() {
+    return IdaJavaJNI.REF_OFF32_get();
+  }
+
+  public static short getREF_LOW8() {
+    return IdaJavaJNI.REF_LOW8_get();
+  }
+
+  public static short getREF_LOW16() {
+    return IdaJavaJNI.REF_LOW16_get();
+  }
+
+  public static short getREF_HIGH8() {
+    return IdaJavaJNI.REF_HIGH8_get();
+  }
+
+  public static short getREF_HIGH16() {
+    return IdaJavaJNI.REF_HIGH16_get();
+  }
+
+  public static short getREF_VHIGH() {
+    return IdaJavaJNI.REF_VHIGH_get();
+  }
+
+  public static short getREF_VLOW() {
+    return IdaJavaJNI.REF_VLOW_get();
+  }
+
+  public static short getREF_OFF64() {
+    return IdaJavaJNI.REF_OFF64_get();
+  }
+
+  public static short getREF_LAST() {
+    return IdaJavaJNI.REF_LAST_get();
+  }
+
+  public static short get_reftype_by_size(long size) {
+    return IdaJavaJNI.get_reftype_by_size(size);
+  }
+
+  public static int set_refinfo_ex(long ea, int n, refinfo_t ri) {
+    return IdaJavaJNI.set_refinfo_ex(ea, n, refinfo_t.getCPtr(ri), ri);
+  }
+
+  public static int set_refinfo(long ea, int n, short type, long target, long base, int tdelta) {
+    return IdaJavaJNI.set_refinfo__SWIG_0(ea, n, type, target, base, tdelta);
+  }
+
+  public static int set_refinfo(long ea, int n, short type, long target, long base) {
+    return IdaJavaJNI.set_refinfo__SWIG_1(ea, n, type, target, base);
+  }
+
+  public static int set_refinfo(long ea, int n, short type, long target) {
+    return IdaJavaJNI.set_refinfo__SWIG_2(ea, n, type, target);
+  }
+
+  public static int set_refinfo(long ea, int n, short type) {
+    return IdaJavaJNI.set_refinfo__SWIG_3(ea, n, type);
+  }
+
+  public static int get_refinfo(long ea, int n, refinfo_t ri) {
+    return IdaJavaJNI.get_refinfo(ea, n, refinfo_t.getCPtr(ri), ri);
+  }
+
+  public static int del_refinfo(long ea, int n) {
+    return IdaJavaJNI.del_refinfo(ea, n);
+  }
+
+  public static void write_struc_path(SWIGTYPE_p_netnode node, int idx, SWIGTYPE_p_unsigned_int path, int plen, int delta) {
+    IdaJavaJNI.write_struc_path(SWIGTYPE_p_netnode.getCPtr(node), idx, SWIGTYPE_p_unsigned_int.getCPtr(path), plen, delta);
+  }
+
+  public static int read_struc_path(SWIGTYPE_p_netnode node, int idx, SWIGTYPE_p_unsigned_int path, SWIGTYPE_p_int delta) {
+    return IdaJavaJNI.read_struc_path(SWIGTYPE_p_netnode.getCPtr(node), idx, SWIGTYPE_p_unsigned_int.getCPtr(path), SWIGTYPE_p_int.getCPtr(delta));
+  }
+
+  public static int get_input_file_path(String buf, long bufsize) {
+    return IdaJavaJNI.get_input_file_path(buf, bufsize);
+  }
+
+  public static int get_root_filename(String buf, long bufsize) {
+    return IdaJavaJNI.get_root_filename(buf, bufsize);
+  }
+
+  public static void set_root_filename(String file) {
+    IdaJavaJNI.set_root_filename(file);
+  }
+
+  public static long retrieve_input_file_crc32() {
+    return IdaJavaJNI.retrieve_input_file_crc32();
+  }
+
+  public static boolean retrieve_input_file_md5(short[] hash) {
+    return IdaJavaJNI.retrieve_input_file_md5(hash);
+  }
+
+  public static int get_asm_inc_file(String buf, long bufsize) {
+    return IdaJavaJNI.get_asm_inc_file(buf, bufsize);
+  }
+
+  public static boolean set_asm_inc_file(String file) {
+    return IdaJavaJNI.set_asm_inc_file(file);
+  }
+
+  public static long get_imagebase() {
+    return IdaJavaJNI.get_imagebase();
+  }
+
+  public static void set_imagebase(long base) {
+    IdaJavaJNI.set_imagebase(base);
+  }
+
+  public static SWIGTYPE_p_netnode get_ids_modnode() {
+    return new SWIGTYPE_p_netnode(IdaJavaJNI.get_ids_modnode(), true);
+  }
+
+  public static void set_ids_modnode(SWIGTYPE_p_netnode id) {
+    IdaJavaJNI.set_ids_modnode(SWIGTYPE_p_netnode.getCPtr(id));
+  }
+
+  public static void ExtraUpdate(long ea, String str, int what) {
+    IdaJavaJNI.ExtraUpdate(ea, str, what);
+  }
+
+  public static void ExtraDel(long ea, int what) {
+    IdaJavaJNI.ExtraDel(ea, what);
+  }
+
+  public static int ExtraGet(long ea, int what, String buf, long bufsize) {
+    return IdaJavaJNI.ExtraGet(ea, what, buf, bufsize);
+  }
+
+  public static int get_auto_plugins(String buf, long bufsize) {
+    return IdaJavaJNI.get_auto_plugins(buf, bufsize);
+  }
+
+  public static boolean set_auto_plugins(String list, long listsize) {
+    return IdaJavaJNI.set_auto_plugins__SWIG_0(list, listsize);
+  }
+
+  public static boolean set_auto_plugins(String list) {
+    return IdaJavaJNI.set_auto_plugins__SWIG_1(list);
+  }
+
+  public static long dbg_get_input_path(String buf, long bufsize) {
+    return IdaJavaJNI.dbg_get_input_path(buf, bufsize);
+  }
+
+  public static int get_import_module_qty() {
+    return IdaJavaJNI.get_import_module_qty();
+  }
+
+  public static boolean get_import_module_name(int mod_index, String buf, long bufsize) {
+    return IdaJavaJNI.get_import_module_name(mod_index, buf, bufsize);
+  }
+
+  public static int enum_import_names(int mod_index, SWIGTYPE_p_f_unsigned_int_p_q_const__char_unsigned_int_p_void__int callback, SWIGTYPE_p_void param) {
+    return IdaJavaJNI.enum_import_names__SWIG_0(mod_index, SWIGTYPE_p_f_unsigned_int_p_q_const__char_unsigned_int_p_void__int.getCPtr(callback), SWIGTYPE_p_void.getCPtr(param));
+  }
+
+  public static int enum_import_names(int mod_index, SWIGTYPE_p_f_unsigned_int_p_q_const__char_unsigned_int_p_void__int callback) {
+    return IdaJavaJNI.enum_import_names__SWIG_1(mod_index, SWIGTYPE_p_f_unsigned_int_p_q_const__char_unsigned_int_p_void__int.getCPtr(callback));
+  }
+
+  public static void set_dbgmem_source(SWIGTYPE_p_f_p_int__p_area_t dbg_get_memory_config_func, SWIGTYPE_p_f_unsigned_int_p_void_int__int memory_read_func, SWIGTYPE_p_f_unsigned_int_p_q_const__void_int__int memory_write_func) {
+    IdaJavaJNI.set_dbgmem_source(SWIGTYPE_p_f_p_int__p_area_t.getCPtr(dbg_get_memory_config_func), SWIGTYPE_p_f_unsigned_int_p_void_int__int.getCPtr(memory_read_func), SWIGTYPE_p_f_unsigned_int_p_q_const__void_int__int.getCPtr(memory_write_func));
+  }
+
+  public static SWIGTYPE_p_error_t enable_flags(long startEA, long endEA, storage_type_t stt) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.enable_flags(startEA, endEA, stt.swigValue()), true);
+  }
+
+  public static SWIGTYPE_p_error_t disable_flags(long startEA, long endEA) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.disable_flags(startEA, endEA), true);
+  }
+
+  public static SWIGTYPE_p_error_t change_storage_type(long startEA, long endEA, storage_type_t stt) {
+    return new SWIGTYPE_p_error_t(IdaJavaJNI.change_storage_type(startEA, endEA, stt.swigValue()), true);
+  }
+
+  public static long nextaddr(long ea) {
+    return IdaJavaJNI.nextaddr(ea);
+  }
+
+  public static long prevaddr(long ea) {
+    return IdaJavaJNI.prevaddr(ea);
+  }
+
+  public static long nextchunk(long ea) {
+    return IdaJavaJNI.nextchunk(ea);
+  }
+
+  public static long prevchunk(long ea) {
+    return IdaJavaJNI.prevchunk(ea);
+  }
+
+  public static long chunkstart(long ea) {
+    return IdaJavaJNI.chunkstart(ea);
+  }
+
+  public static long chunksize(long ea) {
+    return IdaJavaJNI.chunksize(ea);
+  }
+
+  public static long freechunk(long bottom, long size, int step) {
+    return IdaJavaJNI.freechunk(bottom, size, step);
+  }
+
+  public static long nextthat(long ea, long maxea, SWIGTYPE_p_f_unsigned_int_p_void__bool testf, SWIGTYPE_p_void ud) {
+    return IdaJavaJNI.nextthat(ea, maxea, SWIGTYPE_p_f_unsigned_int_p_void__bool.getCPtr(testf), SWIGTYPE_p_void.getCPtr(ud));
+  }
+
+  public static long next_unknown(long ea, long maxea) {
+    return IdaJavaJNI.next_unknown(ea, maxea);
+  }
+
+  public static long prevthat(long ea, long minea, SWIGTYPE_p_f_unsigned_int_p_void__bool testf, SWIGTYPE_p_void ud) {
+    return IdaJavaJNI.prevthat(ea, minea, SWIGTYPE_p_f_unsigned_int_p_void__bool.getCPtr(testf), SWIGTYPE_p_void.getCPtr(ud));
+  }
+
+  public static long prev_unknown(long ea, long minea) {
+    return IdaJavaJNI.prev_unknown(ea, minea);
+  }
+
+  public static long prev_head(long ea, long minea) {
+    return IdaJavaJNI.prev_head(ea, minea);
+  }
+
+  public static long next_head(long ea, long maxea) {
+    return IdaJavaJNI.next_head(ea, maxea);
+  }
+
+  public static long prev_not_tail(long ea) {
+    return IdaJavaJNI.prev_not_tail(ea);
+  }
+
+  public static long next_not_tail(long ea) {
+    return IdaJavaJNI.next_not_tail(ea);
+  }
+
+  public static long prev_visea(long ea) {
+    return IdaJavaJNI.prev_visea(ea);
+  }
+
+  public static long next_visea(long ea) {
+    return IdaJavaJNI.next_visea(ea);
+  }
+
+  public static void invalidate_visea_cache() {
+    IdaJavaJNI.invalidate_visea_cache();
+  }
+
+  public static long get_item_head(long ea) {
+    return IdaJavaJNI.get_item_head(ea);
+  }
+
+  public static long get_item_end(long ea) {
+    return IdaJavaJNI.get_item_end(ea);
+  }
+
+  public static long calc_max_item_end(long ea, int how) {
+    return IdaJavaJNI.calc_max_item_end__SWIG_0(ea, how);
+  }
+
+  public static long calc_max_item_end(long ea) {
+    return IdaJavaJNI.calc_max_item_end__SWIG_1(ea);
+  }
+
+  public static long get_item_size(long ea) {
+    return IdaJavaJNI.get_item_size(ea);
+  }
+
+  public static boolean isEnabled(long ea) {
+    return IdaJavaJNI.isEnabled(ea);
+  }
+
+  public static long get_flags_ex(long ea, int how) {
+    return IdaJavaJNI.get_flags_ex(ea, how);
+  }
+
+  public static long get_flags_novalue(long ea) {
+    return IdaJavaJNI.get_flags_novalue(ea);
+  }
+
+  public static long getFlags(long ea) {
+    return IdaJavaJNI.getFlags(ea);
+  }
+
+  public static long get_item_flag(long from, int n, long ea, boolean appzero) {
+    return IdaJavaJNI.get_item_flag(from, n, ea, appzero);
+  }
+
+  public static void setFlags(long ea, long flags) {
+    IdaJavaJNI.setFlags(ea, flags);
+  }
+
+  public static void setFlbits(long EA, long bits) {
+    IdaJavaJNI.setFlbits(EA, bits);
+  }
+
+  public static void clrFlbits(long EA, long bits) {
+    IdaJavaJNI.clrFlbits(EA, bits);
+  }
+
+  public static boolean hasValue(long F) {
+    return IdaJavaJNI.hasValue(F);
+  }
+
+  public static boolean f_hasValue(long f, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_hasValue(f, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static void delValue(long ea) {
+    IdaJavaJNI.delValue(ea);
+  }
+
+  public static boolean isLoaded(long ea) {
+    return IdaJavaJNI.isLoaded(ea);
+  }
+
+  public static short get_byte(long ea) {
+    return IdaJavaJNI.get_byte(ea);
+  }
+
+  public static short get_db_byte(long ea) {
+    return IdaJavaJNI.get_db_byte(ea);
+  }
+
+  public static boolean get_dbg_byte(long ea, SWIGTYPE_p_unsigned_int x) {
+    return IdaJavaJNI.get_dbg_byte(ea, SWIGTYPE_p_unsigned_int.getCPtr(x));
+  }
+
+  public static int get_word(long ea) {
+    return IdaJavaJNI.get_word(ea);
+  }
+
+  public static long get_3byte(long ea) {
+    return IdaJavaJNI.get_3byte(ea);
+  }
+
+  public static long get_long(long ea) {
+    return IdaJavaJNI.get_long(ea);
+  }
+
+  public static SWIGTYPE_p_ulonglong get_qword(long ea) {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.get_qword(ea), true);
+  }
+
+  public static long get_full_byte(long ea) {
+    return IdaJavaJNI.get_full_byte(ea);
+  }
+
+  public static SWIGTYPE_p_ulonglong get_full_word(long ea) {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.get_full_word(ea), true);
+  }
+
+  public static SWIGTYPE_p_ulonglong get_full_long(long ea) {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.get_full_long(ea), true);
+  }
+
+  public static short get_8bit(SWIGTYPE_p_unsigned_int ea, SWIGTYPE_p_unsigned_int v, SWIGTYPE_p_int nbit) {
+    return IdaJavaJNI.get_8bit(SWIGTYPE_p_unsigned_int.getCPtr(ea), SWIGTYPE_p_unsigned_int.getCPtr(v), SWIGTYPE_p_int.getCPtr(nbit));
+  }
+
+  public static long get_16bit(long ea) {
+    return IdaJavaJNI.get_16bit(ea);
+  }
+
+  public static long get_32bit(long ea) {
+    return IdaJavaJNI.get_32bit(ea);
+  }
+
+  public static SWIGTYPE_p_ulonglong get_64bit(long ea) {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.get_64bit(ea), true);
+  }
+
+  public static boolean get_data_value(long ea, SWIGTYPE_p_unsigned_int v, long size) {
+    return IdaJavaJNI.get_data_value(ea, SWIGTYPE_p_unsigned_int.getCPtr(v), size);
+  }
+
+  public static long get_original_byte(long ea) {
+    return IdaJavaJNI.get_original_byte(ea);
+  }
+
+  public static SWIGTYPE_p_ulonglong get_original_word(long ea) {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.get_original_word(ea), true);
+  }
+
+  public static SWIGTYPE_p_ulonglong get_original_long(long ea) {
+    return new SWIGTYPE_p_ulonglong(IdaJavaJNI.get_original_long(ea), true);
+  }
+
+  public static boolean put_byte(long ea, long x) {
+    return IdaJavaJNI.put_byte(ea, x);
+  }
+
+  public static boolean put_dbg_byte(long ea, long x) {
+    return IdaJavaJNI.put_dbg_byte(ea, x);
+  }
+
+  public static void put_word(long ea, SWIGTYPE_p_ulonglong x) {
+    IdaJavaJNI.put_word(ea, SWIGTYPE_p_ulonglong.getCPtr(x));
+  }
+
+  public static void put_long(long ea, SWIGTYPE_p_ulonglong x) {
+    IdaJavaJNI.put_long(ea, SWIGTYPE_p_ulonglong.getCPtr(x));
+  }
+
+  public static void put_qword(long ea, SWIGTYPE_p_ulonglong x) {
+    IdaJavaJNI.put_qword(ea, SWIGTYPE_p_ulonglong.getCPtr(x));
+  }
+
+  public static boolean patch_byte(long ea, long x) {
+    return IdaJavaJNI.patch_byte(ea, x);
+  }
+
+  public static boolean patch_word(long ea, SWIGTYPE_p_ulonglong x) {
+    return IdaJavaJNI.patch_word(ea, SWIGTYPE_p_ulonglong.getCPtr(x));
+  }
+
+  public static boolean patch_long(long ea, SWIGTYPE_p_ulonglong x) {
+    return IdaJavaJNI.patch_long(ea, SWIGTYPE_p_ulonglong.getCPtr(x));
+  }
+
+  public static void add_byte(long ea, long value) {
+    IdaJavaJNI.add_byte(ea, value);
+  }
+
+  public static void add_word(long ea, SWIGTYPE_p_ulonglong value) {
+    IdaJavaJNI.add_word(ea, SWIGTYPE_p_ulonglong.getCPtr(value));
+  }
+
+  public static void add_long(long ea, SWIGTYPE_p_ulonglong value) {
+    IdaJavaJNI.add_long(ea, SWIGTYPE_p_ulonglong.getCPtr(value));
+  }
+
+  public static void add_qword(long ea, SWIGTYPE_p_ulonglong value) {
+    IdaJavaJNI.add_qword(ea, SWIGTYPE_p_ulonglong.getCPtr(value));
+  }
+
+  public static boolean get_zero_areas(areaset_t zareas, area_t range) {
+    return IdaJavaJNI.get_zero_areas(areaset_t.getCPtr(zareas), zareas, area_t.getCPtr(range), range);
+  }
+
+  public static boolean get_many_bytes(long ea, SWIGTYPE_p_void buf, int size) {
+    return IdaJavaJNI.get_many_bytes(ea, SWIGTYPE_p_void.getCPtr(buf), size);
+  }
+
+  public static void put_many_bytes(long ea, SWIGTYPE_p_void buf, long size) {
+    IdaJavaJNI.put_many_bytes(ea, SWIGTYPE_p_void.getCPtr(buf), size);
+  }
+
+  public static void patch_many_bytes(long ea, SWIGTYPE_p_void buf, long size) {
+    IdaJavaJNI.patch_many_bytes(ea, SWIGTYPE_p_void.getCPtr(buf), size);
+  }
+
+  public static boolean isCode(long F) {
+    return IdaJavaJNI.isCode(F);
+  }
+
+  public static boolean f_isCode(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isCode(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean isData(long F) {
+    return IdaJavaJNI.isData(F);
+  }
+
+  public static boolean f_isData(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isData(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean isTail(long F) {
+    return IdaJavaJNI.isTail(F);
+  }
+
+  public static boolean f_isTail(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isTail(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean isNotTail(long F) {
+    return IdaJavaJNI.isNotTail(F);
+  }
+
+  public static boolean f_isNotTail(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isNotTail(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean isUnknown(long F) {
+    return IdaJavaJNI.isUnknown(F);
+  }
+
+  public static boolean isHead(long F) {
+    return IdaJavaJNI.isHead(F);
+  }
+
+  public static boolean f_isHead(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isHead(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static void do_unknown(long ea, int flags) {
+    IdaJavaJNI.do_unknown(ea, flags);
+  }
+
+  public static void do_unknown_range(long ea, long size, int flags) {
+    IdaJavaJNI.do_unknown_range(ea, size, flags);
+  }
+
+  public static boolean is_manual_insn(long ea) {
+    return IdaJavaJNI.is_manual_insn(ea);
+  }
+
+  public static String get_manual_insn(long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_manual_insn(ea, buf, bufsize);
+  }
+
+  public static void set_manual_insn(long ea, String manual_insn) {
+    IdaJavaJNI.set_manual_insn(ea, manual_insn);
+  }
+
+  public static boolean isFlow(long F) {
+    return IdaJavaJNI.isFlow(F);
+  }
+
+  public static boolean isVar(long F) {
+    return IdaJavaJNI.isVar(F);
+  }
+
+  public static boolean hasExtra(long F) {
+    return IdaJavaJNI.hasExtra(F);
+  }
+
+  public static boolean has_cmt(long F) {
+    return IdaJavaJNI.has_cmt(F);
+  }
+
+  public static boolean hasRef(long F) {
+    return IdaJavaJNI.hasRef(F);
+  }
+
+  public static boolean f_hasRef(long f, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_hasRef(f, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean has_name(long F) {
+    return IdaJavaJNI.has_name(F);
+  }
+
+  public static boolean f_has_name(long f, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_has_name(f, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean has_dummy_name(long F) {
+    return IdaJavaJNI.has_dummy_name(F);
+  }
+
+  public static boolean f_has_dummy_name(long f, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_has_dummy_name(f, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean has_auto_name(long F) {
+    return IdaJavaJNI.has_auto_name(F);
+  }
+
+  public static boolean has_any_name(long F) {
+    return IdaJavaJNI.has_any_name(F);
+  }
+
+  public static boolean has_user_name(long F) {
+    return IdaJavaJNI.has_user_name(F);
+  }
+
+  public static boolean f_has_user_name(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_has_user_name(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean is_invsign(long ea, long F, int n) {
+    return IdaJavaJNI.is_invsign(ea, F, n);
+  }
+
+  public static boolean toggle_sign(long ea, int n) {
+    return IdaJavaJNI.toggle_sign(ea, n);
+  }
+
+  public static long signed_data_flag() {
+    return IdaJavaJNI.signed_data_flag();
+  }
+
+  public static boolean is_signed_data(long F) {
+    return IdaJavaJNI.is_signed_data(F);
+  }
+
+  public static boolean is_bnot(long ea, long F, int n) {
+    return IdaJavaJNI.is_bnot(ea, F, n);
+  }
+
+  public static boolean toggle_bnot(long ea, int n) {
+    return IdaJavaJNI.toggle_bnot(ea, n);
+  }
+
+  public static long bnot_data_flag() {
+    return IdaJavaJNI.bnot_data_flag();
+  }
+
+  public static boolean is_bnot_data(long F) {
+    return IdaJavaJNI.is_bnot_data(F);
+  }
+
+  public static boolean is_lzero(long ea, int n) {
+    return IdaJavaJNI.is_lzero(ea, n);
+  }
+
+  public static boolean set_lzero(long ea, int n) {
+    return IdaJavaJNI.set_lzero(ea, n);
+  }
+
+  public static boolean clr_lzero(long ea, int n) {
+    return IdaJavaJNI.clr_lzero(ea, n);
+  }
+
+  public static boolean toggle_lzero(long ea, int n) {
+    return IdaJavaJNI.toggle_lzero(ea, n);
+  }
+
+  public static boolean leading_zero_important(long ea, int n) {
+    return IdaJavaJNI.leading_zero_important(ea, n);
+  }
+
+  public static void doVar(long ea, boolean isvar) {
+    IdaJavaJNI.doVar__SWIG_0(ea, isvar);
+  }
+
+  public static void doVar(long ea) {
+    IdaJavaJNI.doVar__SWIG_1(ea);
+  }
+
+  public static boolean isDefArg0(long F) {
+    return IdaJavaJNI.isDefArg0(F);
+  }
+
+  public static boolean isDefArg1(long F) {
+    return IdaJavaJNI.isDefArg1(F);
+  }
+
+  public static boolean isOff0(long F) {
+    return IdaJavaJNI.isOff0(F);
+  }
+
+  public static boolean isOff1(long F) {
+    return IdaJavaJNI.isOff1(F);
+  }
+
+  public static boolean isChar0(long F) {
+    return IdaJavaJNI.isChar0(F);
+  }
+
+  public static boolean isChar1(long F) {
+    return IdaJavaJNI.isChar1(F);
+  }
+
+  public static boolean isSeg0(long F) {
+    return IdaJavaJNI.isSeg0(F);
+  }
+
+  public static boolean isSeg1(long F) {
+    return IdaJavaJNI.isSeg1(F);
+  }
+
+  public static boolean isEnum0(long F) {
+    return IdaJavaJNI.isEnum0(F);
+  }
+
+  public static boolean isEnum1(long F) {
+    return IdaJavaJNI.isEnum1(F);
+  }
+
+  public static boolean isFop0(long F) {
+    return IdaJavaJNI.isFop0(F);
+  }
+
+  public static boolean isFop1(long F) {
+    return IdaJavaJNI.isFop1(F);
+  }
+
+  public static boolean isStroff0(long F) {
+    return IdaJavaJNI.isStroff0(F);
+  }
+
+  public static boolean isStroff1(long F) {
+    return IdaJavaJNI.isStroff1(F);
+  }
+
+  public static boolean isStkvar0(long F) {
+    return IdaJavaJNI.isStkvar0(F);
+  }
+
+  public static boolean isStkvar1(long F) {
+    return IdaJavaJNI.isStkvar1(F);
+  }
+
+  public static boolean isFloat0(long F) {
+    return IdaJavaJNI.isFloat0(F);
+  }
+
+  public static boolean isFloat1(long F) {
+    return IdaJavaJNI.isFloat1(F);
+  }
+
+  public static boolean isCustFmt0(long F) {
+    return IdaJavaJNI.isCustFmt0(F);
+  }
+
+  public static boolean isCustFmt1(long F) {
+    return IdaJavaJNI.isCustFmt1(F);
+  }
+
+  public static boolean isNum0(long F) {
+    return IdaJavaJNI.isNum0(F);
+  }
+
+  public static boolean isNum1(long F) {
+    return IdaJavaJNI.isNum1(F);
+  }
+
+  public static long get_optype_flags0(long F) {
+    return IdaJavaJNI.get_optype_flags0(F);
+  }
+
+  public static long get_optype_flags1(long F) {
+    return IdaJavaJNI.get_optype_flags1(F);
+  }
+
+  public static boolean isDefArg(long F, int n) {
+    return IdaJavaJNI.isDefArg(F, n);
+  }
+
+  public static boolean isOff(long F, int n) {
+    return IdaJavaJNI.isOff(F, n);
+  }
+
+  public static boolean isChar(long F, int n) {
+    return IdaJavaJNI.isChar(F, n);
+  }
+
+  public static boolean isSeg(long F, int n) {
+    return IdaJavaJNI.isSeg(F, n);
+  }
+
+  public static boolean isEnum(long F, int n) {
+    return IdaJavaJNI.isEnum(F, n);
+  }
+
+  public static boolean isFop(long F, int n) {
+    return IdaJavaJNI.isFop(F, n);
+  }
+
+  public static boolean isStroff(long F, int n) {
+    return IdaJavaJNI.isStroff(F, n);
+  }
+
+  public static boolean isStkvar(long F, int n) {
+    return IdaJavaJNI.isStkvar(F, n);
+  }
+
+  public static boolean isFltnum(long F, int n) {
+    return IdaJavaJNI.isFltnum(F, n);
+  }
+
+  public static boolean isCustFmt(long F, int n) {
+    return IdaJavaJNI.isCustFmt(F, n);
+  }
+
+  public static boolean isNum(long F, int n) {
+    return IdaJavaJNI.isNum(F, n);
+  }
+
+  public static boolean isVoid(long ea, long F, int n) {
+    return IdaJavaJNI.isVoid(ea, F, n);
+  }
+
+  public static boolean set_op_type(long ea, long type, int n) {
+    return IdaJavaJNI.set_op_type(ea, type, n);
+  }
+
+  public static long typeflag(long ea, long oldflag, long type, int n) {
+    return IdaJavaJNI.typeflag(ea, oldflag, type, n);
+  }
+
+  public static boolean op_seg(long ea, int n) {
+    return IdaJavaJNI.op_seg(ea, n);
+  }
+
+  public static boolean op_enum(long ea, int n, long id, short serial) {
+    return IdaJavaJNI.op_enum(ea, n, id, serial);
+  }
+
+  public static long get_enum_id(long ea, int n, SWIGTYPE_p_unsigned_char serial) {
+    return IdaJavaJNI.get_enum_id(ea, n, SWIGTYPE_p_unsigned_char.getCPtr(serial));
+  }
+
+  public static boolean op_stroff(long ea, int n, SWIGTYPE_p_unsigned_int path, int path_len, int delta) {
+    return IdaJavaJNI.op_stroff(ea, n, SWIGTYPE_p_unsigned_int.getCPtr(path), path_len, delta);
+  }
+
+  public static boolean set_stroff_path(long ea, int n, SWIGTYPE_p_unsigned_int path, int plen, int delta) {
+    return IdaJavaJNI.set_stroff_path(ea, n, SWIGTYPE_p_unsigned_int.getCPtr(path), plen, delta);
+  }
+
+  public static int get_stroff_path(long ea, int n, SWIGTYPE_p_unsigned_int path, SWIGTYPE_p_int delta) {
+    return IdaJavaJNI.get_stroff_path(ea, n, SWIGTYPE_p_unsigned_int.getCPtr(path), SWIGTYPE_p_int.getCPtr(delta));
+  }
+
+  public static boolean del_stroff_path(long ea, int n) {
+    return IdaJavaJNI.del_stroff_path(ea, n);
+  }
+
+  public static boolean op_stkvar(long ea, int n) {
+    return IdaJavaJNI.op_stkvar(ea, n);
+  }
+
+  public static boolean set_forced_operand(long ea, int n, String op) {
+    return IdaJavaJNI.set_forced_operand(ea, n, op);
+  }
+
+  public static int get_forced_operand(long ea, int n, String buf, long bufsize) {
+    return IdaJavaJNI.get_forced_operand(ea, n, buf, bufsize);
+  }
+
+  public static boolean is_forced_operand(long ea, int n) {
+    return IdaJavaJNI.is_forced_operand(ea, n);
+  }
+
+  public static long charflag() {
+    return IdaJavaJNI.charflag();
+  }
+
+  public static long offflag() {
+    return IdaJavaJNI.offflag();
+  }
+
+  public static long enumflag() {
+    return IdaJavaJNI.enumflag();
+  }
+
+  public static long stroffflag() {
+    return IdaJavaJNI.stroffflag();
+  }
+
+  public static long stkvarflag() {
+    return IdaJavaJNI.stkvarflag();
+  }
+
+  public static long fltflag() {
+    return IdaJavaJNI.fltflag();
+  }
+
+  public static long custfmtflag() {
+    return IdaJavaJNI.custfmtflag();
+  }
+
+  public static long segflag() {
+    return IdaJavaJNI.segflag();
+  }
+
+  public static long numflag() {
+    return IdaJavaJNI.numflag();
+  }
+
+  public static long hexflag() {
+    return IdaJavaJNI.hexflag();
+  }
+
+  public static long decflag() {
+    return IdaJavaJNI.decflag();
+  }
+
+  public static long octflag() {
+    return IdaJavaJNI.octflag();
+  }
+
+  public static long binflag() {
+    return IdaJavaJNI.binflag();
+  }
+
+  public static boolean op_chr(long ea, int n) {
+    return IdaJavaJNI.op_chr(ea, n);
+  }
+
+  public static boolean op_num(long ea, int n) {
+    return IdaJavaJNI.op_num(ea, n);
+  }
+
+  public static boolean op_hex(long ea, int n) {
+    return IdaJavaJNI.op_hex(ea, n);
+  }
+
+  public static boolean op_dec(long ea, int n) {
+    return IdaJavaJNI.op_dec(ea, n);
+  }
+
+  public static boolean op_oct(long ea, int n) {
+    return IdaJavaJNI.op_oct(ea, n);
+  }
+
+  public static boolean op_bin(long ea, int n) {
+    return IdaJavaJNI.op_bin(ea, n);
+  }
+
+  public static boolean op_flt(long ea, int n) {
+    return IdaJavaJNI.op_flt(ea, n);
+  }
+
+  public static boolean op_custfmt(long ea, int n, int fid) {
+    return IdaJavaJNI.op_custfmt(ea, n, fid);
+  }
+
+  public static boolean noType(long ea, int n) {
+    return IdaJavaJNI.noType(ea, n);
+  }
+
+  public static int getDefaultRadix() {
+    return IdaJavaJNI.getDefaultRadix();
+  }
+
+  public static int getRadix(long F, int n) {
+    return IdaJavaJNI.getRadix(F, n);
+  }
+
+  public static int getRadixEA(long ea, int n) {
+    return IdaJavaJNI.getRadixEA(ea, n);
+  }
+
+  public static long codeflag() {
+    return IdaJavaJNI.codeflag();
+  }
+
+  public static long byteflag() {
+    return IdaJavaJNI.byteflag();
+  }
+
+  public static long wordflag() {
+    return IdaJavaJNI.wordflag();
+  }
+
+  public static long dwrdflag() {
+    return IdaJavaJNI.dwrdflag();
+  }
+
+  public static long qwrdflag() {
+    return IdaJavaJNI.qwrdflag();
+  }
+
+  public static long owrdflag() {
+    return IdaJavaJNI.owrdflag();
+  }
+
+  public static long tbytflag() {
+    return IdaJavaJNI.tbytflag();
+  }
+
+  public static long asciflag() {
+    return IdaJavaJNI.asciflag();
+  }
+
+  public static long struflag() {
+    return IdaJavaJNI.struflag();
+  }
+
+  public static long custflag() {
+    return IdaJavaJNI.custflag();
+  }
+
+  public static long alignflag() {
+    return IdaJavaJNI.alignflag();
+  }
+
+  public static long floatflag() {
+    return IdaJavaJNI.floatflag();
+  }
+
+  public static long doubleflag() {
+    return IdaJavaJNI.doubleflag();
+  }
+
+  public static long tribyteflag() {
+    return IdaJavaJNI.tribyteflag();
+  }
+
+  public static long packrealflag() {
+    return IdaJavaJNI.packrealflag();
+  }
+
+  public static long get_flags_by_size(long size) {
+    return IdaJavaJNI.get_flags_by_size(size);
+  }
+
+  public static boolean do_data_ex(long ea, long dataflag, long size, long tid) {
+    return IdaJavaJNI.do_data_ex(ea, dataflag, size, tid);
+  }
+
+  public static boolean doByte(long ea, long length) {
+    return IdaJavaJNI.doByte(ea, length);
+  }
+
+  public static boolean doWord(long ea, long length) {
+    return IdaJavaJNI.doWord(ea, length);
+  }
+
+  public static boolean doDwrd(long ea, long length) {
+    return IdaJavaJNI.doDwrd(ea, length);
+  }
+
+  public static boolean doQwrd(long ea, long length) {
+    return IdaJavaJNI.doQwrd(ea, length);
+  }
+
+  public static boolean doOwrd(long ea, long length) {
+    return IdaJavaJNI.doOwrd(ea, length);
+  }
+
+  public static boolean doTbyt(long ea, long length) {
+    return IdaJavaJNI.doTbyt(ea, length);
+  }
+
+  public static boolean doFloat(long ea, long length) {
+    return IdaJavaJNI.doFloat(ea, length);
+  }
+
+  public static boolean doDouble(long ea, long length) {
+    return IdaJavaJNI.doDouble(ea, length);
+  }
+
+  public static boolean doPackReal(long ea, long length) {
+    return IdaJavaJNI.doPackReal(ea, length);
+  }
+
+  public static boolean doASCI(long ea, long length) {
+    return IdaJavaJNI.doASCI(ea, length);
+  }
+
+  public static boolean do3byte(long ea, long length) {
+    return IdaJavaJNI.do3byte(ea, length);
+  }
+
+  public static boolean doStruct(long ea, long length, long tid) {
+    return IdaJavaJNI.doStruct(ea, length, tid);
+  }
+
+  public static boolean doCustomData(long ea, long length, int dtid, int fid) {
+    return IdaJavaJNI.doCustomData(ea, length, dtid, fid);
+  }
+
+  public static boolean doAlign(long ea, long length, int alignment) {
+    return IdaJavaJNI.doAlign(ea, length, alignment);
+  }
+
+  public static int calc_min_align(long length) {
+    return IdaJavaJNI.calc_min_align(length);
+  }
+
+  public static int calc_max_align(long endea) {
+    return IdaJavaJNI.calc_max_align(endea);
+  }
+
+  public static int calc_def_align(long ea, int mina, int maxa) {
+    return IdaJavaJNI.calc_def_align(ea, mina, maxa);
+  }
+
+  public static boolean do16bit(long ea, long length) {
+    return IdaJavaJNI.do16bit(ea, length);
+  }
+
+  public static boolean do32bit(long ea, long length) {
+    return IdaJavaJNI.do32bit(ea, length);
+  }
+
+  public static boolean isByte(long F) {
+    return IdaJavaJNI.isByte(F);
+  }
+
+  public static boolean isWord(long F) {
+    return IdaJavaJNI.isWord(F);
+  }
+
+  public static boolean isDwrd(long F) {
+    return IdaJavaJNI.isDwrd(F);
+  }
+
+  public static boolean isQwrd(long F) {
+    return IdaJavaJNI.isQwrd(F);
+  }
+
+  public static boolean isOwrd(long F) {
+    return IdaJavaJNI.isOwrd(F);
+  }
+
+  public static boolean isTbyt(long F) {
+    return IdaJavaJNI.isTbyt(F);
+  }
+
+  public static boolean isFloat(long F) {
+    return IdaJavaJNI.isFloat(F);
+  }
+
+  public static boolean isDouble(long F) {
+    return IdaJavaJNI.isDouble(F);
+  }
+
+  public static boolean isPackReal(long F) {
+    return IdaJavaJNI.isPackReal(F);
+  }
+
+  public static boolean isASCII(long F) {
+    return IdaJavaJNI.isASCII(F);
+  }
+
+  public static boolean isStruct(long F) {
+    return IdaJavaJNI.isStruct(F);
+  }
+
+  public static boolean isAlign(long F) {
+    return IdaJavaJNI.isAlign(F);
+  }
+
+  public static boolean is3byte(long F) {
+    return IdaJavaJNI.is3byte(F);
+  }
+
+  public static boolean isCustom(long F) {
+    return IdaJavaJNI.isCustom(F);
+  }
+
+  public static boolean f_isByte(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isByte(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isWord(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isWord(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isDwrd(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isDwrd(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isQwrd(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isQwrd(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isOwrd(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isOwrd(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isTbyt(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isTbyt(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isFloat(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isFloat(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isDouble(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isDouble(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isPackReal(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isPackReal(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isASCII(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isASCII(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isStruct(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isStruct(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isAlign(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isAlign(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_is3byte(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_is3byte(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean f_isCustom(long F, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_isCustom(F, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static boolean is_same_data_type(long F1, long F2) {
+    return IdaJavaJNI.is_same_data_type(F1, F2);
+  }
+
+  public static long get_max_ascii_length(long ea, int strtype, boolean ignore_heads) {
+    return IdaJavaJNI.get_max_ascii_length__SWIG_0(ea, strtype, ignore_heads);
+  }
+
+  public static long get_max_ascii_length(long ea, int strtype) {
+    return IdaJavaJNI.get_max_ascii_length__SWIG_1(ea, strtype);
+  }
+
+  public static boolean get_ascii_contents(long ea, long len, int type, String buf, long bufsize) {
+    return IdaJavaJNI.get_ascii_contents(ea, len, type, buf, bufsize);
+  }
+
+  public static boolean make_ascii_string(long start, long len, int strtype) {
+    return IdaJavaJNI.make_ascii_string(start, len, strtype);
+  }
+
+  public static String print_ascii_string_type(String buf, long bufsize, int strtype) {
+    return IdaJavaJNI.print_ascii_string_type(buf, bufsize, strtype);
+  }
+
+  public static opinfo_t get_opinfo(long ea, int n, long flags, opinfo_t buf) {
+    long cPtr = IdaJavaJNI.get_opinfo(ea, n, flags, opinfo_t.getCPtr(buf), buf);
+    return (cPtr == 0) ? null : new opinfo_t(cPtr, false);
+  }
+
+  public static boolean set_opinfo(long ea, int n, long flag, opinfo_t ti) {
+    return IdaJavaJNI.set_opinfo(ea, n, flag, opinfo_t.getCPtr(ti), ti);
+  }
+
+  public static long get_data_elsize(long ea, long F, opinfo_t ti) {
+    return IdaJavaJNI.get_data_elsize__SWIG_0(ea, F, opinfo_t.getCPtr(ti), ti);
+  }
+
+  public static long get_data_elsize(long ea, long F) {
+    return IdaJavaJNI.get_data_elsize__SWIG_1(ea, F);
+  }
+
+  public static int is_varsize_item(long ea, long F, opinfo_t ti, SWIGTYPE_p_unsigned_int itemsize) {
+    return IdaJavaJNI.is_varsize_item__SWIG_0(ea, F, opinfo_t.getCPtr(ti), ti, SWIGTYPE_p_unsigned_int.getCPtr(itemsize));
+  }
+
+  public static int is_varsize_item(long ea, long F, opinfo_t ti) {
+    return IdaJavaJNI.is_varsize_item__SWIG_1(ea, F, opinfo_t.getCPtr(ti), ti);
+  }
+
+  public static int is_varsize_item(long ea, long F) {
+    return IdaJavaJNI.is_varsize_item__SWIG_2(ea, F);
+  }
+
+  public static boolean can_define_item(long ea, long length, long flags) {
+    return IdaJavaJNI.can_define_item(ea, length, flags);
+  }
+
+  public static boolean isImmd(long F) {
+    return IdaJavaJNI.isImmd(F);
+  }
+
+  public static boolean isFunc(long F) {
+    return IdaJavaJNI.isFunc(F);
+  }
+
+  public static void doImmd(long ea) {
+    IdaJavaJNI.doImmd(ea);
+  }
+
+  public static void noImmd(long ea) {
+    IdaJavaJNI.noImmd(ea);
+  }
+
+  public static int gettof(long F) {
+    return IdaJavaJNI.gettof(F);
+  }
+
+  public static int register_custom_data_type(SWIGTYPE_p_data_type_t dtinfo) {
+    return IdaJavaJNI.register_custom_data_type(SWIGTYPE_p_data_type_t.getCPtr(dtinfo));
+  }
+
+  public static boolean unregister_custom_data_type(int dtid) {
+    return IdaJavaJNI.unregister_custom_data_type(dtid);
+  }
+
+  public static int register_custom_data_format(int dtid, SWIGTYPE_p_data_format_t dtform) {
+    return IdaJavaJNI.register_custom_data_format(dtid, SWIGTYPE_p_data_format_t.getCPtr(dtform));
+  }
+
+  public static boolean unregister_custom_data_format(int dtid, int fid) {
+    return IdaJavaJNI.unregister_custom_data_format(dtid, fid);
+  }
+
+  public static SWIGTYPE_p_data_type_t get_custom_data_type(int dtid) {
+    long cPtr = IdaJavaJNI.get_custom_data_type(dtid);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_data_type_t(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_data_format_t get_custom_data_format(int dtid, int fid) {
+    long cPtr = IdaJavaJNI.get_custom_data_format(dtid, fid);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_data_format_t(cPtr, false);
+  }
+
+  public static int get_custom_data_types(SWIGTYPE_p_qvectorT_int_t out, long min_size, long max_size) {
+    return IdaJavaJNI.get_custom_data_types__SWIG_0(SWIGTYPE_p_qvectorT_int_t.getCPtr(out), min_size, max_size);
+  }
+
+  public static int get_custom_data_types(SWIGTYPE_p_qvectorT_int_t out, long min_size) {
+    return IdaJavaJNI.get_custom_data_types__SWIG_1(SWIGTYPE_p_qvectorT_int_t.getCPtr(out), min_size);
+  }
+
+  public static int get_custom_data_types(SWIGTYPE_p_qvectorT_int_t out) {
+    return IdaJavaJNI.get_custom_data_types__SWIG_2(SWIGTYPE_p_qvectorT_int_t.getCPtr(out));
+  }
+
+  public static int get_custom_data_formats(SWIGTYPE_p_qvectorT_int_t out, int dtid) {
+    return IdaJavaJNI.get_custom_data_formats(SWIGTYPE_p_qvectorT_int_t.getCPtr(out), dtid);
+  }
+
+  public static int find_custom_data_type(String name) {
+    return IdaJavaJNI.find_custom_data_type(name);
+  }
+
+  public static int find_custom_data_format(String name) {
+    return IdaJavaJNI.find_custom_data_format(name);
+  }
+
+  public static boolean set_cmt(long ea, String comm, boolean rptble) {
+    return IdaJavaJNI.set_cmt(ea, comm, rptble);
+  }
+
+  public static int get_cmt(long ea, boolean rptble, String buf, long bufsize) {
+    return IdaJavaJNI.get_cmt(ea, rptble, buf, bufsize);
+  }
+
+  public static boolean append_cmt(long ea, String str, boolean rptble) {
+    return IdaJavaJNI.append_cmt(ea, str, rptble);
+  }
+
+  public static long find_byte(long sEA, long size, short value, boolean sense_case) {
+    return IdaJavaJNI.find_byte(sEA, size, value, sense_case);
+  }
+
+  public static long find_byter(long sEA, long size, short value, boolean sense_case) {
+    return IdaJavaJNI.find_byter(sEA, size, value, sense_case);
+  }
+
+  public static long bin_search(long startEA, long endEA, SWIGTYPE_p_unsigned_char image, SWIGTYPE_p_unsigned_char mask, long len, int step, int flags) {
+    return IdaJavaJNI.bin_search(startEA, endEA, SWIGTYPE_p_unsigned_char.getCPtr(image), SWIGTYPE_p_unsigned_char.getCPtr(mask), len, step, flags);
+  }
+
+  public static boolean equal_bytes(long ea, SWIGTYPE_p_unsigned_char image, SWIGTYPE_p_unsigned_char mask, long len, boolean sense_case) {
+    return IdaJavaJNI.equal_bytes(ea, SWIGTYPE_p_unsigned_char.getCPtr(image), SWIGTYPE_p_unsigned_char.getCPtr(mask), len, sense_case);
+  }
+
+  public static void invalidate_dbgmem_config() {
+    IdaJavaJNI.invalidate_dbgmem_config();
+  }
+
+  public static void invalidate_dbgmem_contents(long ea, long size) {
+    IdaJavaJNI.invalidate_dbgmem_contents(ea, size);
+  }
+
+  public static boolean is_debugger_on() {
+    return IdaJavaJNI.is_debugger_on();
+  }
+
+  public static void setHidden_areas(areacb_t value) {
+    IdaJavaJNI.hidden_areas_set(areacb_t.getCPtr(value), value);
+  }
+
+  public static areacb_t getHidden_areas() {
+    long cPtr = IdaJavaJNI.hidden_areas_get();
+    return (cPtr == 0) ? null : new areacb_t(cPtr, false);
+  }
+
+  public static boolean update_hidden_area(hidden_area_t ha) {
+    return IdaJavaJNI.update_hidden_area(hidden_area_t.getCPtr(ha), ha);
+  }
+
+  public static boolean add_hidden_area(long ea1, long ea2, String description, String header, String footer, long color) {
+    return IdaJavaJNI.add_hidden_area(ea1, ea2, description, header, footer, color);
+  }
+
+  public static hidden_area_t get_hidden_area(long ea) {
+    long cPtr = IdaJavaJNI.get_hidden_area(ea);
+    return (cPtr == 0) ? null : new hidden_area_t(cPtr, false);
+  }
+
+  public static hidden_area_t getn_hidden_area(int n) {
+    long cPtr = IdaJavaJNI.getn_hidden_area(n);
+    return (cPtr == 0) ? null : new hidden_area_t(cPtr, false);
+  }
+
+  public static int get_hidden_area_qty() {
+    return IdaJavaJNI.get_hidden_area_qty();
+  }
+
+  public static int get_hidden_area_num(long ea) {
+    return IdaJavaJNI.get_hidden_area_num(ea);
+  }
+
+  public static hidden_area_t get_prev_hidden_area(long ea) {
+    long cPtr = IdaJavaJNI.get_prev_hidden_area(ea);
+    return (cPtr == 0) ? null : new hidden_area_t(cPtr, false);
+  }
+
+  public static hidden_area_t get_next_hidden_area(long ea) {
+    long cPtr = IdaJavaJNI.get_next_hidden_area(ea);
+    return (cPtr == 0) ? null : new hidden_area_t(cPtr, false);
+  }
+
+  public static boolean del_hidden_area(long ea) {
+    return IdaJavaJNI.del_hidden_area(ea);
+  }
+
+  public static void doFlow(long ea) {
+    IdaJavaJNI.doFlow(ea);
+  }
+
+  public static void noFlow(long ea) {
+    IdaJavaJNI.noFlow(ea);
+  }
+
+  public static void doExtra(long ea) {
+    IdaJavaJNI.doExtra(ea);
+  }
+
+  public static void noExtra(long ea) {
+    IdaJavaJNI.noExtra(ea);
+  }
+
+  public static int getAU_NONE() {
+    return IdaJavaJNI.AU_NONE_get();
+  }
+
+  public static int getAU_UNK() {
+    return IdaJavaJNI.AU_UNK_get();
+  }
+
+  public static int getAU_CODE() {
+    return IdaJavaJNI.AU_CODE_get();
+  }
+
+  public static int getAU_WEAK() {
+    return IdaJavaJNI.AU_WEAK_get();
+  }
+
+  public static int getAU_PROC() {
+    return IdaJavaJNI.AU_PROC_get();
+  }
+
+  public static int getAU_TAIL() {
+    return IdaJavaJNI.AU_TAIL_get();
+  }
+
+  public static int getAU_TRSP() {
+    return IdaJavaJNI.AU_TRSP_get();
+  }
+
+  public static int getAU_USED() {
+    return IdaJavaJNI.AU_USED_get();
+  }
+
+  public static int getAU_TYPE() {
+    return IdaJavaJNI.AU_TYPE_get();
+  }
+
+  public static int getAU_LIBF() {
+    return IdaJavaJNI.AU_LIBF_get();
+  }
+
+  public static int getAU_LBF2() {
+    return IdaJavaJNI.AU_LBF2_get();
+  }
+
+  public static int getAU_LBF3() {
+    return IdaJavaJNI.AU_LBF3_get();
+  }
+
+  public static int getAU_CHLB() {
+    return IdaJavaJNI.AU_CHLB_get();
+  }
+
+  public static int getAU_FINAL() {
+    return IdaJavaJNI.AU_FINAL_get();
+  }
+
+  public static int getSt_Ready() {
+    return IdaJavaJNI.st_Ready_get();
+  }
+
+  public static int getSt_Think() {
+    return IdaJavaJNI.st_Think_get();
+  }
+
+  public static int getSt_Waiting() {
+    return IdaJavaJNI.st_Waiting_get();
+  }
+
+  public static int getSt_Work() {
+    return IdaJavaJNI.st_Work_get();
+  }
+
+  public static void setAutoEnabled(int value) {
+    IdaJavaJNI.autoEnabled_set(value);
+  }
+
+  public static int getAutoEnabled() {
+    return IdaJavaJNI.autoEnabled_get();
+  }
+
+  public static void setAuto_state(int value) {
+    IdaJavaJNI.auto_state_set(value);
+  }
+
+  public static int getAuto_state() {
+    return IdaJavaJNI.auto_state_get();
+  }
+
+  public static void setAuto_display(auto_display_t value) {
+    IdaJavaJNI.auto_display_set(auto_display_t.getCPtr(value), value);
+  }
+
+  public static auto_display_t getAuto_display() {
+    long cPtr = IdaJavaJNI.auto_display_get();
+    return (cPtr == 0) ? null : new auto_display_t(cPtr, false);
+  }
+
+  public static void showAuto(long ea, int type) {
+    IdaJavaJNI.showAuto__SWIG_0(ea, type);
+  }
+
+  public static void showAuto(long ea) {
+    IdaJavaJNI.showAuto__SWIG_1(ea);
+  }
+
+  public static void showAddr(long ea) {
+    IdaJavaJNI.showAddr(ea);
+  }
+
+  public static int setStat(int st) {
+    return IdaJavaJNI.setStat(st);
+  }
+
+  public static boolean may_create_stkvars() {
+    return IdaJavaJNI.may_create_stkvars();
+  }
+
+  public static boolean may_trace_sp() {
+    return IdaJavaJNI.may_trace_sp();
+  }
+
+  public static void auto_mark_range(long start, long end, int type) {
+    IdaJavaJNI.auto_mark_range(start, end, type);
+  }
+
+  public static void autoMark(long ea, int type) {
+    IdaJavaJNI.autoMark(ea, type);
+  }
+
+  public static void autoUnmark(long start, long end, int type) {
+    IdaJavaJNI.autoUnmark(start, end, type);
+  }
+
+  public static void noUsed(long ea) {
+    IdaJavaJNI.noUsed__SWIG_0(ea);
+  }
+
+  public static void noUsed(long sEA, long eEA) {
+    IdaJavaJNI.noUsed__SWIG_1(sEA, eEA);
+  }
+
+  public static void auto_make_code(long ea) {
+    IdaJavaJNI.auto_make_code(ea);
+  }
+
+  public static void auto_make_proc(long ea) {
+    IdaJavaJNI.auto_make_proc(ea);
+  }
+
+  public static void reanalyze_callers(long ea, boolean noret) {
+    IdaJavaJNI.reanalyze_callers(ea, noret);
+  }
+
+  public static void auto_apply_type(long caller, long callee) {
+    IdaJavaJNI.auto_apply_type(caller, callee);
+  }
+
+  public static int analyze_area(long sEA, long eEA) {
+    return IdaJavaJNI.analyze_area(sEA, eEA);
+  }
+
+  public static boolean autoWait() {
+    return IdaJavaJNI.autoWait();
+  }
+
+  public static void autoCancel(long ea1, long ea2) {
+    IdaJavaJNI.autoCancel(ea1, ea2);
+  }
+
+  public static boolean autoIsOk() {
+    return IdaJavaJNI.autoIsOk();
+  }
+
+  public static boolean autoStep() {
+    return IdaJavaJNI.autoStep();
+  }
+
+  public static long auto_get(long lowEA, long highEA, SWIGTYPE_p_int type) {
+    return IdaJavaJNI.auto_get(lowEA, highEA, SWIGTYPE_p_int.getCPtr(type));
+  }
+
+  public static String autoGetName(int type) {
+    return IdaJavaJNI.autoGetName(type);
+  }
+
+  public static boolean is_func_entry(func_t pfn) {
+    return IdaJavaJNI.is_func_entry(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean is_func_tail(func_t pfn) {
+    return IdaJavaJNI.is_func_tail(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static void setFuncs(areacb_t value) {
+    IdaJavaJNI.funcs_set(areacb_t.getCPtr(value), value);
+  }
+
+  public static areacb_t getFuncs() {
+    long cPtr = IdaJavaJNI.funcs_get();
+    return (cPtr == 0) ? null : new areacb_t(cPtr, false);
+  }
+
+  public static boolean is_func_locked(func_t pfn) {
+    return IdaJavaJNI.is_func_locked(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static func_t get_func(long ea) {
+    long cPtr = IdaJavaJNI.get_func(ea);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static int get_func_chunknum(func_t pfn, long ea) {
+    return IdaJavaJNI.get_func_chunknum(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static boolean func_contains(func_t pfn, long ea) {
+    return IdaJavaJNI.func_contains(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static func_t getn_func(long n) {
+    long cPtr = IdaJavaJNI.getn_func(n);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static long get_func_qty() {
+    return IdaJavaJNI.get_func_qty();
+  }
+
+  public static int get_func_num(long ea) {
+    return IdaJavaJNI.get_func_num(ea);
+  }
+
+  public static func_t get_prev_func(long ea) {
+    long cPtr = IdaJavaJNI.get_prev_func(ea);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static func_t get_next_func(long ea) {
+    long cPtr = IdaJavaJNI.get_next_func(ea);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static boolean get_func_limits(func_t pfn, area_t limits) {
+    return IdaJavaJNI.get_func_limits(func_t.getCPtr(pfn), pfn, area_t.getCPtr(limits), limits);
+  }
+
+  public static String get_func_cmt(func_t fn, boolean repeatable) {
+    return IdaJavaJNI.get_func_cmt(func_t.getCPtr(fn), fn, repeatable);
+  }
+
+  public static boolean set_func_cmt(func_t fn, String cmt, boolean repeatable) {
+    return IdaJavaJNI.set_func_cmt(func_t.getCPtr(fn), fn, cmt, repeatable);
+  }
+
+  public static void del_func_cmt(func_t fn, boolean repeatable) {
+    IdaJavaJNI.del_func_cmt(func_t.getCPtr(fn), fn, repeatable);
+  }
+
+  public static boolean update_func(func_t fn) {
+    return IdaJavaJNI.update_func(func_t.getCPtr(fn), fn);
+  }
+
+  public static boolean add_func_ex(func_t fn) {
+    return IdaJavaJNI.add_func_ex(func_t.getCPtr(fn), fn);
+  }
+
+  public static boolean add_func(long ea1, long ea2) {
+    return IdaJavaJNI.add_func(ea1, ea2);
+  }
+
+  public static boolean del_func(long ea) {
+    return IdaJavaJNI.del_func(ea);
+  }
+
+  public static int func_setstart(long ea, long newstart) {
+    return IdaJavaJNI.func_setstart(ea, newstart);
+  }
+
+  public static boolean func_setend(long ea, long newend) {
+    return IdaJavaJNI.func_setend(ea, newend);
+  }
+
+  public static void reanalyze_function(func_t pfn, long ea1, long ea2, boolean analyze_parents) {
+    IdaJavaJNI.reanalyze_function__SWIG_0(func_t.getCPtr(pfn), pfn, ea1, ea2, analyze_parents);
+  }
+
+  public static void reanalyze_function(func_t pfn, long ea1, long ea2) {
+    IdaJavaJNI.reanalyze_function__SWIG_1(func_t.getCPtr(pfn), pfn, ea1, ea2);
+  }
+
+  public static void reanalyze_function(func_t pfn, long ea1) {
+    IdaJavaJNI.reanalyze_function__SWIG_2(func_t.getCPtr(pfn), pfn, ea1);
+  }
+
+  public static void reanalyze_function(func_t pfn) {
+    IdaJavaJNI.reanalyze_function__SWIG_3(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static void clear_func_struct(func_t fn) {
+    IdaJavaJNI.clear_func_struct(func_t.getCPtr(fn), fn);
+  }
+
+  public static int find_func_bounds(long ea, func_t nfn, int flags) {
+    return IdaJavaJNI.find_func_bounds(ea, func_t.getCPtr(nfn), nfn, flags);
+  }
+
+  public static String get_func_name(long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_func_name(ea, buf, bufsize);
+  }
+
+  public static int get_func_bitness(func_t pfn) {
+    return IdaJavaJNI.get_func_bitness(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static int get_func_bits(func_t pfn) {
+    return IdaJavaJNI.get_func_bits(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static int get_func_bytes(func_t pfn) {
+    return IdaJavaJNI.get_func_bytes(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean is_visible_func(func_t pfn) {
+    return IdaJavaJNI.is_visible_func(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean is_finally_visible_func(func_t pfn) {
+    return IdaJavaJNI.is_finally_visible_func(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static void set_visible_func(func_t pfn, boolean visible) {
+    IdaJavaJNI.set_visible_func(func_t.getCPtr(pfn), pfn, visible);
+  }
+
+  public static int set_func_name_if_jumpfunc(func_t fn, String oldname) {
+    return IdaJavaJNI.set_func_name_if_jumpfunc(func_t.getCPtr(fn), fn, oldname);
+  }
+
+  public static long calc_thunk_func_target(func_t fn, SWIGTYPE_p_unsigned_int fptr) {
+    return IdaJavaJNI.calc_thunk_func_target(func_t.getCPtr(fn), fn, SWIGTYPE_p_unsigned_int.getCPtr(fptr));
+  }
+
+  public static String a2funcoff(long ea, String buf, long bufsize) {
+    return IdaJavaJNI.a2funcoff(ea, buf, bufsize);
+  }
+
+  public static void std_gen_func_header(func_t pfn) {
+    IdaJavaJNI.std_gen_func_header(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean func_does_return(long callee) {
+    return IdaJavaJNI.func_does_return(callee);
+  }
+
+  public static boolean set_noret_insn(long insn_ea, boolean noret) {
+    return IdaJavaJNI.set_noret_insn(insn_ea, noret);
+  }
+
+  public static func_t get_fchunk(long ea) {
+    long cPtr = IdaJavaJNI.get_fchunk(ea);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static func_t getn_fchunk(int n) {
+    long cPtr = IdaJavaJNI.getn_fchunk(n);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static long get_fchunk_qty() {
+    return IdaJavaJNI.get_fchunk_qty();
+  }
+
+  public static int get_fchunk_num(long ea) {
+    return IdaJavaJNI.get_fchunk_num(ea);
+  }
+
+  public static func_t get_prev_fchunk(long ea) {
+    long cPtr = IdaJavaJNI.get_prev_fchunk(ea);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static func_t get_next_fchunk(long ea) {
+    long cPtr = IdaJavaJNI.get_next_fchunk(ea);
+    return (cPtr == 0) ? null : new func_t(cPtr, false);
+  }
+
+  public static boolean append_func_tail(func_t pfn, long ea1, long ea2) {
+    return IdaJavaJNI.append_func_tail(func_t.getCPtr(pfn), pfn, ea1, ea2);
+  }
+
+  public static boolean remove_func_tail(func_t pfn, long tail_ea) {
+    return IdaJavaJNI.remove_func_tail(func_t.getCPtr(pfn), pfn, tail_ea);
+  }
+
+  public static boolean set_tail_owner(func_t fnt, long func_start) {
+    return IdaJavaJNI.set_tail_owner(func_t.getCPtr(fnt), fnt, func_start);
+  }
+
+  public static boolean func_tail_iterator_set(func_tail_iterator_t fti, func_t pfn, long ea) {
+    return IdaJavaJNI.func_tail_iterator_set(func_tail_iterator_t.getCPtr(fti), fti, func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static boolean func_tail_iterator_set2(func_tail_iterator_t fti, func_t pfn, long ea) {
+    return IdaJavaJNI.func_tail_iterator_set2(func_tail_iterator_t.getCPtr(fti), fti, func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static boolean func_tail_iterator_set_ea(func_tail_iterator_t fti, long ea) {
+    return IdaJavaJNI.func_tail_iterator_set_ea(func_tail_iterator_t.getCPtr(fti), fti, ea);
+  }
+
+  public static boolean func_parent_iterator_set(func_parent_iterator_t fpi, func_t pfn) {
+    return IdaJavaJNI.func_parent_iterator_set(func_parent_iterator_t.getCPtr(fpi), fpi, func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean func_parent_iterator_set2(func_parent_iterator_t fpi, func_t pfn) {
+    return IdaJavaJNI.func_parent_iterator_set2(func_parent_iterator_t.getCPtr(fpi), fpi, func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean func_item_iterator_next(func_item_iterator_t fii, SWIGTYPE_p_f_unsigned_int_p_void__bool testf, SWIGTYPE_p_void ud) {
+    return IdaJavaJNI.func_item_iterator_next(func_item_iterator_t.getCPtr(fii), fii, SWIGTYPE_p_f_unsigned_int_p_void__bool.getCPtr(testf), SWIGTYPE_p_void.getCPtr(ud));
+  }
+
+  public static boolean func_item_iterator_prev(func_item_iterator_t fii, SWIGTYPE_p_f_unsigned_int_p_void__bool testf, SWIGTYPE_p_void ud) {
+    return IdaJavaJNI.func_item_iterator_prev(func_item_iterator_t.getCPtr(fii), fii, SWIGTYPE_p_f_unsigned_int_p_void__bool.getCPtr(testf), SWIGTYPE_p_void.getCPtr(ud));
+  }
+
+  public static boolean func_item_iterator_decode_prev_insn(func_item_iterator_t fii) {
+    return IdaJavaJNI.func_item_iterator_decode_prev_insn(func_item_iterator_t.getCPtr(fii), fii);
+  }
+
+  public static boolean func_item_iterator_decode_preceding_insn(func_item_iterator_t fii, SWIGTYPE_p_qvectorT_unsigned_int_t visited, SWIGTYPE_p_bool p_farref) {
+    return IdaJavaJNI.func_item_iterator_decode_preceding_insn(func_item_iterator_t.getCPtr(fii), fii, SWIGTYPE_p_qvectorT_unsigned_int_t.getCPtr(visited), SWIGTYPE_p_bool.getCPtr(p_farref));
+  }
+
+  public static boolean f_any(long arg0, SWIGTYPE_p_void arg1) {
+    return IdaJavaJNI.f_any(arg0, SWIGTYPE_p_void.getCPtr(arg1));
+  }
+
+  public static long get_prev_func_addr(func_t pfn, long ea) {
+    return IdaJavaJNI.get_prev_func_addr(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static long get_next_func_addr(func_t pfn, long ea) {
+    return IdaJavaJNI.get_next_func_addr(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static void read_regargs(func_t pfn) {
+    IdaJavaJNI.read_regargs(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static void add_regarg(func_t pfn, int reg, SWIGTYPE_p_type_t type, String name) {
+    IdaJavaJNI.add_regarg(func_t.getCPtr(pfn), pfn, reg, SWIGTYPE_p_type_t.getCPtr(type), name);
+  }
+
+  public static int plan_to_apply_idasgn(String fname) {
+    return IdaJavaJNI.plan_to_apply_idasgn(fname);
+  }
+
+  public static boolean apply_idasgn(int advance) {
+    return IdaJavaJNI.apply_idasgn(advance);
+  }
+
+  public static int apply_idasgn_to(String signame, long ea, int is_startup) {
+    return IdaJavaJNI.apply_idasgn_to(signame, ea, is_startup);
+  }
+
+  public static int get_idasgn_qty() {
+    return IdaJavaJNI.get_idasgn_qty();
+  }
+
+  public static int get_current_idasgn() {
+    return IdaJavaJNI.get_current_idasgn();
+  }
+
+  public static int calc_idasgn_state(int n) {
+    return IdaJavaJNI.calc_idasgn_state(n);
+  }
+
+  public static int del_idasgn(int n) {
+    return IdaJavaJNI.del_idasgn(n);
+  }
+
+  public static int get_idasgn_desc(int n, String signame, long signamesize, String optlibs, long optlibssize) {
+    return IdaJavaJNI.get_idasgn_desc(n, signame, signamesize, optlibs, optlibssize);
+  }
+
+  public static String get_sig_filename(String buf, long bufsize, String signame) {
+    return IdaJavaJNI.get_sig_filename(buf, bufsize, signame);
+  }
+
+  public static SWIGTYPE_p_idasgn_t get_idasgn_header_by_short_name(String name) {
+    long cPtr = IdaJavaJNI.get_idasgn_header_by_short_name(name);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_idasgn_t(cPtr, false);
+  }
+
+  public static String get_idasgn_title(String name, String buf, long bufsize) {
+    return IdaJavaJNI.get_idasgn_title(name, buf, bufsize);
+  }
+
+  public static boolean apply_startup_sig(long ea, String startup) {
+    return IdaJavaJNI.apply_startup_sig(ea, startup);
+  }
+
+  public static int try_to_add_libfunc(long ea) {
+    return IdaJavaJNI.try_to_add_libfunc(ea);
+  }
+
+  public static void setXlatAsciiName(String value) {
+    IdaJavaJNI.XlatAsciiName_set(value);
+  }
+
+  public static String getXlatAsciiName() {
+    return IdaJavaJNI.XlatAsciiName_get();
+  }
+
+  public static boolean set_name(long ea, String name, int flag) {
+    return IdaJavaJNI.set_name__SWIG_0(ea, name, flag);
+  }
+
+  public static boolean set_name(long ea, String name) {
+    return IdaJavaJNI.set_name__SWIG_1(ea, name);
+  }
+
+  public static boolean del_global_name(long ea) {
+    return IdaJavaJNI.del_global_name(ea);
+  }
+
+  public static boolean del_local_name(long ea) {
+    return IdaJavaJNI.del_local_name(ea);
+  }
+
+  public static boolean set_dummy_name(long from, long ea) {
+    return IdaJavaJNI.set_dummy_name(from, ea);
+  }
+
+  public static boolean make_name_auto(long ea) {
+    return IdaJavaJNI.make_name_auto(ea);
+  }
+
+  public static boolean make_name_user(long ea) {
+    return IdaJavaJNI.make_name_user(ea);
+  }
+
+  public static boolean do_name_anyway(long ea, String name, long maxlen) {
+    return IdaJavaJNI.do_name_anyway__SWIG_0(ea, name, maxlen);
+  }
+
+  public static boolean do_name_anyway(long ea, String name) {
+    return IdaJavaJNI.do_name_anyway__SWIG_1(ea, name);
+  }
+
+  public static String validate_name(String name) {
+    return IdaJavaJNI.validate_name(name);
+  }
+
+  public static boolean is_ident_char(char c) {
+    return IdaJavaJNI.is_ident_char(c);
+  }
+
+  public static boolean is_visible_char(char c) {
+    return IdaJavaJNI.is_visible_char(c);
+  }
+
+  public static String make_visible_name(String dstname, String srcname, long dstsize) {
+    return IdaJavaJNI.make_visible_name(dstname, srcname, dstsize);
+  }
+
+  public static boolean isident(String name) {
+    return IdaJavaJNI.isident(name);
+  }
+
+  public static boolean is_uname(String name) {
+    return IdaJavaJNI.is_uname(name);
+  }
+
+  public static boolean is_valid_typename(String name) {
+    return IdaJavaJNI.is_valid_typename(name);
+  }
+
+  public static String extract_name(String line, int x, String buf, long bufsize) {
+    return IdaJavaJNI.extract_name(line, x, buf, bufsize);
+  }
+
+  public static void hide_name(long ea) {
+    IdaJavaJNI.hide_name(ea);
+  }
+
+  public static void show_name(long ea) {
+    IdaJavaJNI.show_name(ea);
+  }
+
+  public static long get_name_ea(long from, String name) {
+    return IdaJavaJNI.get_name_ea(from, name);
+  }
+
+  public static long get_name_base_ea(long from, long to) {
+    return IdaJavaJNI.get_name_base_ea(from, to);
+  }
+
+  public static int get_name_value(long from, String name, long[] value) {
+    return IdaJavaJNI.get_name_value(from, name, value);
+  }
+
+  public static String get_true_name(long from, long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_true_name(from, ea, buf, bufsize);
+  }
+
+  public static String get_name(long from, long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_name(from, ea, buf, bufsize);
+  }
+
+  public static String get_colored_name(long from, long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_colored_name(from, ea, buf, bufsize);
+  }
+
+  public static short get_name_color(long from, long ea) {
+    return IdaJavaJNI.get_name_color(from, ea);
+  }
+
+  public static String get_demangled_name(long from, long ea, String buf, long bufsize, int inhibitor, int demform, boolean strict) {
+    return IdaJavaJNI.get_demangled_name(from, ea, buf, bufsize, inhibitor, demform, strict);
+  }
+
+  public static String get_colored_demangled_name(long from, long ea, String buf, long bufsize, int inhibitor, int demform, boolean strict) {
+    return IdaJavaJNI.get_colored_demangled_name(from, ea, buf, bufsize, inhibitor, demform, strict);
+  }
+
+  public static int get_name_expr(long from, int n, long ea, int off, String buf, long bufsize, int flags) {
+    return IdaJavaJNI.get_name_expr__SWIG_0(from, n, ea, off, buf, bufsize, flags);
+  }
+
+  public static int get_name_expr(long from, int n, long ea, int off, String buf, long bufsize) {
+    return IdaJavaJNI.get_name_expr__SWIG_1(from, n, ea, off, buf, bufsize);
+  }
+
+  public static int get_nice_colored_name(long ea, String buf, long bufsize, int flags) {
+    return IdaJavaJNI.get_nice_colored_name__SWIG_0(ea, buf, bufsize, flags);
+  }
+
+  public static int get_nice_colored_name(long ea, String buf, long bufsize) {
+    return IdaJavaJNI.get_nice_colored_name__SWIG_1(ea, buf, bufsize);
+  }
+
+  public static long append_struct_fields(int n, SWIGTYPE_p_unsigned_int path, int plen, long flags, String ptr, String end, SWIGTYPE_p_int disp, int delta, boolean appzero) {
+    return IdaJavaJNI.append_struct_fields(n, SWIGTYPE_p_unsigned_int.getCPtr(path), plen, flags, ptr, end, SWIGTYPE_p_int.getCPtr(disp), delta, appzero);
+  }
+
+  public static int get_struct_operand(long ea, int n, SWIGTYPE_p_unsigned_int path, SWIGTYPE_p_int disp, SWIGTYPE_p_int delta) {
+    return IdaJavaJNI.get_struct_operand(ea, n, SWIGTYPE_p_unsigned_int.getCPtr(path), SWIGTYPE_p_int.getCPtr(disp), SWIGTYPE_p_int.getCPtr(delta));
+  }
+
+  public static boolean is_public_name(long ea) {
+    return IdaJavaJNI.is_public_name(ea);
+  }
+
+  public static void make_name_public(long ea) {
+    IdaJavaJNI.make_name_public(ea);
+  }
+
+  public static void make_name_non_public(long ea) {
+    IdaJavaJNI.make_name_non_public(ea);
+  }
+
+  public static int gen_name_decl(long ea, String name) {
+    return IdaJavaJNI.gen_name_decl(ea, name);
+  }
+
+  public static boolean is_weak_name(long ea) {
+    return IdaJavaJNI.is_weak_name(ea);
+  }
+
+  public static void make_name_weak(long ea) {
+    IdaJavaJNI.make_name_weak(ea);
+  }
+
+  public static void make_name_non_weak(long ea) {
+    IdaJavaJNI.make_name_non_weak(ea);
+  }
+
+  public static long get_nlist_size() {
+    return IdaJavaJNI.get_nlist_size();
+  }
+
+  public static long get_nlist_idx(long ea) {
+    return IdaJavaJNI.get_nlist_idx(ea);
+  }
+
+  public static boolean is_in_nlist(long ea) {
+    return IdaJavaJNI.is_in_nlist(ea);
+  }
+
+  public static long get_nlist_ea(long idx) {
+    return IdaJavaJNI.get_nlist_ea(idx);
+  }
+
+  public static String get_nlist_name(long idx) {
+    return IdaJavaJNI.get_nlist_name(idx);
+  }
+
+  public static void rebuild_nlist() {
+    IdaJavaJNI.rebuild_nlist();
+  }
+
+  public static void reorder_dummy_names() {
+    IdaJavaJNI.reorder_dummy_names();
+  }
+
+  public static int set_debug_names(SWIGTYPE_p_unsigned_int addrs, SWIGTYPE_p_p_char names, int qty) {
+    return IdaJavaJNI.set_debug_names(SWIGTYPE_p_unsigned_int.getCPtr(addrs), SWIGTYPE_p_p_char.getCPtr(names), qty);
+  }
+
+  public static boolean set_debug_name(long ea, String name) {
+    return IdaJavaJNI.set_debug_name(ea, name);
+  }
+
+  public static boolean get_debug_name(SWIGTYPE_p_unsigned_int ea_ptr, debug_name_how_t how, String buf, long bufsize) {
+    return IdaJavaJNI.get_debug_name(SWIGTYPE_p_unsigned_int.getCPtr(ea_ptr), how.swigValue(), buf, bufsize);
+  }
+
+  public static void del_debug_names(long ea1, long ea2) {
+    IdaJavaJNI.del_debug_names(ea1, ea2);
+  }
+
+  public static long get_debug_name_ea(String name) {
+    return IdaJavaJNI.get_debug_name_ea(name);
+  }
+
+  public static void get_debug_names(long ea1, long ea2, SWIGTYPE_p_qvectorT_ea_name_t_t names) {
+    IdaJavaJNI.get_debug_names(ea1, ea2, SWIGTYPE_p_qvectorT_ea_name_t_t.getCPtr(names));
+  }
+
+  public static int getIgnore_none() {
+    return IdaJavaJNI.ignore_none_get();
+  }
+
+  public static int getIgnore_regvar() {
+    return IdaJavaJNI.ignore_regvar_get();
+  }
+
+  public static int getIgnore_llabel() {
+    return IdaJavaJNI.ignore_llabel_get();
+  }
+
+  public static int getIgnore_stkvar() {
+    return IdaJavaJNI.ignore_stkvar_get();
+  }
+
+  public static int getIgnore_glabel() {
+    return IdaJavaJNI.ignore_glabel_get();
+  }
+
+  public static boolean is_name_defined_locally(func_t pfn, String name, int ignore, long ea1, long ea2) {
+    return IdaJavaJNI.is_name_defined_locally__SWIG_0(func_t.getCPtr(pfn), pfn, name, ignore, ea1, ea2);
+  }
+
+  public static boolean is_name_defined_locally(func_t pfn, String name, int ignore, long ea1) {
+    return IdaJavaJNI.is_name_defined_locally__SWIG_1(func_t.getCPtr(pfn), pfn, name, ignore, ea1);
+  }
+
+  public static boolean is_name_defined_locally(func_t pfn, String name, int ignore) {
+    return IdaJavaJNI.is_name_defined_locally__SWIG_2(func_t.getCPtr(pfn), pfn, name, ignore);
+  }
+
+  public static int demangle_name(String buf, long bufsize, String name, long disable_mask) {
+    return IdaJavaJNI.demangle_name(buf, bufsize, name, disable_mask);
+  }
+
+  public static void setNameChars(String value) {
+    IdaJavaJNI.NameChars_set(value);
+  }
+
+  public static String getNameChars() {
+    return IdaJavaJNI.NameChars_get();
+  }
+
+  public static void setMangleChars(String value) {
+    IdaJavaJNI.MangleChars_set(value);
+  }
+
+  public static String getMangleChars() {
+    return IdaJavaJNI.MangleChars_get();
+  }
+
+  public static long get_struc_qty() {
+    return IdaJavaJNI.get_struc_qty();
+  }
+
+  public static long get_first_struc_idx() {
+    return IdaJavaJNI.get_first_struc_idx();
+  }
+
+  public static long get_last_struc_idx() {
+    return IdaJavaJNI.get_last_struc_idx();
+  }
+
+  public static long get_prev_struc_idx(long idx) {
+    return IdaJavaJNI.get_prev_struc_idx(idx);
+  }
+
+  public static long get_next_struc_idx(long idx) {
+    return IdaJavaJNI.get_next_struc_idx(idx);
+  }
+
+  public static long get_struc_idx(long id) {
+    return IdaJavaJNI.get_struc_idx(id);
+  }
+
+  public static long get_struc_by_idx(long idx) {
+    return IdaJavaJNI.get_struc_by_idx(idx);
+  }
+
+  public static struc_t get_struc(long id) {
+    long cPtr = IdaJavaJNI.get_struc(id);
+    return (cPtr == 0) ? null : new struc_t(cPtr, false);
+  }
+
+  public static long get_struc_id(String name) {
+    return IdaJavaJNI.get_struc_id(name);
+  }
+
+  public static int get_struc_name(long id, String buf, long bufsize) {
+    return IdaJavaJNI.get_struc_name(id, buf, bufsize);
+  }
+
+  public static int get_struc_cmt(long id, boolean repeatable, String buf, long bufsize) {
+    return IdaJavaJNI.get_struc_cmt(id, repeatable, buf, bufsize);
+  }
+
+  public static long get_struc_size(struc_t sptr) {
+    return IdaJavaJNI.get_struc_size__SWIG_0(struc_t.getCPtr(sptr), sptr);
+  }
+
+  public static long get_struc_size(long id) {
+    return IdaJavaJNI.get_struc_size__SWIG_1(id);
+  }
+
+  public static long get_struc_prev_offset(struc_t sptr, long offset) {
+    return IdaJavaJNI.get_struc_prev_offset(struc_t.getCPtr(sptr), sptr, offset);
+  }
+
+  public static long get_struc_next_offset(struc_t sptr, long offset) {
+    return IdaJavaJNI.get_struc_next_offset(struc_t.getCPtr(sptr), sptr, offset);
+  }
+
+  public static long get_struc_last_offset(struc_t sptr) {
+    return IdaJavaJNI.get_struc_last_offset(struc_t.getCPtr(sptr), sptr);
+  }
+
+  public static long get_struc_first_offset(struc_t sptr) {
+    return IdaJavaJNI.get_struc_first_offset(struc_t.getCPtr(sptr), sptr);
+  }
+
+  public static long get_max_offset(struc_t sptr) {
+    return IdaJavaJNI.get_max_offset(struc_t.getCPtr(sptr), sptr);
+  }
+
+  public static boolean is_varstr(long id) {
+    return IdaJavaJNI.is_varstr(id);
+  }
+
+  public static boolean is_union(long id) {
+    return IdaJavaJNI.is_union(id);
+  }
+
+  public static struc_t get_member_struc(String fullname) {
+    long cPtr = IdaJavaJNI.get_member_struc(fullname);
+    return (cPtr == 0) ? null : new struc_t(cPtr, false);
+  }
+
+  public static struc_t get_sptr(member_t mptr) {
+    long cPtr = IdaJavaJNI.get_sptr(member_t.getCPtr(mptr), mptr);
+    return (cPtr == 0) ? null : new struc_t(cPtr, false);
+  }
+
+  public static member_t get_member(struc_t sptr, long offset) {
+    long cPtr = IdaJavaJNI.get_member(struc_t.getCPtr(sptr), sptr, offset);
+    return (cPtr == 0) ? null : new member_t(cPtr, false);
+  }
+
+  public static member_t get_member_by_name(struc_t sptr, String membername) {
+    long cPtr = IdaJavaJNI.get_member_by_name(struc_t.getCPtr(sptr), sptr, membername);
+    return (cPtr == 0) ? null : new member_t(cPtr, false);
+  }
+
+  public static member_t get_member_by_fullname(String fullname, SWIGTYPE_p_p_struc_t sptr_place) {
+    long cPtr = IdaJavaJNI.get_member_by_fullname(fullname, SWIGTYPE_p_p_struc_t.getCPtr(sptr_place));
+    return (cPtr == 0) ? null : new member_t(cPtr, false);
+  }
+
+  public static int get_member_fullname(long mid, String buf, long bufsize) {
+    return IdaJavaJNI.get_member_fullname(mid, buf, bufsize);
+  }
+
+  public static int get_member_name(long mid, String buf, long bufsize) {
+    return IdaJavaJNI.get_member_name(mid, buf, bufsize);
+  }
+
+  public static int get_member_cmt(long mid, boolean repeatable, String buf, long bufsize) {
+    return IdaJavaJNI.get_member_cmt(mid, repeatable, buf, bufsize);
+  }
+
+  public static long get_member_size(member_t mptr) {
+    return IdaJavaJNI.get_member_size(member_t.getCPtr(mptr), mptr);
+  }
+
+  public static boolean is_varmember(member_t mptr) {
+    return IdaJavaJNI.is_varmember(member_t.getCPtr(mptr), mptr);
+  }
+
+  public static member_t get_best_fit_member(struc_t sptr, long offset) {
+    long cPtr = IdaJavaJNI.get_best_fit_member(struc_t.getCPtr(sptr), sptr, offset);
+    return (cPtr == 0) ? null : new member_t(cPtr, false);
+  }
+
+  public static int get_next_member_idx(struc_t sptr, long off) {
+    return IdaJavaJNI.get_next_member_idx(struc_t.getCPtr(sptr), sptr, off);
+  }
+
+  public static int get_prev_member_idx(struc_t sptr, long off) {
+    return IdaJavaJNI.get_prev_member_idx(struc_t.getCPtr(sptr), sptr, off);
+  }
+
+  public static long add_struc(long idx, String name, boolean is_union) {
+    return IdaJavaJNI.add_struc__SWIG_0(idx, name, is_union);
+  }
+
+  public static long add_struc(long idx, String name) {
+    return IdaJavaJNI.add_struc__SWIG_1(idx, name);
+  }
+
+  public static void del_struc(struc_t sptr) {
+    IdaJavaJNI.del_struc(struc_t.getCPtr(sptr), sptr);
+  }
+
+  public static boolean set_struc_idx(struc_t sptr, long idx) {
+    return IdaJavaJNI.set_struc_idx(struc_t.getCPtr(sptr), sptr, idx);
+  }
+
+  public static boolean set_struc_name(long id, String name) {
+    return IdaJavaJNI.set_struc_name(id, name);
+  }
+
+  public static boolean set_struc_cmt(long id, String cmt, boolean repeatable) {
+    return IdaJavaJNI.set_struc_cmt(id, cmt, repeatable);
+  }
+
+  public static int add_struc_member(struc_t sptr, String fieldname, long offset, long flag, opinfo_t mt, long nbytes) {
+    return IdaJavaJNI.add_struc_member(struc_t.getCPtr(sptr), sptr, fieldname, offset, flag, opinfo_t.getCPtr(mt), mt, nbytes);
+  }
+
+  public static boolean del_struc_member(struc_t sptr, long offset) {
+    return IdaJavaJNI.del_struc_member(struc_t.getCPtr(sptr), sptr, offset);
+  }
+
+  public static int del_struc_members(struc_t sptr, long off1, long off2) {
+    return IdaJavaJNI.del_struc_members(struc_t.getCPtr(sptr), sptr, off1, off2);
+  }
+
+  public static boolean set_member_name(struc_t sptr, long offset, String name) {
+    return IdaJavaJNI.set_member_name(struc_t.getCPtr(sptr), sptr, offset, name);
+  }
+
+  public static boolean set_member_type(struc_t sptr, long offset, long flag, opinfo_t mt, long nbytes) {
+    return IdaJavaJNI.set_member_type(struc_t.getCPtr(sptr), sptr, offset, flag, opinfo_t.getCPtr(mt), mt, nbytes);
+  }
+
+  public static boolean set_member_cmt(member_t mptr, String cmt, boolean repeatable) {
+    return IdaJavaJNI.set_member_cmt(member_t.getCPtr(mptr), mptr, cmt, repeatable);
+  }
+
+  public static boolean expand_struc(struc_t sptr, long offset, int delta, boolean recalc) {
+    return IdaJavaJNI.expand_struc__SWIG_0(struc_t.getCPtr(sptr), sptr, offset, delta, recalc);
+  }
+
+  public static boolean expand_struc(struc_t sptr, long offset, int delta) {
+    return IdaJavaJNI.expand_struc__SWIG_1(struc_t.getCPtr(sptr), sptr, offset, delta);
+  }
+
+  public static void save_struc2(struc_t sptr, boolean may_update_ltypes) {
+    IdaJavaJNI.save_struc2__SWIG_0(struc_t.getCPtr(sptr), sptr, may_update_ltypes);
+  }
+
+  public static void save_struc2(struc_t sptr) {
+    IdaJavaJNI.save_struc2__SWIG_1(struc_t.getCPtr(sptr), sptr);
+  }
+
+  public static boolean get_member_tinfo(member_t mptr, SWIGTYPE_p__qstringT_unsigned_char_t buf, SWIGTYPE_p__qstringT_unsigned_char_t fields) {
+    return IdaJavaJNI.get_member_tinfo(member_t.getCPtr(mptr), mptr, SWIGTYPE_p__qstringT_unsigned_char_t.getCPtr(buf), SWIGTYPE_p__qstringT_unsigned_char_t.getCPtr(fields));
+  }
+
+  public static boolean del_member_tinfo(struc_t sptr, member_t mptr) {
+    return IdaJavaJNI.del_member_tinfo(struc_t.getCPtr(sptr), sptr, member_t.getCPtr(mptr), mptr);
+  }
+
+  public static boolean set_member_tinfo(SWIGTYPE_p_til_t til, struc_t sptr, member_t mptr, long memoff, SWIGTYPE_p_type_t type, SWIGTYPE_p_p_list fields, int flags) {
+    return IdaJavaJNI.set_member_tinfo(SWIGTYPE_p_til_t.getCPtr(til), struc_t.getCPtr(sptr), sptr, member_t.getCPtr(mptr), mptr, memoff, SWIGTYPE_p_type_t.getCPtr(type), SWIGTYPE_p_p_list.getCPtr(fields), flags);
+  }
+
+  public static boolean get_or_guess_member_tinfo(member_t mptr, SWIGTYPE_p__qstringT_unsigned_char_t type, SWIGTYPE_p__qstringT_unsigned_char_t fields) {
+    return IdaJavaJNI.get_or_guess_member_tinfo(member_t.getCPtr(mptr), mptr, SWIGTYPE_p__qstringT_unsigned_char_t.getCPtr(type), SWIGTYPE_p__qstringT_unsigned_char_t.getCPtr(fields));
+  }
+
+  public static opinfo_t retrieve_member_info(member_t mptr, opinfo_t buf) {
+    long cPtr = IdaJavaJNI.retrieve_member_info(member_t.getCPtr(mptr), mptr, opinfo_t.getCPtr(buf), buf);
+    return (cPtr == 0) ? null : new opinfo_t(cPtr, false);
+  }
+
+  public static boolean is_anonymous_member_name(String name) {
+    return IdaJavaJNI.is_anonymous_member_name(name);
+  }
+
+  public static boolean is_dummy_member_name(String name) {
+    return IdaJavaJNI.is_dummy_member_name(name);
+  }
+
+  public static boolean is_member_id(long mid) {
+    return IdaJavaJNI.is_member_id(mid);
+  }
+
+  public static boolean is_special_member(long id) {
+    return IdaJavaJNI.is_special_member(id);
+  }
+
+  public static boolean stroff_as_size(int plen, struc_t sptr, long value) {
+    return IdaJavaJNI.stroff_as_size(plen, struc_t.getCPtr(sptr), sptr, value);
+  }
+
+  public static boolean InstrIsSet(int icode, int bit) {
+    return IdaJavaJNI.InstrIsSet(icode, bit);
+  }
+
+  public static boolean is_call_insn(long ea) {
+    return IdaJavaJNI.is_call_insn(ea);
+  }
+
+  public static boolean is_ret_insn(long ea, boolean strict) {
+    return IdaJavaJNI.is_ret_insn__SWIG_0(ea, strict);
+  }
+
+  public static boolean is_ret_insn(long ea) {
+    return IdaJavaJNI.is_ret_insn__SWIG_1(ea);
+  }
+
+  public static boolean is_indirect_jump_insn(long ea) {
+    return IdaJavaJNI.is_indirect_jump_insn(ea);
+  }
+
+  public static boolean is_basic_block_end(boolean call_insn_stops_block) {
+    return IdaJavaJNI.is_basic_block_end(call_insn_stops_block);
+  }
+
+  public static void setPh(processor_t value) {
+    IdaJavaJNI.ph_set(processor_t.getCPtr(value), value);
+  }
+
+  public static processor_t getPh() {
+    long cPtr = IdaJavaJNI.ph_get();
+    return (cPtr == 0) ? null : new processor_t(cPtr, false);
+  }
+
+  public static void setAsh(asm_t value) {
+    IdaJavaJNI.ash_set(asm_t.getCPtr(value), value);
+  }
+
+  public static asm_t getAsh() {
+    long cPtr = IdaJavaJNI.ash_get();
+    return (cPtr == 0) ? null : new asm_t(cPtr, false);
+  }
+
+  public static int str2regf(String p) {
+    return IdaJavaJNI.str2regf(p);
+  }
+
+  public static int str2reg(String p) {
+    return IdaJavaJNI.str2reg(p);
+  }
+
+  public static int get_reg_name(int reg, long width, String buf, long bufsize, int reghi) {
+    return IdaJavaJNI.get_reg_name__SWIG_0(reg, width, buf, bufsize, reghi);
+  }
+
+  public static int get_reg_name(int reg, long width, String buf, long bufsize) {
+    return IdaJavaJNI.get_reg_name__SWIG_1(reg, width, buf, bufsize);
+  }
+
+  public static String get_reg_info(String regname, SWIGTYPE_p_ulonglong mask) {
+    return IdaJavaJNI.get_reg_info(regname, SWIGTYPE_p_ulonglong.getCPtr(mask));
+  }
+
+  public static boolean parse_reg_name(String regname, reg_info_t ri) {
+    return IdaJavaJNI.parse_reg_name(regname, reg_info_t.getCPtr(ri), ri);
+  }
+
+  public static long sizeof_ldbl() {
+    return IdaJavaJNI.sizeof_ldbl();
+  }
+
+  public static void intel_data(long ea) {
+    IdaJavaJNI.intel_data(ea);
+  }
+
+  public static boolean gen_spcdef(long ea, short segtype) {
+    return IdaJavaJNI.gen_spcdef(ea, segtype);
+  }
+
+  public static boolean gen_extern(long ea, String name) {
+    return IdaJavaJNI.gen_extern(ea, name);
+  }
+
+  public static boolean gen_abssym(long ea, String name) {
+    return IdaJavaJNI.gen_abssym(ea, name);
+  }
+
+  public static boolean gen_comvar(long ea, String name) {
+    return IdaJavaJNI.gen_comvar(ea, name);
+  }
+
+  public static String set_processor_type(String procname, int level) {
+    return IdaJavaJNI.set_processor_type(procname, level);
+  }
+
+  public static String get_idp_name(String buf, long bufsize) {
+    return IdaJavaJNI.get_idp_name(buf, bufsize);
+  }
+
+  public static boolean set_target_assembler(int asmnum) {
+    return IdaJavaJNI.set_target_assembler(asmnum);
+  }
+
+  public static int nbits(long ea) {
+    return IdaJavaJNI.nbits(ea);
+  }
+
+  public static int bytesize(long ea) {
+    return IdaJavaJNI.bytesize(ea);
+  }
+
+  public static boolean add_frame(func_t pfn, long frsize, int frregs, long argsize) {
+    return IdaJavaJNI.add_frame(func_t.getCPtr(pfn), pfn, frsize, frregs, argsize);
+  }
+
+  public static boolean del_frame(func_t pfn) {
+    return IdaJavaJNI.del_frame(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean set_frame_size(func_t pfn, long frsize, int frregs, long argsize) {
+    return IdaJavaJNI.set_frame_size(func_t.getCPtr(pfn), pfn, frsize, frregs, argsize);
+  }
+
+  public static long get_frame_size(func_t pfn) {
+    return IdaJavaJNI.get_frame_size(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static int get_frame_retsize(func_t pfn) {
+    return IdaJavaJNI.get_frame_retsize(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static struc_t get_frame(func_t pfn) {
+    long cPtr = IdaJavaJNI.get_frame__SWIG_0(func_t.getCPtr(pfn), pfn);
+    return (cPtr == 0) ? null : new struc_t(cPtr, false);
+  }
+
+  public static struc_t get_frame(long ea) {
+    long cPtr = IdaJavaJNI.get_frame__SWIG_1(ea);
+    return (cPtr == 0) ? null : new struc_t(cPtr, false);
+  }
+
+  public static boolean update_fpd(func_t pfn, long fpd) {
+    return IdaJavaJNI.update_fpd(func_t.getCPtr(pfn), pfn, fpd);
+  }
+
+  public static boolean set_purged(long ea, int nbytes, boolean override_old_value) {
+    return IdaJavaJNI.set_purged(ea, nbytes, override_old_value);
+  }
+
+  public static long get_func_by_frame(long frame_id) {
+    return IdaJavaJNI.get_func_by_frame(frame_id);
+  }
+
+  public static member_t get_stkvar(SWIGTYPE_p_op_t x, int v, SWIGTYPE_p_int actval) {
+    long cPtr = IdaJavaJNI.get_stkvar(SWIGTYPE_p_op_t.getCPtr(x), v, SWIGTYPE_p_int.getCPtr(actval));
+    return (cPtr == 0) ? null : new member_t(cPtr, false);
+  }
+
+  public static boolean add_stkvar3(SWIGTYPE_p_op_t x, int v, int flags) {
+    return IdaJavaJNI.add_stkvar3(SWIGTYPE_p_op_t.getCPtr(x), v, flags);
+  }
+
+  public static boolean add_stkvar2(func_t pfn, String name, int off, long flags, opinfo_t ti, long nbytes) {
+    return IdaJavaJNI.add_stkvar2(func_t.getCPtr(pfn), pfn, name, off, flags, opinfo_t.getCPtr(ti), ti, nbytes);
+  }
+
+  public static String build_stkvar_name(String buf, long bufsize, func_t pfn, int v) {
+    return IdaJavaJNI.build_stkvar_name(buf, bufsize, func_t.getCPtr(pfn), pfn, v);
+  }
+
+  public static long calc_stkvar_struc_offset(func_t pfn, long ea, int n) {
+    return IdaJavaJNI.calc_stkvar_struc_offset(func_t.getCPtr(pfn), pfn, ea, n);
+  }
+
+  public static int delete_unreferenced_stkvars(func_t pfn) {
+    return IdaJavaJNI.delete_unreferenced_stkvars(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static int delete_wrong_stkvar_ops(func_t pfn) {
+    return IdaJavaJNI.delete_wrong_stkvar_ops(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static int add_regvar(func_t pfn, long ea1, long ea2, String canon, String user, String cmt) {
+    return IdaJavaJNI.add_regvar(func_t.getCPtr(pfn), pfn, ea1, ea2, canon, user, cmt);
+  }
+
+  public static regvar_t find_regvar(func_t pfn, long ea1, long ea2, String canon, String user) {
+    long cPtr = IdaJavaJNI.find_regvar__SWIG_0(func_t.getCPtr(pfn), pfn, ea1, ea2, canon, user);
+    return (cPtr == 0) ? null : new regvar_t(cPtr, false);
+  }
+
+  public static regvar_t find_regvar(func_t pfn, long ea, String canon) {
+    long cPtr = IdaJavaJNI.find_regvar__SWIG_1(func_t.getCPtr(pfn), pfn, ea, canon);
+    return (cPtr == 0) ? null : new regvar_t(cPtr, false);
+  }
+
+  public static int rename_regvar(func_t pfn, regvar_t v, String user) {
+    return IdaJavaJNI.rename_regvar(func_t.getCPtr(pfn), pfn, regvar_t.getCPtr(v), v, user);
+  }
+
+  public static int set_regvar_cmt(func_t pfn, regvar_t v, String cmt) {
+    return IdaJavaJNI.set_regvar_cmt(func_t.getCPtr(pfn), pfn, regvar_t.getCPtr(v), v, cmt);
+  }
+
+  public static int del_regvar(func_t pfn, long ea1, long ea2, String canon) {
+    return IdaJavaJNI.del_regvar(func_t.getCPtr(pfn), pfn, ea1, ea2, canon);
+  }
+
+  public static boolean add_auto_stkpnt2(func_t pfn, long ea, int delta) {
+    return IdaJavaJNI.add_auto_stkpnt2(func_t.getCPtr(pfn), pfn, ea, delta);
+  }
+
+  public static boolean add_user_stkpnt(long ea, int delta) {
+    return IdaJavaJNI.add_user_stkpnt(ea, delta);
+  }
+
+  public static boolean del_stkpnt(func_t pfn, long ea) {
+    return IdaJavaJNI.del_stkpnt(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static int get_spd(func_t pfn, long ea) {
+    return IdaJavaJNI.get_spd(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static int get_sp_delta(func_t pfn, long ea) {
+    return IdaJavaJNI.get_sp_delta(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static long get_min_spd_ea(func_t pfn) {
+    return IdaJavaJNI.get_min_spd_ea(func_t.getCPtr(pfn), pfn);
+  }
+
+  public static boolean recalc_spd(long cur_ea) {
+    return IdaJavaJNI.recalc_spd(cur_ea);
+  }
+
+  public static void setFixup_node(SWIGTYPE_p_netnode value) {
+    IdaJavaJNI.fixup_node_set(SWIGTYPE_p_netnode.getCPtr(value));
+  }
+
+  public static SWIGTYPE_p_netnode getFixup_node() {
+    return new SWIGTYPE_p_netnode(IdaJavaJNI.fixup_node_get(), true);
+  }
+
+  public static void set_fixup(long source, fixup_data_t fp) {
+    IdaJavaJNI.set_fixup(source, fixup_data_t.getCPtr(fp), fp);
+  }
+
+  public static void set_fixup_ex(long source, fixup_data_t fd, long offset_base) {
+    IdaJavaJNI.set_fixup_ex(source, fixup_data_t.getCPtr(fd), fd, offset_base);
+  }
+
+  public static void del_fixup(long source) {
+    IdaJavaJNI.del_fixup(source);
+  }
+
+  public static boolean get_fixup(long source, fixup_data_t fd) {
+    return IdaJavaJNI.get_fixup(source, fixup_data_t.getCPtr(fd), fd);
+  }
+
+  public static long get_first_fixup_ea() {
+    return IdaJavaJNI.get_first_fixup_ea();
+  }
+
+  public static long get_next_fixup_ea(long ea) {
+    return IdaJavaJNI.get_next_fixup_ea(ea);
+  }
+
+  public static long get_prev_fixup_ea(long ea) {
+    return IdaJavaJNI.get_prev_fixup_ea(ea);
+  }
+
+  public static long get_fixup_base(long source, fixup_data_t fd) {
+    return IdaJavaJNI.get_fixup_base(source, fixup_data_t.getCPtr(fd), fd);
+  }
+
+  public static long get_fixup_extdef_ea(long source, fixup_data_t fd) {
+    return IdaJavaJNI.get_fixup_extdef_ea__SWIG_0(source, fixup_data_t.getCPtr(fd), fd);
+  }
+
+  public static long get_fixup_segdef_sel(fixup_data_t fd) {
+    return IdaJavaJNI.get_fixup_segdef_sel__SWIG_0(fixup_data_t.getCPtr(fd), fd);
+  }
+
+  public static long get_fixup_extdef_ea(long ea) {
+    return IdaJavaJNI.get_fixup_extdef_ea__SWIG_1(ea);
+  }
+
+  public static long get_fixup_segdef_sel(long ea) {
+    return IdaJavaJNI.get_fixup_segdef_sel__SWIG_1(ea);
+  }
+
+  public static String get_fixup_desc(long source, fixup_data_t fdp, String buf, long bufsize) {
+    return IdaJavaJNI.get_fixup_desc(source, fixup_data_t.getCPtr(fdp), fdp, buf, bufsize);
+  }
+
+  public static int contains_fixups(long ea, long size) {
+    return IdaJavaJNI.contains_fixups(ea, size);
+  }
+
+  public static void gen_fix_fixups(long from, long to, long size) {
+    IdaJavaJNI.gen_fix_fixups(from, to, size);
+  }
+
+  public static boolean set_offset(long ea, int n, long base) {
+    return IdaJavaJNI.set_offset(ea, n, base);
+  }
+
+  public static int op_offset_ex(long ea, int n, refinfo_t ri) {
+    return IdaJavaJNI.op_offset_ex(ea, n, refinfo_t.getCPtr(ri), ri);
+  }
+
+  public static int op_offset(long ea, int n, short type, long target, long base, int tdelta) {
+    return IdaJavaJNI.op_offset__SWIG_0(ea, n, type, target, base, tdelta);
+  }
+
+  public static int op_offset(long ea, int n, short type, long target, long base) {
+    return IdaJavaJNI.op_offset__SWIG_1(ea, n, type, target, base);
+  }
+
+  public static int op_offset(long ea, int n, short type, long target) {
+    return IdaJavaJNI.op_offset__SWIG_2(ea, n, type, target);
+  }
+
+  public static int op_offset(long ea, int n, short type) {
+    return IdaJavaJNI.op_offset__SWIG_3(ea, n, type);
+  }
+
+  public static long get_offbase(long ea, int n) {
+    return IdaJavaJNI.get_offbase(ea, n);
+  }
+
+  public static int get_offset_expression(long ea, int n, long from, int offset, String buf, long bufsize, int getn_flags) {
+    return IdaJavaJNI.get_offset_expression__SWIG_0(ea, n, from, offset, buf, bufsize, getn_flags);
+  }
+
+  public static int get_offset_expression(long ea, int n, long from, int offset, String buf, long bufsize) {
+    return IdaJavaJNI.get_offset_expression__SWIG_1(ea, n, from, offset, buf, bufsize);
+  }
+
+  public static int get_offset_expr(long ea, int n, refinfo_t ri, long from, int offset, String buf, long bufsize, int getn_flags) {
+    return IdaJavaJNI.get_offset_expr__SWIG_0(ea, n, refinfo_t.getCPtr(ri), ri, from, offset, buf, bufsize, getn_flags);
+  }
+
+  public static int get_offset_expr(long ea, int n, refinfo_t ri, long from, int offset, String buf, long bufsize) {
+    return IdaJavaJNI.get_offset_expr__SWIG_1(ea, n, refinfo_t.getCPtr(ri), ri, from, offset, buf, bufsize);
+  }
+
+  public static long can_be_off32(long ea) {
+    return IdaJavaJNI.can_be_off32(ea);
+  }
+
+  public static long calc_probable_base_by_value(long ea, long off) {
+    return IdaJavaJNI.calc_probable_base_by_value(ea, off);
+  }
+
+  public static short get_default_reftype(long ea) {
+    return IdaJavaJNI.get_default_reftype(ea);
+  }
+
+  public static long calc_reference_target(long from, refinfo_t ri, int opval) {
+    return IdaJavaJNI.calc_reference_target(from, refinfo_t.getCPtr(ri), ri, opval);
+  }
+
+  public static long calc_reference_basevalue(long from, refinfo_t ri, int opval, long target) {
+    return IdaJavaJNI.calc_reference_basevalue(from, refinfo_t.getCPtr(ri), ri, opval, target);
+  }
+
+  public static long calc_target(long from, long ea, int n, int opval) {
+    return IdaJavaJNI.calc_target(from, ea, n, opval);
+  }
+
   public static String getParameter(String key) {
     return IdaJavaJNI.getParameter(key);
   }
@@ -1463,24 +5582,8 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.initIdaEmbeddedWindow(SWIGTYPE_p_Forms__TForm.getCPtr(form));
   }
 
-  public static int getInternalHandle(int handle) {
-    return IdaJavaJNI.getInternalHandle(handle);
-  }
-
-  public static void sayHello() {
-    IdaJavaJNI.sayHello();
-  }
-
   public static String getIdbPath() {
     return IdaJavaJNI.getIdbPath();
-  }
-
-  public static boolean openDatabase(String fileName) {
-    return IdaJavaJNI.openDatabase(fileName);
-  }
-
-  public static void closeDatabase() {
-    IdaJavaJNI.closeDatabase();
   }
 
   public static boolean addMenuItem(String menupath, String name, String hotkey, int flags, IdaMenuItemListener listener) {

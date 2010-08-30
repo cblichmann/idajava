@@ -16,7 +16,7 @@ del /q "%OUTDIR%\*.*"
 	-java -package de.blichmann.idajava.natives ^
 	-I"%IDASDK%" ^
 	-outdir "%OUTDIR%" ^
-	"idajava_natives.i"
+	"idajava_idaapi.i"
 pause
 
 endlocal

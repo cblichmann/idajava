@@ -19,117 +19,73 @@
 
 #pragma once
 
-// STL headers
+// Standard headers
+#include <cstdarg>
 #include <string>
 #include <map>
-
-// Windows specific includes, omit rarely used APIs
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-// IDA SDK includes
-#pragma warning(push)
-// Disable warning about conversion between nodeidx_t and size_t in netnode.hpp
-#pragma warning(disable: 4267)
-// Disable warning about unsafe use of ctime() in pro.h
-#pragma warning(disable: 4996)
-#include <ida.hpp>
-#include <idp.hpp>
-#include <expr.hpp>
-#include <bytes.hpp>
-#include <loader.hpp>
-#include <kernwin.hpp>
-#pragma warning( pop )
 
 // Java Native Interface
 #include <jni.h>
 
 #include "idajava_consts.h"
-#include "javavmcreator.h"
-#include <process.h>
+#include "idajava_jvm.h"
 
 /** Minimum JVM version required */
-#define MIN_JVM_VERSION 1.4
-
-class AttachCurrentThread {
-	JavaVM *m_jvm;
-public:
-	AttachCurrentThread(JavaVM **jvm, JNIEnv **m_env)
-		: m_jvm(*jvm)
-	{
-/*		jint existingJvmReturned;
-		jint res;
-		res = JavaVMCreator::pfnGetCreatedJavaVMs(jvm, 1, &existingJvmReturned);
-		if (*jvm != 0 && res == 0 && existingJvmReturned > 0) // success
-		{
-			// Jvm already existed, get the env
-			res = (*jvm)->GetEnv((void**)m_env, JNI_VERSION_1_6);
-		} else
-			throw std::string("Could not obtain JVM");
- 
-		if (res == JNI_EDETACHED)*/
-			m_jvm->AttachCurrentThreadAsDaemon((void**)m_env, 0);
-	}
-
-	~AttachCurrentThread()
-	{
-//		m_jvm->DetachCurrentThread();
-	}
-};
+#define MIN_JVM_VERSION 1.5
 
 /**
  * @brief Plugin class, handles the IDA plugin callback functions.
  */
-class IdaJavaPlugin {
+class idajava_plugin {
 	/** Reference to the single instance */
-	static IdaJavaPlugin *m_instance;
+	static idajava_plugin * instance_;
 
 	/** Flag to determine whether the plugin was already initialized */
-	bool m_initDone;
-	bool m_lateInitDone;
+	bool init_done_;
+	bool late_init_done_;
 
 	/** Variable holding the instanciated Java VM */
-	JavaVM *m_jvm;
+	JavaVM * jvm_;
 
 	/** The JVM environment class */
-	JNIEnv *m_env;
+	JNIEnv * env_;
 
 	/** Class path for the internal Java VM */
-	std::string m_jvmClassPath;
+	std::string jvm_class_path_;
 
 	/** Working directory for the internal Java VM */
-	std::string m_jvmWorkingDirectory;
+	std::string jvm_working_directory_;
 
 	/** Amount of logging information that is printed to IDA console */
-	unsigned int m_logLevel;
+	unsigned int log_level_;
 
-	/** Absolute file name of the plugin shared library */
-	std::string m_moduleFileName;
+	/** Absolute filename of the plugin shared library */
+	std::string module_filename_;
 
 	/** Name of the Java class to instantiate */
-	std::string m_pluginJavaClassName;
+	std::string java_plugin_class_name_;
 
 	/**
 	 * Holds configuration parameters for Java plugins, similiar to parameters
 	 * in applets.
 	 */
-	std::map<std::string, std::string> m_params;
+	std::map<std::string, std::string> params_;
 
 	/** Reference to the Java plugin's class */
-	jclass m_javaPluginClass;
+	jclass java_plugin_class_;
 
 	/** The instantiated Java plugin */
-	jobject m_javaPluginObj;
+	jobject java_plugin_instance;
 
-	/** @brief Construct an instance of @a IdaJavaPlugin. */
-	IdaJavaPlugin()
-		: m_initDone(false)
-		, m_lateInitDone(false)
-		, m_jvm(0)
-		, m_env(0)
-		, m_logLevel(0)
-		, m_javaPluginClass(0)
-		, m_javaPluginObj(0) {}
+	/** @brief Construct an instance of @a idajava_plugin. */
+	idajava_plugin()
+		: init_done_(false)
+		, late_init_done_(false)
+		, jvm_(0)
+		, env_(0)
+		, log_level_(0)
+		, java_plugin_class_(0)
+		, java_plugin_instance(0) {}
 
 	/**
 	 * @brief Read the plugin configuration from the specified Windows registry
@@ -140,7 +96,7 @@ class IdaJavaPlugin {
 	 * @return true of the specified rootkey exists and configuration data was
 	 *     read, false otherwise.
 	 */
-	bool readRegConfig(HKEY rootkey, LPCSTR subkey);
+	bool read_reg_config(HKEY rootkey, LPCSTR subkey);
 
 	/**
 	 * @brief Read the plugin configuration. Tries to read the configuration
@@ -158,13 +114,13 @@ class IdaJavaPlugin {
 	 *      prefix "idajava".
 	 * @return true on success, false if the configuration could not be read
 	 */
-	bool readConfig(void);
+	bool read_config(void);
 	
 	/**
 	 * Creates the the java plugin by calling its constructor.
 	 * @return true on success, false otherwise
 	 */
-	bool createJavaPlugin(void);
+	bool create_java_plugin(void);
 
 	/**
 	 * @brief Checks if there is a pending Java exception and if so, outputs the
@@ -172,23 +128,23 @@ class IdaJavaPlugin {
 	 * @return true if an exception was handled and cleared, false if there was
 	 *     no pending exception.
 	 */
-	bool checkHandleJavaException(void);
+	bool check_handle_java_exception(void);
 
-	int callJavaPluginInitialize(void);
-	void callJavaPluginRun(int arg);
-	void callJavaPluginTerminate(void);
+	int call_java_plugin_initialize(void);
+	void call_java_plugin_run(int arg);
+	void call_java_plugin_terminate(void);
 
 public:
 	/**
-	 * @brief Return an instance of @a IdaJavaPlugin.
+	 * @brief Return an instance of @a idajava_plugin.
 	 * @return the instance
 	 */
-	static IdaJavaPlugin *getInstance(void);
+	static idajava_plugin * instance(void);
 
 	/**
-	 * @brief Destroy the instance of @a IdaJavaPlugin.
+	 * @brief Destroy the instance of @a idajava_plugin.
 	 */
-	static void destroyInstance(void);
+	static void destroy_instance(void);
 
 	/**
 	 * @brief Initialize the plugin.
@@ -200,7 +156,7 @@ public:
 	/**
 	 * @brief Notifies the plugin that IDA's GUI is fully initialized.
 	 */
-	void notifyGuiInitialized(void);
+	void notify_late_init_done(void);
 
 	/**
 	 * @brief Plugin main function. Gets called when the user selects the plugin.
@@ -218,8 +174,8 @@ public:
      * @brief The following functions are documented in idajava_natives.h
      * @{
      */
-	const char *getParameter(const char *name);
-	bool initIdaEmbeddedWindow(TForm *form);
+	const char * parameter(const char * name);
+	bool init_ida_embedded_window(TForm * form);
 	/** @} */
 
 	/**
@@ -234,12 +190,6 @@ public:
 	 * @return The value returned by a call to the saved window procedure for
 	 *     @a handle, or non-zero if @a uMsg == WM_ERASEBKGND.
 	 */
-	LRESULT embeddedWindowProc(HWND handle, UINT uMsg, WPARAM wParam,
+	LRESULT embedded_window_proc(HWND handle, UINT uMsg, WPARAM wParam,
 		LPARAM lParam);
 };
-
-/**
- * @brief Utility function that returns a handle to the current module.
- * @return the handle
- */
-HMODULE GetCurrentModule();

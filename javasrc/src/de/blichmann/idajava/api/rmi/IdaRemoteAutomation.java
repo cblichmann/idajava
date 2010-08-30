@@ -39,21 +39,12 @@ public interface IdaRemoteAutomation extends Remote {
 	void msg(String message) throws RemoteException;
 	
 	// Disassembly databases
-	/**
-	 * Programmatically opens an existing IDA database. Does not properly
-	 * update the IDA user interface. The plugin list is also not properly
-	 * updated.
-	 * <p>Use with caution: At times, it does not seem to work at all.
-	 * @throws RemoteException
-	 */
-	boolean openDatabase(String fileName) throws RemoteException;
-	
-	/**
-	 * Closes the currently active database. Simply calls
-	 * {@code IDAJava.term_database()}.
-	 * @throws RemoteException
-	 */
-	void closeDatabase() throws RemoteException; 
+//	/**
+//	 * Closes the currently active database. Simply calls
+//	 * {@code IDAJava.term_database()}.
+//	 * @throws RemoteException
+//	 */
+//	void closeDatabase() throws RemoteException; 
 	
 	// Additional file management
 	/**

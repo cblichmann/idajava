@@ -280,12 +280,12 @@ public class IdaJavaPlugin extends IdaPlugin {
         yoff += 40;
         appNameLabel.setBounds(new Rectangle(24, yoff, 352, 20));
 
-        final JLabel versionLabel = new JLabel("Version 0.2 (32-bit)");
+        final JLabel versionLabel = new JLabel("Version 0.3 (32-bit)");
         panel.add(versionLabel);
         yoff += 24;
         versionLabel.setBounds(new Rectangle(32, yoff, 344, 20));
 
-        final JLabel copyrightLabel = new JLabel("Copyright (c)2007-2009 Christian Blichmann");
+        final JLabel copyrightLabel = new JLabel("Copyright (c)2007-2010 Christian Blichmann");
         panel.add(copyrightLabel);
         yoff += 20;
         copyrightLabel.setBounds(new Rectangle(32, yoff, 344, 20));

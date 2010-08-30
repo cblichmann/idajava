@@ -35,12 +35,28 @@ public class IdaMenuItemListener {
     }
   }
 
+  protected void swigDirectorDisconnect() {
+    swigCMemOwn = false;
+    delete();
+  }
+
+  public void swigReleaseOwnership() {
+    swigCMemOwn = false;
+    IdaJavaJNI.IdaMenuItemListener_change_ownership(this, swigCPtr, false);
+  }
+
+  public void swigTakeOwnership() {
+    swigCMemOwn = true;
+    IdaJavaJNI.IdaMenuItemListener_change_ownership(this, swigCPtr, true);
+  }
+
   public void actionPerformed() {
-    IdaJavaJNI.IdaMenuItemListener_actionPerformed(swigCPtr, this);
+    if (getClass() == IdaMenuItemListener.class) IdaJavaJNI.IdaMenuItemListener_actionPerformed(swigCPtr, this); else IdaJavaJNI.IdaMenuItemListener_actionPerformedSwigExplicitIdaMenuItemListener(swigCPtr, this);
   }
 
   public IdaMenuItemListener() {
     this(IdaJavaJNI.new_IdaMenuItemListener(), true);
+    IdaJavaJNI.IdaMenuItemListener_director_connect(this, swigCPtr, swigCMemOwn, true);
   }
 
 }

@@ -5,26 +5,33 @@ if not "%SKIP_POST_BUILD_EVENTS%" == "" (
 	goto :eof
 )
 
-openfiles > nul 2>&1
-if "%ERRORLEVEL%" == "1" (
-	echo Logged-on user does not have administrative privilege, skipping
-	echo post build script.
-	goto :eof
-)
+rem openfiles > nul 2>&1
+rem if "%ERRORLEVEL%" == "1" (
+rem 	echo Logged-on user does not have administrative privilege, skipping
+rem 	echo post build script.
+rem 	goto :eof
+rem )
 
 
 :: IDA home directory (leave empty for auto-configuration)
 if not defined IDA_HOME set IDA_HOME=
 set BIN_DIR=.\Debug
 
+if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+	set REG=%SystemRoot%\SysWOW64\reg.exe
+) else (
+	set REG=%SystemRoot%\System32\reg.exe
+)
+
 :: ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 if "%IDA_HOME%" == "" ( 
 	:: Get IDA installation directory from registry
 	set IDA_REG="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\IDA Pro_is1" /v InstallLocation
-	reg query %IDA_REG% > nul 2>&1
+	"%REG%" query !IDA_REG! > nul 2>&1
 	if %ERRORLEVEL% equ 0 (
-		for /f "skip=2 tokens=2,*" %%I in ('reg query %IDA_REG% 2^>^&1') do (
+		for /f "skip=2 tokens=2,*" %%I in ('"%REG%" query !IDA_REG! 2^>^&1') do (
+echo MARK
 			set IDA_HOME=%%J
 			if "!IDA_HOME:~-1!" == "\" (
 				:: Clean up trailing slash
@@ -34,10 +41,10 @@ if "%IDA_HOME%" == "" (
 	)
 	
 	:: Still empty? Try to set a sensible default
-	if "%IDA_HOME%" == "" set IDA_HOME=%ProgramFiles%\IDA
+	if "!IDA_HOME!" == "" set IDA_HOME=%ProgramFiles%\IDA
 )
 
-if not exist "%IDA_HOME%" (
+if not exist "!IDA_HOME!" (
 	echo [%0] Error: Cannot determine IDA installation directory.
 	echo [%0]        You can either edit this script to set the directory or define
 	echo [%0]        the environment variable IDA_HOME.

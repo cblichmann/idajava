@@ -17,41 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Include class definition
-#include "idajava_pluginclass.h"
+// IDA SDK includes
+#define USE_DANGEROUS_FUNCTIONS
+#define USE_STANDARD_FILE_FUNCTIONS
+#pragma warning(push)
+#pragma warning(disable: 4267) // netnode.hpp: Conversion nodeidx_t <-> size_t
+#pragma warning(disable: 4996) // pro.h: unsafe use of ctime()
+#include <ida.hpp>
+#include <idp.hpp>
+#include <expr.hpp>
+#include <bytes.hpp>
+#include <loader.hpp>
+#include <kernwin.hpp>
+#pragma warning(pop)
+
+#include "idajava_pluginclass.h" // Include class definition
+#include "idajava_windows.h"
 
 using namespace std;
-
-HMODULE GetCurrentModule()
-{
-	// Note: Although this function does a little trickery, it is the
-	//       recommended way to obtain a handle to the current module. We use
-	//       VirtualQuery to obtain MEMORY_BASIC_INFORMATION structure for a
-	//       variable in this module's address space. Since the AllocationBase
-	//       member of this structure is always the base address after any
-	//       relocations (and is guaranteed to be unique throughout the
-	//       system, it can be used safely as the handle to the current
-	//       module.
-
-	MEMORY_BASIC_INFORMATION mbi;
-	static int addressSpaceAnchor;
-	VirtualQuery(&addressSpaceAnchor, &mbi, sizeof(mbi));
-
-	return reinterpret_cast<HMODULE>(mbi.AllocationBase);
-}
 
 static int idaapi ui_callback(void *user_data, int notification_code,
 		va_list va)
 {
 	if (notification_code == ui_ready_to_run)
-		IdaJavaPlugin::getInstance()->notifyGuiInitialized();
+		idajava_plugin::instance()->notify_late_init_done();
 	return 0;
 }
 
 // Initialize static member
-IdaJavaPlugin *IdaJavaPlugin::m_instance = 0;
+idajava_plugin *idajava_plugin::instance_ = 0;
 
-bool IdaJavaPlugin::readRegConfig(HKEY rootkey, LPCSTR subkey)
+bool idajava_plugin::read_reg_config(HKEY rootkey, LPCSTR subkey)
 {
 	HKEY key;
 	char buf[MAX_PATH];
@@ -60,60 +56,58 @@ bool IdaJavaPlugin::readRegConfig(HKEY rootkey, LPCSTR subkey)
 			&key) != ERROR_SUCCESS)
 		return false;
 
-	// TODO: Allow to pass arbitrary configuration options to Java
-
 	if (RegQueryStringValue(key, CONFIG_NAME_JVMCLASSPATH,
 			static_cast<char *>(buf), MAX_PATH))
-		m_jvmClassPath = buf;
+		jvm_class_path_ = buf;
 	
 	if (RegQueryStringValue(key, CONFIG_NAME_JVMWORKINGDIRECTORY,
 			static_cast<char *>(buf), MAX_PATH))
-		m_jvmWorkingDirectory = buf;
+		jvm_working_directory_ = buf;
 
 	if (RegQueryStringValue(key, CONFIG_NAME_PLUGINJAVACLASS,
 			static_cast<char *>(buf), MAX_PATH))
-		m_pluginJavaClassName = buf;
+		java_plugin_class_name_ = buf;
 	
 	if (RegQueryStringValue(key, CONFIG_NAME_EMBEDDEDFRAMECLASS,
 			static_cast<char *>(buf), MAX_PATH))
-		m_params[CONFIG_NAME_EMBEDDEDFRAMECLASS] = buf;
+		params_[CONFIG_NAME_EMBEDDEDFRAMECLASS] = buf;
 
 	{
 	DWORD loglevel(0);
 	if (RegQueryUInt32Value(key, CONFIG_NAME_LOGLEVEL, loglevel)) {
-		m_logLevel = loglevel;
-		m_params[CONFIG_NAME_LOGLEVEL] = string("" + m_logLevel);
+		log_level_ = loglevel;
+		params_[CONFIG_NAME_LOGLEVEL] = string("" + log_level_);
 	}
 	}
 	
 	if (RegQueryStringValue(key, CONFIG_NAME_RMIREGISTRY,
 			static_cast<char *>(buf), MAX_PATH))
-		m_params[CONFIG_NAME_RMIREGISTRY] = buf;
+		params_[CONFIG_NAME_RMIREGISTRY] = buf;
 	
 	if (RegQueryStringValue(key, CONFIG_NAME_RMIPOOLSERVEROBJECTNAME,
 			static_cast<char *>(buf), MAX_PATH))
-		m_params[CONFIG_NAME_RMIPOOLSERVEROBJECTNAME] = buf;
+		params_[CONFIG_NAME_RMIPOOLSERVEROBJECTNAME] = buf;
 	
 	RegCloseKey(key);
 	return true;
 }
 
-bool IdaJavaPlugin::readConfig()
+bool idajava_plugin::read_config()
 {
 	// Set defaults
-	m_jvmClassPath = CONFIG_VALUE_JVMCLASSPATH;
-	m_jvmWorkingDirectory = CONFIG_VALUE_JVMWORKINGDIRECTORY;
-	m_pluginJavaClassName = CONFIG_VALUE_PLUGINJAVACLASS;
-	m_params[CONFIG_NAME_EMBEDDEDFRAMECLASS] =
+	jvm_class_path_ = CONFIG_VALUE_JVMCLASSPATH;
+	jvm_working_directory_ = CONFIG_VALUE_JVMWORKINGDIRECTORY;
+	java_plugin_class_name_ = CONFIG_VALUE_PLUGINJAVACLASS;
+	params_[CONFIG_NAME_EMBEDDEDFRAMECLASS] =
 		CONFIG_VALUE_EMBEDDEDFRAMECLASS;
-	m_params[CONFIG_NAME_RMIREGISTRY] = CONFIG_VALUE_RMIREGISTRY;
-	m_params[CONFIG_NAME_RMIPOOLSERVEROBJECTNAME] =
+	params_[CONFIG_NAME_RMIREGISTRY] = CONFIG_VALUE_RMIREGISTRY;
+	params_[CONFIG_NAME_RMIPOOLSERVEROBJECTNAME] =
 		CONFIG_VALUE_RMIPOOLSERVEROBJECTNAME;
 
 	// Read from HKCU first, then from HKLM
-	bool haveConfig(readRegConfig(HKEY_CURRENT_USER,
+	bool haveConfig(read_reg_config(HKEY_CURRENT_USER,
 		REGKEY_HKCU_PLUGIN_ROOT));
-	haveConfig = haveConfig || readRegConfig(HKEY_LOCAL_MACHINE,
+	haveConfig = haveConfig || read_reg_config(HKEY_LOCAL_MACHINE,
 		REGKEY_HKLM_PLUGIN_ROOT);
 
 	// TODO: Implement plugin options
@@ -124,65 +118,69 @@ bool IdaJavaPlugin::readConfig()
 	return haveConfig;
 }
 
-IdaJavaPlugin *IdaJavaPlugin::getInstance()
+idajava_plugin *idajava_plugin::instance()
 {
-	if (m_instance == 0)
-		m_instance = new IdaJavaPlugin();
-	return m_instance;
+	if (instance_ == 0)
+		instance_ = new idajava_plugin();
+	return instance_;
 }
 
-void IdaJavaPlugin::destroyInstance()
+void idajava_plugin::destroy_instance()
 {
-	if (m_instance == 0)
+	if (instance_ == 0)
 		return;
-	delete m_instance;
-	m_instance = 0;
+	delete instance_;
+	instance_ = 0;
 }
 
-int IdaJavaPlugin::initialize()
+int idajava_plugin::initialize()
 {
  	// Only initialize once
-	if (m_initDone)
+	if (init_done_)
 		return PLUGIN_KEEP;
-	m_initDone = true;
+	init_done_ = true;
 
 	// Display version and copyright information
 	msg("%s\n", APP_BANNER);
 
 	// Read configuration
-	if (!readConfig()) {
+	if (!read_config())
+	{
 		msg("Error: Cannot read plugin configuration, skipping "
 			"plugin\n");
 		return PLUGIN_SKIP;
 	}
 
 	char buf[MAX_PATH];
-	if (GetModuleFileName(GetCurrentModule(), buf, MAX_PATH) == 0) {
+	if (GetModuleFileName(GetCurrentModule(), buf, MAX_PATH) == 0)
+	{
 		msg("Error: Cannot determine module path, skipping plugin\n");
 		return PLUGIN_SKIP;
 	}
-	m_moduleFileName = buf;
+	module_filename_ = buf;
 
-	if (m_jvmWorkingDirectory.empty())
+	if (jvm_working_directory_.empty())
 		// Extract the directory part of the module file name
 		// FIXME: Determine platform-specific path separator and use it
-		m_jvmWorkingDirectory = string(m_moduleFileName.begin(),
-			m_moduleFileName.begin() + m_moduleFileName.rfind('\\'));
+		jvm_working_directory_ = string(module_filename_.begin(),
+			module_filename_.begin() + module_filename_.rfind('\\'));
 
-	if (!SetCurrentDirectory(m_jvmWorkingDirectory.c_str()))
+	if (!SetCurrentDirectory(jvm_working_directory_.c_str()))
 		msg("Warning: Failed to change working directory to \"%s\"\n",
-			m_jvmWorkingDirectory.c_str());
+			jvm_working_directory_.c_str());
 
 	// Find and create a suitable Java VM
 	msg("Initializing in-process Java VM...");
-	JavaVMCreator jvc;
-	jvc.addVMOption(("-Djava.class.path=" + m_jvmClassPath).c_str());
-	jvc.addVMOption("-Xcheck:jni");
-	if (!jvc.findJRE(MIN_JVM_VERSION)) {
+	jvm_builder jvc;
+	jvc.add_vmoption(("-Djava.class.path=" + jvm_class_path_).c_str());
+	jvc.add_vmoption("-Xcheck:jni");
+	if (!jvc.find_jre(MIN_JVM_VERSION))
+	{
 		msg("\nError: Cannot find a suitable Java VM, skipping plugin\n");
 		return PLUGIN_SKIP;
 	}
-	if (!jvc.createVM(&m_jvm, &m_env)) {
+	if (!jvc.create_jvm(&jvm_, &env_))
+	{
 		msg("\nError: Cannot create Java VM, skipping plugin\n");
 		return PLUGIN_SKIP;
 	}
@@ -190,7 +188,8 @@ int IdaJavaPlugin::initialize()
 
 	// Register to receive IDA UI events
 	if (!hook_to_notification_point(HT_UI, ui_callback, 
-			reinterpret_cast<void *>(HOOKDATA_IDAJAVA_COOKIE))) {
+			reinterpret_cast<void *>(HOOKDATA_IDAJAVA_COOKIE)))
+	{
 		msg("Error: Cannot register to receive UI messages, skipping plugin\n");
 		return PLUGIN_SKIP;
 	}
@@ -198,41 +197,45 @@ int IdaJavaPlugin::initialize()
 	return PLUGIN_KEEP;
 }
 
-void IdaJavaPlugin::notifyGuiInitialized(void) {
-	m_lateInitDone = true;
+void idajava_plugin::notify_late_init_done(void) {
+	late_init_done_ = true;
 
 	// Call Java plugins late in the init process;
-	callJavaPluginInitialize();
+	call_java_plugin_initialize();
 }
 
-bool IdaJavaPlugin::createJavaPlugin()
+bool idajava_plugin::create_java_plugin()
 {
 	jmethodID mid;
 	jstring jstr;
 
-	m_javaPluginClass = m_env->FindClass(m_pluginJavaClassName.c_str());
-	if (m_javaPluginClass == 0) {
+	java_plugin_class_ = env_->FindClass(java_plugin_class_name_.c_str());
+	if (java_plugin_class_ == 0)
+	{
 		msg("\nError: Plugin Java class %s not found, skipping plugin\n",
-			m_pluginJavaClassName.c_str());
+			java_plugin_class_name_.c_str());
 		return false;
 	}
 
-	mid = m_env->GetMethodID(m_javaPluginClass, "<init>",
+	mid = env_->GetMethodID(java_plugin_class_, "<init>",
 		"(Ljava/lang/String;)V");
-	if (mid == 0) {
+	if (mid == 0)
+	{
 		msg("\nError: Plugin class has no constructor with signature " \
 			"(Ljava/lang/String;)V, skipping plugin\n");
 		return false;
 	}
 
-	jstr = m_env->NewStringUTF(m_moduleFileName.c_str());
-	if (jstr == 0) {
+	jstr = env_->NewStringUTF(module_filename_.c_str());
+	if (jstr == 0)
+	{
 		msg("\nError: Cannot create UTF string, skipping plugin\n");
 		return false;
 	}
 
-	m_javaPluginObj = m_env->NewObject(m_javaPluginClass, mid, jstr);
-	if (m_javaPluginObj == 0) {
+	java_plugin_instance = env_->NewObject(java_plugin_class_, mid, jstr);
+	if (java_plugin_instance == 0)
+	{
 		msg("\nError: Cannot create Java object, skipping plugin\n");
 		return false;
 	}
@@ -241,18 +244,18 @@ bool IdaJavaPlugin::createJavaPlugin()
 	return true;
 }
 
-bool IdaJavaPlugin::checkHandleJavaException()
+bool idajava_plugin::check_handle_java_exception()
 {
-//	AttachCurrentThread attach(&m_jvm, &m_env);
+//	AttachCurrentThread attach(&jvm_, &env_);
 
 	// Exit early if there is no pending exception
-	if (m_env != 0 && !m_env->ExceptionCheck())
+	if (env_ != 0 && !env_->ExceptionCheck())
 		return false;
 
 	// From this point on we know for sure an exception happened. Now we try
 	// to provide at least some of the information a normal Java program
 	// would output when encountering an exception.
-	jthrowable e = m_env->ExceptionOccurred();
+	jthrowable e = env_->ExceptionOccurred();
 	
 	// Save some method IDs for future use
 	static jmethodID throwableGetClass(0);
@@ -263,168 +266,152 @@ bool IdaJavaPlugin::checkHandleJavaException()
 		// we're asking for core Java classes here.
 		jclass cls;
 
-		cls = m_env->FindClass("java/lang/Throwable");
+		cls = env_->FindClass("java/lang/Throwable");
 		assert(cls != 0);
-		throwableGetClass = m_env->GetMethodID(cls, "getClass",
+		throwableGetClass = env_->GetMethodID(cls, "getClass",
 			"()Ljava/lang/Class;");
 		assert(throwableGetClass != 0);
-		throwableGetMessage = m_env->GetMethodID(cls, "getMessage",
+		throwableGetMessage = env_->GetMethodID(cls, "getMessage",
 			"()Ljava/lang/String;");
 		assert(throwableGetMessage);
-		m_env->DeleteLocalRef(cls);
+		env_->DeleteLocalRef(cls);
 
-		cls = m_env->FindClass("java/lang/Class");
-		classGetName = m_env->GetMethodID(cls, "getName",
+		cls = env_->FindClass("java/lang/Class");
+		classGetName = env_->GetMethodID(cls, "getName",
 			"()Ljava/lang/String;");
 		assert(classGetName != 0);
-		m_env->DeleteLocalRef(cls);
+		env_->DeleteLocalRef(cls);
 	}
 
 	// Get exception class
-	jobject c = m_env->CallObjectMethod(e, throwableGetClass);
-	jstring className_jstr = (jstring) m_env->CallObjectMethod(c, classGetName);
-	const char *className = m_env->GetStringUTFChars(className_jstr, JNI_FALSE);
+	jobject c = env_->CallObjectMethod(e, throwableGetClass);
+	jstring className_jstr = (jstring) env_->CallObjectMethod(c, classGetName);
+	const char *className = env_->GetStringUTFChars(className_jstr, JNI_FALSE);
 
 	// Get exception message
-	jstring message_jstr = (jstring) m_env->CallObjectMethod(e,
+	jstring message_jstr = (jstring) env_->CallObjectMethod(e,
 		throwableGetMessage);
-	const char *message = m_env->GetStringUTFChars(message_jstr, JNI_FALSE);
+	const char *message = env_->GetStringUTFChars(message_jstr, JNI_FALSE);
 	
 	msg("Java Exception %s: %s\n", className, message);
 
 	// Free JNI allocated strings
-	m_env->ReleaseStringUTFChars(message_jstr, message);
-	m_env->ReleaseStringUTFChars(className_jstr, className);
+	env_->ReleaseStringUTFChars(message_jstr, message);
+	env_->ReleaseStringUTFChars(className_jstr, className);
 
 	// Clear the exception, so JNI is available again
-	m_env->ExceptionClear();
+	env_->ExceptionClear();
 	return true;
 }
 
-/*#include <sstream>
-#include "va_pass.h"
-static callui_t (idaapi *g_savedCallui)(ui_notification_t what, ...) = 0;
-callui_t idaapi spy_callui(ui_notification_t what, ...)
+int idajava_plugin::call_java_plugin_initialize()
 {
-	callui_t result;
-	va_list args;
-
-	va_start(args, what);
-	ostringstream os;
-	os << what << endl;
-	OutputDebugString(os.str().c_str());
-	result = g_savedCallui(what, va_pass(args));
-	va_end(args);
-
-	return result;
-}*/
-
-int IdaJavaPlugin::callJavaPluginInitialize()
-{
-/*	g_savedCallui = callui;
-	callui = spy_callui;//*/
-
-	AttachCurrentThread attach(&m_jvm, &m_env);
+	jvm_thread_autoattach attach(&jvm_, &env_);
 	msg("Invoking Java stub plugin...");
-	if (!createJavaPlugin())
+	if (!create_java_plugin())
 		return PLUGIN_SKIP;
 
-	jmethodID mid = m_env->GetMethodID(m_javaPluginClass, "initialize", "()I");
+	jmethodID mid = env_->GetMethodID(java_plugin_class_, "initialize", "()I");
 
 	// If the initialize()-method was not found, just issue a warning and
 	// assume the plugin needs no initialization and return PLUGIN_KEEP
-	if (mid == 0) {
+	if (mid == 0)
+	{
 		msg("Info: No initialize()-method found for Java plugin, assuming " \
 			"it does not need initialization\n");
 		return PLUGIN_KEEP;
 	}
 
 	// Call the plugin's initialize()-method
-	long result = m_env->CallIntMethod(m_javaPluginObj, mid);
+	long result = env_->CallIntMethod(java_plugin_instance, mid);
 
 	// Skip plugin if there was an exception
-	if (checkHandleJavaException())
+	if (check_handle_java_exception())
 		return PLUGIN_SKIP;
 
 	return PLUGIN_KEEP;//(int) result;
 }
 
-void IdaJavaPlugin::callJavaPluginRun(int arg)
+void idajava_plugin::call_java_plugin_run(int arg)
 {
-//	AttachCurrentThread attach(&m_jvm, &m_env);
-	jmethodID mid = m_env->GetMethodID(m_javaPluginClass, "run", "(I)V");
-	if (mid == 0) {
+//	jvm_thread_autoattach attach(&jvm_, &env_);
+	jmethodID mid = env_->GetMethodID(java_plugin_class_, "run", "(I)V");
+	if (mid == 0)
+	{
 		msg("Warning: Java plugin has no run()-method, nothing to be done\n");
 		return;
 	}
 
 	// Call the plugin's run()-method
-	m_env->CallVoidMethod(m_javaPluginObj, mid, (jint) arg);
-	checkHandleJavaException();
+	env_->CallVoidMethod(java_plugin_instance, mid, (jint) arg);
+	check_handle_java_exception();
 }
 
-void IdaJavaPlugin::callJavaPluginTerminate(void)
+void idajava_plugin::call_java_plugin_terminate(void)
 {
-	AttachCurrentThread attach(&m_jvm, &m_env);
-	jmethodID mid = m_env->GetMethodID(m_javaPluginClass, "terminate", "()V");
-	if (mid == 0) {
+	jvm_thread_autoattach attach(&jvm_, &env_);
+	jmethodID mid = env_->GetMethodID(java_plugin_class_, "terminate", "()V");
+	if (mid == 0)
+	{
 		msg("Info: No terminate()-method found for Java plugin\n");
 		return;
 	}
 
 	// Call the plugin's terminate()-method
-	m_env->CallVoidMethod(m_javaPluginObj, mid);
-	checkHandleJavaException();
+	env_->CallVoidMethod(java_plugin_instance, mid);
+	check_handle_java_exception();
 }
 
-void IdaJavaPlugin::run(int arg)
+void idajava_plugin::run(int arg)
 {
-	if (!m_lateInitDone)
+	if (!late_init_done_)
 		return;
 
-	if (m_env == 0 || m_javaPluginClass == 0) {
+	if (env_ == 0 || java_plugin_class_ == 0)
+	{
 		msg("Error: Java not initialized and plugin invocation requested\n");
 		return;
 	}
-	callJavaPluginRun(arg);
+	call_java_plugin_run(arg);
 }
 
-void IdaJavaPlugin::terminate()
+void idajava_plugin::terminate()
 {
 	// Call terminate()-method if Java was ever initialized
-	if (m_env == 0 || m_javaPluginClass == 0)
-		callJavaPluginTerminate();
+	if (env_ == 0 || java_plugin_class_ == 0)
+		call_java_plugin_terminate();
 
 	// Unregister UI event notification (placed here in case terminate()
 	// needed it)
 	unhook_from_notification_point(HT_UI, ui_callback,
 		reinterpret_cast<void *>(HOOKDATA_IDAJAVA_COOKIE));
 
-	if (m_env == 0)
+	if (env_ == 0)
 		return;
 
 	{
-//	AttachCurrentThread attach(&m_jvm, &m_env);
+//	AttachCurrentThread attach(&jvm_, &env_);
 	// Call System.exit(0) to ensure there are no Java threads. Ignore all
 	// errors and exceptions here. FindClass and GetStaticMethodID shouldn't
 	// fail anyway, since java.lang.System is a core Java class.
-m_jvm->AttachCurrentThreadAsDaemon((void**)&m_env, 0);
-	jclass cls = m_env->FindClass("java/lang/System");
-	jmethodID mid = m_env->GetStaticMethodID(cls, "exit", "(I)V");
-	m_env->CallVoidMethod(m_javaPluginObj, mid, 0);
+jvm_->AttachCurrentThreadAsDaemon((void **)&env_, 0);
+	jclass cls = env_->FindClass("java/lang/System");
+	jmethodID mid = env_->GetStaticMethodID(cls, "exit", "(I)V");
+	env_->CallVoidMethod(java_plugin_instance, mid, 0);
 	// TODO: Use the mutex from the initialize()-method to determine whether
 	//       we're exiting IDA for good or just open another database
 	msg("Unloading Java...");
 	}
-//	m_jvm->DetachCurrentThread();
-	m_jvm->DestroyJavaVM();
+//	jvm_->DetachCurrentThread();
+	jvm_->DestroyJavaVM();
 	msg("OK\n");
 }
 
-const char *IdaJavaPlugin::getParameter(const char *name)
+const char *
+idajava_plugin::parameter(const char * name)
 {
-	map<string, string>::iterator i = m_params.find(name);
-	return (i != m_params.end()) ? i->second.c_str() : 0;
+	map<string, string>::iterator i = params_.find(name);
+	return (i != params_.end()) ? i->second.c_str() : 0;
 }
 
 /**
@@ -435,24 +422,25 @@ const char *IdaJavaPlugin::getParameter(const char *name)
  * @param[in] lParam  The second message parameter
  *
  * @return The value returned by call to
- *     @a IdaJavaPlugin::embeddedWindowProc().
+ *     @a idajava_plugin::embedded_window_proc().
  * 
  */
-static LRESULT CALLBACK embeddedWindowProcCallback(HWND handle, UINT uMsg,
-		WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK
+embeddedWindowProcCallback(HWND handle, UINT uMsg, WPARAM wParam, LPARAM lParam)
 { 
-	return IdaJavaPlugin::getInstance()->embeddedWindowProc(handle, uMsg,
+	return idajava_plugin::instance()->embedded_window_proc(handle, uMsg,
 			wParam, lParam);
 }
 
-LRESULT IdaJavaPlugin::embeddedWindowProc(HWND handle, UINT uMsg,
-		WPARAM wParam, LPARAM lParam)
+LRESULT
+idajava_plugin::embedded_window_proc(HWND handle, UINT uMsg, WPARAM wParam,
+		LPARAM lParam)
 {
 	if (uMsg == WM_ERASEBKGND)
 		return 1;
 	if (uMsg == WM_SIZING)
 	{
-		msg(".");
+//		msg(".");
 	}
 
 	WNDPROC prevWndProc(reinterpret_cast<WNDPROC>(GetWindowLong(handle,
@@ -462,11 +450,14 @@ LRESULT IdaJavaPlugin::embeddedWindowProc(HWND handle, UINT uMsg,
 	return CallWindowProc(prevWndProc, handle, uMsg, wParam, lParam);
 }
 
-bool IdaJavaPlugin::initIdaEmbeddedWindow(TForm *form)
+bool
+idajava_plugin::init_ida_embedded_window(TForm * form)
 {
+	// Try to find deeply nested child window
 	HWND handle = get_tform_handle(form);
 	RECT rect;
-	while (GetClientRect(handle, &rect)) {
+	while (GetClientRect(handle, &rect))
+	{
 		if (rect.right < 10000)
 			break;
 		handle = GetParent(handle);
@@ -474,7 +465,8 @@ bool IdaJavaPlugin::initIdaEmbeddedWindow(TForm *form)
 
 	WNDPROC prevWndProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(handle,
 			GWL_WNDPROC));
-	if (prevWndProc == 0) {
+	if (prevWndProc == 0)
+	{
 		msg("Error: Could not get previous window procedure\n");
 		return false;
 	}

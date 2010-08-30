@@ -20,9 +20,13 @@
 #pragma once
 
 // IDA SDK includes
+#define USE_STANDARD_FILE_FUNCTIONS
+#pragma warning(push)
+#pragma warning(disable: 4267) // netnode.hpp: Conversion nodeidx_t <-> size_t
+#pragma warning(disable: 4996) // pro.h: unsafe use of ctime()
 #include <ida.hpp>
 #include <kernwin.hpp>
-#include <diskio.hpp>
+#pragma warning(pop)
 
 // Note: When extending this file with additional functions, watch out for
 //       potential name clashes with the IDA API.
@@ -34,7 +38,7 @@
  * @return the value of the named parameter, or 0 if there was no
  *     configuration value with the specified key.
  */
-const char *getParameter(const char *key);
+const char * getParameter(const char * key);
 
 /**
  * @brief Returns a window handle to the IDA main window.
@@ -47,41 +51,22 @@ int getIdaWindowHandle();
  * @param form An IDA TForm that already has a valid window handle
  * @return @a true on success, @a false otherwise.
  */
-bool initIdaEmbeddedWindow(TForm *form);
-int getInternalHandle(int handle);
-
-
-/**
- * Adds the text "Hello IDA from Java!" to the IDA message window.
- */
-void sayHello(void);
+bool initIdaEmbeddedWindow(TForm * form);
 
 /**
  * @brief Returns the absolute filename of the database that is currently
  * loaded.
  * @return the filename.
  */
-const char *getIdbPath(void);
+const char * getIdbPath(void);
 
-/**
- * @brief Experimental function that opens another IDA database within the
- * same instance of IDA. This function uses some dirty tricks and does not
- * work reliably. DO NOT USE.
- * @param fileName the file name of the database to open
- * @return true on success, false otherwise.
- */
-bool openDatabase(char *fileName);
-
-/**
- * @brief Closes the current IDA database.
- */
-void closeDatabase(void);
-
-class IdaMenuItemListener {
+class IdaMenuItemListener
+{
 public:
-	virtual ~IdaMenuItemListener() { /* Empty destructor needed for SWIG*/ }
+	virtual ~IdaMenuItemListener()
+	{ /* Empty destructor needed for SWIG*/ }
 	virtual void actionPerformed()
 	{ /* Do nothing by default */ }
 };
-bool addMenuItem(const char *menupath, const char *name,
-	const char *hotkey, int flags, IdaMenuItemListener *listener);
+bool addMenuItem(const char * menupath, const char * name,
+	const char * hotkey, int flags, IdaMenuItemListener * listener);

@@ -226,17 +226,6 @@ public class IdaRemoteAutomationPlugin extends IdaPlugin
 	}
 	
 	// IDARemoteAutomation Interface
-	public boolean openDatabase(String fileName) throws RemoteException {
-		if (!new File(fileName).isFile())
-			return false;
-		
-		return IdaJava.openDatabase(fileName);
-	}
-	
-	public void closeDatabase() throws RemoteException {
-		IdaJava.closeDatabase();
-	}
-	
 	public void msg(String message) throws RemoteException {
 		IdaJava.msg(message);
 	}
@@ -262,19 +251,18 @@ public class IdaRemoteAutomationPlugin extends IdaPlugin
 	
 	public boolean runScript(String code) throws RemoteException {
 		// UNTESTED
-		return IdaJava.execute(code);
+		return false;// IdaJava.execute(code);
 	}
 	
 	public boolean runScriptFile(String fileName) throws RemoteException {
 		// UNTESTED
 		String errbuf = "";
-		return IdaJava.ExecuteFile(fileName, "main", 0, null, null, errbuf,
-				1024);
+		return false;//IdaJava.ExecuteFile(fileName, "main", 0, null, null, errbuf, 1024);
 	}
 	
 	public boolean runPlugin(String name, int arg) throws RemoteException {
 		// Mimic the behavior of the RunPlugin() IDC function
-		return IdaJava.load_and_run_plugin(name, arg);
+		return false;//IdaJava.load_and_run_plugin(name, arg);
 	}
 
 	public void exit(final int code) throws RemoteException {
@@ -288,8 +276,8 @@ public class IdaRemoteAutomationPlugin extends IdaPlugin
 				// Make sure terminate gets called
 				terminate();
 				
-				// Properly close the database
-				IdaJava.closeDatabase();
+//				// Properly close the database
+//				IdaJava.closeDatabase();
 				
 				// Exit IDA
 				IdaConsole.out.println("Calling qexit");

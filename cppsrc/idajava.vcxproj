@@ -51,9 +51,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
-      <Command>$(ProjectDir)CopyFiles.cmd
-</Command>
-      <Outputs>$(OutDir)copied.stamp;%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -83,7 +84,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\external\idasdk_5_5\include;$(ProjectDir)..\external\idasdk_5_5\include;$(WindowsSdkDir)Include;$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\external\idasdk_5_7\include;$(ProjectDir)..\external\idasdk_5_7\include;$(WindowsSdkDir)Include;$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;IDAPLUGINTEST_EXPORTS;__NT__;__IDP__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -93,7 +94,7 @@
     <Link>
       <AdditionalDependencies>ida.lib;pro.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).plw</OutputFile>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\external\idasdk_5_5\libvc.w32;$(ProjectDir)..\external\idasdk_5_5\libvc.w32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\external\idasdk_5_7\lib\vc.w32;$(ProjectDir)..\external\idasdk_5_7\lib\vc.w32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -109,18 +110,44 @@
     <ClInclude Include="src\idajava_main.h" />
     <ClInclude Include="src\idajava_natives.h" />
     <ClInclude Include="src\idajava_pluginclass.h" />
-    <ClInclude Include="src\javavmcreator.h" />
+    <ClInclude Include="src\idajava_jvm.h" />
+    <ClInclude Include="src\idajava_windows.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\idajava_idaapi_wrap.cxx" />
     <ClCompile Include="src\idajava_main.cpp" />
     <ClCompile Include="src\idajava_natives.cpp" />
-    <ClCompile Include="src\idajava_natives_wrap.cxx" />
     <ClCompile Include="src\idajava_pluginclass.cpp" />
-    <ClCompile Include="src\javavmcreator.cpp" />
+    <ClCompile Include="src\idajava_jvm.cpp" />
+    <ClCompile Include="src\idajava_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\area.i" />
+    <None Include="src\auto.i" />
+    <None Include="src\bytes.i" />
+    <None Include="src\diskio.i" />
+    <None Include="src\expr.i" />
+    <None Include="src\fixup.i" />
+    <None Include="src\fpro.i" />
+    <None Include="src\frame.i" />
+    <None Include="src\funcs.i" />
+    <None Include="src\help.i" />
+    <None Include="src\ida.i" />
+    <None Include="src\idajava_idaapi.i" />
     <None Include="src\idajava_natives.i" />
+    <None Include="src\idp.i" />
+    <None Include="src\ints.i" />
+    <None Include="src\kernwin.i" />
+    <None Include="src\llong.i" />
+    <None Include="src\loader.i" />
+    <None Include="src\nalt.i" />
+    <None Include="src\name.i" />
+    <None Include="src\offset.i" />
     <None Include="src\operators.i" />
+    <None Include="src\pro.i" />
+    <None Include="src\segment.i" />
+    <None Include="src\struct.i" />
+    <None Include="src\ua.i" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

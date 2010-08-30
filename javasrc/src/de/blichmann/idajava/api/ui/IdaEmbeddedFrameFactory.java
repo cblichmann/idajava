@@ -1,6 +1,6 @@
 package de.blichmann.idajava.api.ui;
 
-import java.awt.*;
+import java.awt.Frame;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -49,15 +49,14 @@ public class IdaEmbeddedFrameFactory {
 		//       get their window handle on-demand, i.e. when shown. So we
 		//       throw away the window handle here.
 		int[] outHandle = new int[1];
-		SWIGTYPE_p_Forms__TForm form = IdaJava.create_tform(title,
-				outHandle);
+		SWIGTYPE_p_Forms__TForm form = IdaJava.create_tform(title, outHandle);
 		IdaJava.open_tform(form, formFlags);
 		int handle = IdaJava.get_tform_handle(form);//IdaJava.getInternalHandle();
 
         // Install custom window procedure
 		if (!IdaJava.initIdaEmbeddedWindow(form))
 			throw new EmbeddedFrameCreationException("Could not initialize " +
-					"embedded window (see native error message about)");
+					"embedded window (see native error message above)");
 
 		// Some JREs have implemented the embedded frame constructor to take an
 		// integer and other JREs take a long.  To handle this binary

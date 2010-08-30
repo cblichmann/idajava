@@ -34,7 +34,7 @@ import de.blichmann.idajava.natives.idc_value_t;
 import de.blichmann.idajava.natives.member_t;
 import de.blichmann.idajava.natives.segment_t;
 import de.blichmann.idajava.natives.struc_t;
-import de.blichmann.idajava.natives.typeinfo_t;
+import de.blichmann.idajava.natives.opinfo_t;
 
 /**
  * This class contains IDA built-in function declarations and internal bit
@@ -1076,8 +1076,8 @@ public class IdcCompat {
 
 		long tid, size;
 		if (IdaJava.isStruct(flags)) {
-			typeinfo_t ti = new typeinfo_t();
-			if (IdaJava.get_typeinfo(ea, 0, flags, ti) == null)
+			opinfo_t ti = new opinfo_t();
+			if (IdaJava.get_opinfo(ea, 0, flags, ti) == null)
 				throw new IdcException("get_typeinfo() failed");
 			size = IdaJava.get_data_elsize(ea, flags, ti);
 			tid = ti.getTid();

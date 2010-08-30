@@ -18,7 +18,7 @@ Obviously:
     with 1.6.0_21)
 
 To rebuild language bindings:
-  - Swig 1.3.40 (http://www.swig.org/)
+  - Swig 2.0.0 (http://www.swig.org/)
 
 
 Bugs
@@ -51,7 +51,7 @@ How to build
 
 IdaJava was developed using Visual Studio 2010, but should compile on Visual
 Studio 2005/2008 as well. Just link with 'jvm.lib' from a 32-bit Sun JDK and
-the ida.lib from the IDA 5.5 SDK. There are no other dependencies.
+the ida.lib from the IDA 5.7 SDK. There are no other dependencies.
 
 To rebuild the SWIG bindings, edit CallSwig.cmd and execute it. It will
 produce qutie a few warnings, though.
@@ -136,8 +136,8 @@ Future Directions
 Copyright/Licensing
 -------------------
 
-IDAJava version 0.2
-Copyright (c)2007-2009 Christian Blichmann <idajava@blichmann.de>
+IDAJava version 0.3
+Copyright (c)2007-2010 Christian Blichmann <idajava@blichmann.de>
 
 IdaJava is subject to the terms of the GPLv2. See LICENSE.txt for details.
 This also applies to all classes in the de.blichmann.framework package.

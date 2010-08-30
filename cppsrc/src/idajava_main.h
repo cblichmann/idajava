@@ -20,27 +20,32 @@
 #pragma once
 
 // IDA SDK includes
-#include <ida.hpp>
+#define USE_DANGEROUS_FUNCTIONS
+#define USE_STANDARD_FILE_FUNCTIONS
+#pragma warning(push)
+#pragma warning(disable: 4267) // netnode.hpp: Conversion nodeidx_t <-> size_t
+#pragma warning(disable: 4996) // pro.h: unsafe use of ctime()
 #include <idp.hpp>
 #include <loader.hpp>
+#pragma warning(pop)
 
 /**
  * Initialize the plugin.
  * @return PLUGIN_KEEP to keep it in memory
  */
-int idaapi IdaJava_init(void);
+int idaapi idajava_init(void);
 
 /**
  * Gets called before unloading the plugin.
  */
-void idaapi IdaJava_term(void);
+void idaapi idajava_term(void);
 
 /**
  * Plugin main function. Gets called when the user selects the plugin.
  * @param arg the input argument, can be specified in plugins.cfg file.
  *            Defaults to zero.
  */
-void idaapi IdaJava_run(int arg);
+void idaapi idajava_run(int arg);
 
 // Plugin Description Block
 char comment[]       = "IdaJava";
@@ -57,9 +62,9 @@ plugin_t PLUGIN =
                             // memory (needed, because we can only load the
 							// JVM once per process)
 
-	IdaJava_init,			// Initialize the plugin
-	IdaJava_term,			// Terminate, this pointer may be NULL
-	IdaJava_run,			// Invoke plugin
+	idajava_init,			// Initialize the plugin
+	idajava_term,			// Terminate, this pointer may be NULL
+	idajava_run,			// Invoke plugin
 
 	comment,				// Long comment about the plugin,
 							// it could appear in the status line

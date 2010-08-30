@@ -21,25 +21,23 @@
  * Documentation generated with Doxygen
  */
 
-#define USE_STANDARD_FILE_FUNCTIONS
-
 // Plugin headers
 #include "idajava_main.h"
 #include "idajava_consts.h"
 #include "idajava_pluginclass.h"
 #include "idajava_natives.h"
 
-int idaapi IdaJava_init()
+int idaapi idajava_init()
 {
-	return IdaJavaPlugin::getInstance()->initialize();
+	return idajava_plugin::instance()->initialize();
 }
 
-void idaapi IdaJava_term()
+void idaapi idajava_term()
 {
-	IdaJavaPlugin::getInstance()->terminate();
+	idajava_plugin::instance()->terminate();
 }
 
-void idaapi IdaJava_run(int arg)
+void idaapi idajava_run(int arg)
 {
-	IdaJavaPlugin::getInstance()->run(arg);
+	idajava_plugin::instance()->run(arg);
 }
