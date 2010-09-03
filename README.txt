@@ -54,9 +54,9 @@ Studio 2005/2008 as well. Just link with 'jvm.lib' from a 32-bit Sun JDK and
 the ida.lib from the IDA 5.7 SDK. There are no other dependencies.
 
 To rebuild the SWIG bindings, edit CallSwig.cmd and execute it. It will
-produce qutie a few warnings, though.
+produce quite a few warnings, though.
 
-The Java part of IdaJava was developed with Eclipse 3.6. Earlier version will
+The Java part of IdaJava was developed with Eclipse 3.6. Earlier versions will
 work as well. The complete project is included.
 
 Source code is in part documented using JavaDoc-style comments. Java sources
