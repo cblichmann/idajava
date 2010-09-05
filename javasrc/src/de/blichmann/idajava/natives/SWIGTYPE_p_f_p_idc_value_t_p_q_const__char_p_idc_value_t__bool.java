@@ -8,18 +8,18 @@
 
 package de.blichmann.idajava.natives;
 
-public class SWIGTYPE_p_segreg_t {
+public class SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool {
   private long swigCPtr;
 
-  protected SWIGTYPE_p_segreg_t(long cPtr, boolean futureUse) {
+  protected SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_segreg_t() {
+  protected SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_segreg_t obj) {
+  protected static long getCPtr(SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

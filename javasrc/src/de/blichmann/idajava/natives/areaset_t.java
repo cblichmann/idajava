@@ -139,12 +139,14 @@ public class areaset_t {
     return IdaJavaJNI.areaset_t___ne__(swigCPtr, this, areaset_t.getCPtr(aset), aset);
   }
 
-  public SWIGTYPE_p_areavec_t__const_iterator begin() {
-    return new SWIGTYPE_p_areavec_t__const_iterator(IdaJavaJNI.areaset_t_begin__SWIG_0(swigCPtr, this), true);
+  public area_t begin() {
+    long cPtr = IdaJavaJNI.areaset_t_begin__SWIG_0(swigCPtr, this);
+    return (cPtr == 0) ? null : new area_t(cPtr, false);
   }
 
-  public SWIGTYPE_p_areavec_t__const_iterator end() {
-    return new SWIGTYPE_p_areavec_t__const_iterator(IdaJavaJNI.areaset_t_end__SWIG_0(swigCPtr, this), true);
+  public area_t end() {
+    long cPtr = IdaJavaJNI.areaset_t_end__SWIG_0(swigCPtr, this);
+    return (cPtr == 0) ? null : new area_t(cPtr, false);
   }
 
   public area_t find_area(long ea) {

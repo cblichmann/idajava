@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
+%ignore area_t_print; // Helper function
+
 %ignore areaset_t::count;
 %ignore areaset_t::lower_bound; // Ignore private member
 %ignore areaset_t::upper_bound; // Ignore private member
@@ -56,5 +58,7 @@
 %ignore areacb_t::for_all_areas;
 
 %javaconstvalue(0x01020304) AREA_LONG_COMMENT_TAG; // Fix constant type
+
+%template(qvector_area_t) qvector<area_t>;
 
 %include <area.hpp>

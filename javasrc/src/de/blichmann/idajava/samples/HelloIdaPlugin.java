@@ -22,7 +22,6 @@ package de.blichmann.idajava.samples;
 import de.blichmann.idajava.api.IdaConsole;
 import de.blichmann.idajava.api.plugin.IdaPlugin;
 import de.blichmann.idajava.natives.IdaJava;
-import de.blichmann.idajava.natives.insn_t;
 
 /**
  * Sample plugin that demonstrates how to write IDA plugins in Java.
@@ -61,9 +60,6 @@ public class HelloIdaPlugin extends IdaPlugin {
 		// Actually do something
 		IdaConsole.out.println("Current address is: " +
 				IdaJava.get_screen_ea());
-
-		insn_t inst;
-		inst = IdaJava.getCmd();
 	}
 
 	@Override

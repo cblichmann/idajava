@@ -32,18 +32,21 @@
 #pragma warning(disable: 4267) // netnode.hpp: Conversion nodeidx_t <-> size_t
 #include <idp.hpp>
 #pragma warning( pop )
+#include <allins.hpp>
 #include <expr.hpp>
 #include <bytes.hpp>
 #include <loader.hpp>
 #include <ints.hpp>
 #include <kernwin.hpp>
 #include <diskio.hpp>
+#include <demangle.hpp>
 #include <llong.hpp>
 #include <fpro.h>
 #include <help.h>
 #include <ua.hpp>
 #include <area.hpp>
 #include <segment.hpp>
+#include <srarea.hpp>
 #include <nalt.hpp>
 #include <auto.hpp>
 #include <funcs.hpp>
@@ -99,6 +102,7 @@
 %include "ua.i"
 %include "area.i"
 %include "segment.i"
+%include "srarea.i"
 %include "nalt.i"
 %include "bytes.i"
 %include "auto.i"
@@ -110,6 +114,13 @@
 %include "fixup.i"
 %include "offset.i"
 %include "xref.i"
+%include "allins.i"
+//%include "compress.i" // Not yet wrapped, use Java Zip routines
+//%include "dbg.i" // Not yet wrapped, need to work around #ifndef SWIG
+//%include "demangle.i"
+//%include "entry.i" // Not yet wrapped
+//%include "enum.i" // Not yet wrapped
+//%include "err.i" // Not yet wrapped
 
 // idajava_natives.i, should come last
 %include "idajava_natives.i"

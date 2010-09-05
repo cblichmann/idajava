@@ -51,10 +51,6 @@ public class extlang_t {
     return IdaJavaJNI.extlang_t_flags_get(swigCPtr, this);
   }
 
-  public void setName(String value) {
-    IdaJavaJNI.extlang_t_name_set(swigCPtr, this, value);
-  }
-
   public String getName() {
     return IdaJavaJNI.extlang_t_name_get(swigCPtr, this);
   }
@@ -95,12 +91,44 @@ public class extlang_t {
     return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_q_const__char_p_char_size_t__bool(cPtr, false);
   }
 
-  public void setFileext(String value) {
-    IdaJavaJNI.extlang_t_fileext_set(swigCPtr, this, value);
-  }
-
   public String getFileext() {
     return IdaJavaJNI.extlang_t_fileext_get(swigCPtr, this);
+  }
+
+  public void setCreate_object(SWIGTYPE_p_f_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool value) {
+    IdaJavaJNI.extlang_t_create_object_set(swigCPtr, this, SWIGTYPE_p_f_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool getCreate_object() {
+    long cPtr = IdaJavaJNI.extlang_t_create_object_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool(cPtr, false);
+  }
+
+  public void setGet_attr(SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_p_idc_value_t__bool value) {
+    IdaJavaJNI.extlang_t_get_attr_set(swigCPtr, this, SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_p_idc_value_t__bool.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_p_idc_value_t__bool getGet_attr() {
+    long cPtr = IdaJavaJNI.extlang_t_get_attr_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_p_idc_value_t__bool(cPtr, false);
+  }
+
+  public void setSet_attr(SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool value) {
+    IdaJavaJNI.extlang_t_set_attr_set(swigCPtr, this, SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool getSet_attr() {
+    long cPtr = IdaJavaJNI.extlang_t_set_attr_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_idc_value_t_p_q_const__char_p_idc_value_t__bool(cPtr, false);
+  }
+
+  public void setCall_method(SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool value) {
+    IdaJavaJNI.extlang_t_call_method_set(swigCPtr, this, SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool getCall_method() {
+    long cPtr = IdaJavaJNI.extlang_t_call_method_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_q_const__idc_value_t_p_q_const__char_int_a___q_const__idc_value_t_p_idc_value_t_p_char_size_t__bool(cPtr, false);
   }
 
 }

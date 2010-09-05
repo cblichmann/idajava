@@ -8,15 +8,16 @@
 
 package de.blichmann.idajava.natives;
 
-public class areavec_t extends qvector_area_t {
+public class lock_segreg {
   private long swigCPtr;
+  protected boolean swigCMemOwn;
 
-  public areavec_t(long cPtr, boolean cMemoryOwn) {
-    super(IdaJavaJNI.areavec_t_SWIGUpcast(cPtr), cMemoryOwn);
+  public lock_segreg(long cPtr, boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
   }
 
-  public static long getCPtr(areavec_t obj) {
+  public static long getCPtr(lock_segreg obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
@@ -28,15 +29,14 @@ public class areavec_t extends qvector_area_t {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        IdaJavaJNI.delete_areavec_t(swigCPtr);
+        IdaJavaJNI.delete_lock_segreg(swigCPtr);
       }
       swigCPtr = 0;
     }
-    super.delete();
   }
 
-  public areavec_t() {
-    this(IdaJavaJNI.new_areavec_t(), true);
+  public lock_segreg(segreg_t _sreg) {
+    this(IdaJavaJNI.new_lock_segreg(segreg_t.getCPtr(_sreg), _sreg), true);
   }
 
 }

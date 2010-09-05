@@ -19,8 +19,10 @@
 
 #undef NO_OBSOLETE_FUNCS
 
-typedef error_t (idaapi *funcset_t_cb)(void);
-%{typedef error_t (idaapi *funcset_t_cb)(void);%}
+%inline
+%{
+	typedef error_t (idaapi *funcset_t_cb)(void);
+%}
 struct funcset_t
 {
   int qnty;
@@ -36,19 +38,32 @@ struct funcset_t
 	typedef bool (idaapi *extlang_t_run_cb)(const char *name, int nargs, const idc_value_t args[], idc_value_t *result, char *errbuf, size_t errbufsize);
 	typedef bool (idaapi *extlang_t_calcexpr_cb)(ea_t current_ea, const char *expr, idc_value_t *rv, char *errbuf, size_t errbufsize);
 	typedef bool (idaapi *extlang_t_compile_file_cb)(const char *file, char *errbuf, size_t errbufsize);
+	typedef bool (idaapi *extlang_t_create_object_cb)(const char *name, int nargs, const idc_value_t args[], idc_value_t *result, char *errbuf, size_t errbufsize);
+	typedef bool (idaapi *extlang_t_get_attr_cb)(const idc_value_t *obj, const char *attr, idc_value_t *result);
+	typedef bool (idaapi *extlang_t_set_attr_cb)(idc_value_t *obj, const char *attr, idc_value_t *value);
+	typedef bool (idaapi *extlang_t_call_method_cb)(const idc_value_t *obj, const char *name, int nargs, const idc_value_t args[], idc_value_t *result, char *errbuf, size_t errbufsize);         // in: size of the error buffer
 %}
 struct extlang_t
 {
-  size_t size;
-  uint32 flags;
-  const char *name;
-  extlang_t_compile_cb compile;
-  extlang_t_run_cb run;
-  extlang_t_calcexpr_cb calcexpr;
-  extlang_t_compile_file_cb compile_file;
-  const char *fileext;         
+	size_t size;
+	uint32 flags;
+%immutable;
+	const char *name;
+%mutable;
+	extlang_t_compile_cb compile;
+	extlang_t_run_cb run;
+	extlang_t_calcexpr_cb calcexpr;
+	extlang_t_compile_file_cb compile_file;
+%immutable;
+	const char *fileext;         
+%mutable;
+	extlang_t_create_object_cb create_object;
+	extlang_t_get_attr_cb get_attr;
+	extlang_t_set_attr_cb set_attr;
+	extlang_t_call_method_cb call_method;
 };
 %ignore extlang_t;
+%template(extlangs_t) qvector<const extlang_t *>;
 
 %inline %{
 	typedef uval_t (idaapi *getname_cb)(const char *name);

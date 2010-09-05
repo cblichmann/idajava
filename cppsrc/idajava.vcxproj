@@ -122,9 +122,11 @@
     <ClCompile Include="src\idajava_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\allins.i" />
     <None Include="src\area.i" />
     <None Include="src\auto.i" />
     <None Include="src\bytes.i" />
+    <None Include="src\demangle.i" />
     <None Include="src\diskio.i" />
     <None Include="src\expr.i" />
     <None Include="src\fixup.i" />
@@ -146,8 +148,10 @@
     <None Include="src\operators.i" />
     <None Include="src\pro.i" />
     <None Include="src\segment.i" />
+    <None Include="src\srarea.i" />
     <None Include="src\struct.i" />
     <None Include="src\ua.i" />
+    <None Include="src\xref.i" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

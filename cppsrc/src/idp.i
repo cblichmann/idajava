@@ -30,16 +30,98 @@
 %ignore IDPOPT_BADVALUE;
 %ignore set_options_t; // Not exported in ida.lib
 %ignore read_user_config_file; // Not exported in ida.lib
-//%ignore instruc_t;
 %ignore s_preline;
 %ignore ca_operation_t;
 %ignore _chkarg_cmd;
 %ignore ENUM_SIZE;
 
-%ignore asm_t::checkarg_dispatch;
-%ignore asm_t::func_header;
-%ignore asm_t::func_footer;
-%ignore asm_t::get_type_name;
+%immutable instruc_t::name; // Avoid memory leak (warning 451)
+
+%inline
+%{
+	typedef bool (idaapi* asm_t_checkarg_dispatch_cb)(void *a1, void *a2, uchar cmd);
+	typedef void (idaapi *asm_t_func_cb)(func_t *);
+	typedef ssize_t (idaapi *asm_t_get_type_name_cb)(flags_t flag, ea_t ea_or_id, char *buf, size_t bufsize);
+%}
+struct asm_t
+{
+	uint32 flag;
+	uint16 uflag;
+%immutable; // Avoid memory leak (warning 451)
+	const char *name;
+%mutable;
+	help_t help;
+%immutable;
+	const char **header;
+	const uint16 *badworks;
+	const char *origin;
+	const char *end;
+	const char *cmnt;
+%mutable;
+	char ascsep;
+	char accsep;
+%immutable; // Avoid memory leak (warning 451)
+	const char *esccodes;
+	const char *a_ascii;
+	const char *a_byte;
+	const char *a_word;
+	const char *a_dword;
+	const char *a_qword;
+	const char *a_oword;
+	const char *a_float;
+	const char *a_double;
+	const char *a_tbyte;
+	const char *a_packreal;
+	const char *a_dups;
+	const char *a_bss;
+	const char *a_equ;
+	const char *a_seg;
+%mutable;
+	asm_t_checkarg_dispatch_cb checkarg_dispatch;
+%immutable; // Avoid memory leak (warning 451)
+	void *_UNUSED1_was_atomprefix;
+	void *_UNUSED2_was_checkarg_operations;
+	const uchar *XlatAsciiOutput;
+	const char *a_curip;
+%mutable;
+	asm_t_func_cb func_header;
+	asm_t_func_cb func_footer;
+%immutable; // Avoid memory leak (warning 451)
+	const char *a_public;
+	const char *a_weak;
+	const char *a_extrn;
+	const char *a_comdef;
+%mutable;
+	asm_t_get_type_name_cb get_type_name;
+%immutable; // Avoid memory leak (warning 451)
+	const char *a_align;
+%mutable;
+	char lbrace;
+	char rbrace;
+%immutable; // Avoid memory leak (warning 451)
+	const char *a_mod;
+	const char *a_band;
+	const char *a_bor;
+	const char *a_xor;
+	const char *a_bnot;
+	const char *a_shl;
+	const char *a_shr;
+	const char *a_sizeof_fmt;
+%mutable;
+	uint32 flag2;
+%immutable; // Avoid memory leak (warning 451)
+	const char *cmnt2;
+	const char *low8;
+	const char *high8;
+	const char *low16;
+	const char *high16;
+	const char *a_include_fmt;
+	const char *a_vstruc_fmt;
+	const char *a_3byte;
+	const char *a_rva;
+};
+%ignore asm_t;
+
 %ignore processor_t::notify;
 %ignore processor_t::header;
 %ignore processor_t::footer;

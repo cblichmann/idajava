@@ -332,6 +332,7 @@ int idajava_plugin::call_java_plugin_initialize()
 	return PLUGIN_KEEP;//(int) result;
 }
 
+#include <idp.hpp>
 void idajava_plugin::call_java_plugin_run(int arg)
 {
 //	jvm_thread_autoattach attach(&jvm_, &env_);

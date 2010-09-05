@@ -35,10 +35,6 @@ public class instruc_t {
     }
   }
 
-  public void setName(String value) {
-    IdaJavaJNI.instruc_t_name_set(swigCPtr, this, value);
-  }
-
   public String getName() {
     return IdaJavaJNI.instruc_t_name_get(swigCPtr, this);
   }

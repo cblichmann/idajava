@@ -136,5 +136,17 @@
     <None Include="src\struct.i">
       <Filter>SWIG</Filter>
     </None>
+    <None Include="src\xref.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\srarea.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\allins.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\demangle.i">
+      <Filter>SWIG</Filter>
+    </None>
   </ItemGroup>
 </Project>

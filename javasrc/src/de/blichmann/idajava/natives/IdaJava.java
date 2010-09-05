@@ -1046,9 +1046,9 @@ public class IdaJava implements IdaJavaConstants {
     return (cPtr == 0) ? null : new segment_t(cPtr, false);
   }
 
-  public static SWIGTYPE_p_segreg_t choose_segreg(String title) {
+  public static segreg_t choose_segreg(String title) {
     long cPtr = IdaJavaJNI.choose_segreg(title);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_segreg_t(cPtr, false);
+    return (cPtr == 0) ? null : new segreg_t(cPtr, false);
   }
 
   public static struc_t choose_struc(String title) {
@@ -1918,9 +1918,9 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.get_extlang_fileext();
   }
 
-  public static SWIGTYPE_p_qvectorT_extlang_t_const_p_t get_extlangs() {
+  public static extlangs_t get_extlangs() {
     long cPtr = IdaJavaJNI.get_extlangs();
-    return (cPtr == 0) ? null : new SWIGTYPE_p_qvectorT_extlang_t_const_p_t(cPtr, false);
+    return (cPtr == 0) ? null : new extlangs_t(cPtr, false);
   }
 
   public static extlang_t find_extlang_by_ext(String ext) {
@@ -2638,6 +2638,53 @@ public class IdaJava implements IdaJavaConstants {
 
   public static long segm_adjust_ea(segment_t s, long ea) {
     return IdaJavaJNI.segm_adjust_ea(segment_t.getCPtr(s), s, ea);
+  }
+
+  public static void setSRareas(areacb_t value) {
+    IdaJavaJNI.SRareas_set(areacb_t.getCPtr(value), value);
+  }
+
+  public static areacb_t getSRareas() {
+    long cPtr = IdaJavaJNI.SRareas_get();
+    return (cPtr == 0) ? null : new areacb_t(cPtr, false);
+  }
+
+  public static boolean is_segreg_locked(segreg_t sreg) {
+    return IdaJavaJNI.is_segreg_locked(segreg_t.getCPtr(sreg), sreg);
+  }
+
+  public static long getSR(long ea, int rg) {
+    return IdaJavaJNI.getSR(ea, rg);
+  }
+
+  public static boolean SetDefaultRegisterValue(segment_t sg, int rg, long value) {
+    return IdaJavaJNI.SetDefaultRegisterValue(segment_t.getCPtr(sg), sg, rg, value);
+  }
+
+  public static boolean splitSRarea1(long ea, int rg, long v, short tag, boolean silent) {
+    return IdaJavaJNI.splitSRarea1__SWIG_0(ea, rg, v, tag, silent);
+  }
+
+  public static boolean splitSRarea1(long ea, int rg, long v, short tag) {
+    return IdaJavaJNI.splitSRarea1__SWIG_1(ea, rg, v, tag);
+  }
+
+  public static void set_sreg_at_next_code(long ea1, long ea2, int reg, long value) {
+    IdaJavaJNI.set_sreg_at_next_code(ea1, ea2, reg, value);
+  }
+
+  public static segreg_t getSRarea(long ea) {
+    long cPtr = IdaJavaJNI.getSRarea(ea);
+    return (cPtr == 0) ? null : new segreg_t(cPtr, false);
+  }
+
+  public static segreg_t getnSRarea(int n) {
+    long cPtr = IdaJavaJNI.getnSRarea(n);
+    return (cPtr == 0) ? null : new segreg_t(cPtr, false);
+  }
+
+  public static void set_default_dataseg(long ds_sel) {
+    IdaJavaJNI.set_default_dataseg(ds_sel);
   }
 
   public static void setNet_patch(SWIGTYPE_p_netnode value) {
@@ -5590,14 +5637,6 @@ public class IdaJava implements IdaJavaConstants {
     IdaJavaJNI.del_dref(from, to);
   }
 
-  public static void setLastXR(char value) {
-    IdaJavaJNI.lastXR_set(value);
-  }
-
-  public static char getLastXR() {
-    return IdaJavaJNI.lastXR_get();
-  }
-
   public static long get_first_dref_from(long from) {
     return IdaJavaJNI.get_first_dref_from(from);
   }
@@ -5660,38 +5699,6 @@ public class IdaJava implements IdaJavaConstants {
 
   public static boolean calc_switch_cases(long insn_ea, SWIGTYPE_p_switch_info_ex_t si, SWIGTYPE_p_qvectorT_qvectorT_int_t_t casevec, SWIGTYPE_p_qvectorT_unsigned_int_t targets) {
     return IdaJavaJNI.calc_switch_cases(insn_ea, SWIGTYPE_p_switch_info_ex_t.getCPtr(si), SWIGTYPE_p_qvectorT_qvectorT_int_t_t.getCPtr(casevec), SWIGTYPE_p_qvectorT_unsigned_int_t.getCPtr(targets));
-  }
-
-  public static int create_xrefs_from(long ea) {
-    return IdaJavaJNI.create_xrefs_from(ea);
-  }
-
-  public static void create_xrefs_from_data(long ea) {
-    IdaJavaJNI.create_xrefs_from_data(ea);
-  }
-
-  public static void delete_all_xrefs_from(long ea, int expand) {
-    IdaJavaJNI.delete_all_xrefs_from(ea, expand);
-  }
-
-  public static void delete_data_xrefs_from(long ea) {
-    IdaJavaJNI.delete_data_xrefs_from(ea);
-  }
-
-  public static void delete_code_xrefs_from(long ea, int expand) {
-    IdaJavaJNI.delete_code_xrefs_from(ea, expand);
-  }
-
-  public static boolean has_jump_or_flow_xref(long ea) {
-    return IdaJavaJNI.has_jump_or_flow_xref(ea);
-  }
-
-  public static boolean has_call_xref(long ea) {
-    return IdaJavaJNI.has_call_xref(ea);
-  }
-
-  public static boolean destroy_switch_info(long ea) {
-    return IdaJavaJNI.destroy_switch_info(ea);
   }
 
   public static String getParameter(String key) {

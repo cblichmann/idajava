@@ -8,18 +8,18 @@
 
 package de.blichmann.idajava.natives;
 
-public class SWIGTYPE_p_areavec_t__const_iterator {
+public class SWIGTYPE_p_f_p_func_t__void {
   private long swigCPtr;
 
-  protected SWIGTYPE_p_areavec_t__const_iterator(long cPtr, boolean futureUse) {
+  protected SWIGTYPE_p_f_p_func_t__void(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_areavec_t__const_iterator() {
+  protected SWIGTYPE_p_f_p_func_t__void() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_areavec_t__const_iterator obj) {
+  protected static long getCPtr(SWIGTYPE_p_f_p_func_t__void obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

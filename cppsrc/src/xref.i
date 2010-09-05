@@ -22,4 +22,16 @@
 %ignore xrefblk_t_first_to; // Helper function, not to be called directly
 %ignore xrefblk_t_next_to; // Helper function, not to be called directly
 
+%ignore lastXR; // Not exported in ida.lib
+
+%ignore create_xrefs_from; // Not exported in ida.lib
+%ignore create_xrefs_from_data(ea_t ea); // Not exported in ida.lib
+%ignore delete_all_xrefs_from; // Not exported in ida.lib
+%ignore delete_data_xrefs_from; // Not exported in ida.lib
+%ignore delete_code_xrefs_from; // Not exported in ida.lib
+%ignore has_jump_or_flow_xref; // Not exported in ida.lib
+%ignore has_call_xref; // Not exported in ida.lib
+%ignore destroy_switch_info; // Not exported in ida.lib
+%ignore del_switch_info_ex; // Not exported in ida.lib
+
 %include <xref.hpp>

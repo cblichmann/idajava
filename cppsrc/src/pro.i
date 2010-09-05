@@ -27,6 +27,7 @@
 %ignore wchar2char; // Not exported in ida.lib
 
 %include <pro.h>
+%template(qvector_uchar) qvector<uchar>;
 
 // Do not move this. We need to override the define from pro.h
 #define CASSERT(type)

@@ -51,10 +51,6 @@ public class asm_t {
     return IdaJavaJNI.asm_t_uflag_get(swigCPtr, this);
   }
 
-  public void setName(String value) {
-    IdaJavaJNI.asm_t_name_set(swigCPtr, this, value);
-  }
-
   public String getName() {
     return IdaJavaJNI.asm_t_name_get(swigCPtr, this);
   }
@@ -67,17 +63,9 @@ public class asm_t {
     return IdaJavaJNI.asm_t_help_get(swigCPtr, this);
   }
 
-  public void setHeader(SWIGTYPE_p_p_char value) {
-    IdaJavaJNI.asm_t_header_set(swigCPtr, this, SWIGTYPE_p_p_char.getCPtr(value));
-  }
-
   public SWIGTYPE_p_p_char getHeader() {
     long cPtr = IdaJavaJNI.asm_t_header_get(swigCPtr, this);
     return (cPtr == 0) ? null : new SWIGTYPE_p_p_char(cPtr, false);
-  }
-
-  public void setBadworks(SWIGTYPE_p_unsigned_short value) {
-    IdaJavaJNI.asm_t_badworks_set(swigCPtr, this, SWIGTYPE_p_unsigned_short.getCPtr(value));
   }
 
   public SWIGTYPE_p_unsigned_short getBadworks() {
@@ -85,24 +73,12 @@ public class asm_t {
     return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_short(cPtr, false);
   }
 
-  public void setOrigin(String value) {
-    IdaJavaJNI.asm_t_origin_set(swigCPtr, this, value);
-  }
-
   public String getOrigin() {
     return IdaJavaJNI.asm_t_origin_get(swigCPtr, this);
   }
 
-  public void setEnd(String value) {
-    IdaJavaJNI.asm_t_end_set(swigCPtr, this, value);
-  }
-
   public String getEnd() {
     return IdaJavaJNI.asm_t_end_get(swigCPtr, this);
-  }
-
-  public void setCmnt(String value) {
-    IdaJavaJNI.asm_t_cmnt_set(swigCPtr, this, value);
   }
 
   public String getCmnt() {
@@ -125,128 +101,73 @@ public class asm_t {
     return IdaJavaJNI.asm_t_accsep_get(swigCPtr, this);
   }
 
-  public void setEsccodes(String value) {
-    IdaJavaJNI.asm_t_esccodes_set(swigCPtr, this, value);
-  }
-
   public String getEsccodes() {
     return IdaJavaJNI.asm_t_esccodes_get(swigCPtr, this);
-  }
-
-  public void setA_ascii(String value) {
-    IdaJavaJNI.asm_t_a_ascii_set(swigCPtr, this, value);
   }
 
   public String getA_ascii() {
     return IdaJavaJNI.asm_t_a_ascii_get(swigCPtr, this);
   }
 
-  public void setA_byte(String value) {
-    IdaJavaJNI.asm_t_a_byte_set(swigCPtr, this, value);
-  }
-
   public String getA_byte() {
     return IdaJavaJNI.asm_t_a_byte_get(swigCPtr, this);
-  }
-
-  public void setA_word(String value) {
-    IdaJavaJNI.asm_t_a_word_set(swigCPtr, this, value);
   }
 
   public String getA_word() {
     return IdaJavaJNI.asm_t_a_word_get(swigCPtr, this);
   }
 
-  public void setA_dword(String value) {
-    IdaJavaJNI.asm_t_a_dword_set(swigCPtr, this, value);
-  }
-
   public String getA_dword() {
     return IdaJavaJNI.asm_t_a_dword_get(swigCPtr, this);
-  }
-
-  public void setA_qword(String value) {
-    IdaJavaJNI.asm_t_a_qword_set(swigCPtr, this, value);
   }
 
   public String getA_qword() {
     return IdaJavaJNI.asm_t_a_qword_get(swigCPtr, this);
   }
 
-  public void setA_oword(String value) {
-    IdaJavaJNI.asm_t_a_oword_set(swigCPtr, this, value);
-  }
-
   public String getA_oword() {
     return IdaJavaJNI.asm_t_a_oword_get(swigCPtr, this);
-  }
-
-  public void setA_float(String value) {
-    IdaJavaJNI.asm_t_a_float_set(swigCPtr, this, value);
   }
 
   public String getA_float() {
     return IdaJavaJNI.asm_t_a_float_get(swigCPtr, this);
   }
 
-  public void setA_double(String value) {
-    IdaJavaJNI.asm_t_a_double_set(swigCPtr, this, value);
-  }
-
   public String getA_double() {
     return IdaJavaJNI.asm_t_a_double_get(swigCPtr, this);
-  }
-
-  public void setA_tbyte(String value) {
-    IdaJavaJNI.asm_t_a_tbyte_set(swigCPtr, this, value);
   }
 
   public String getA_tbyte() {
     return IdaJavaJNI.asm_t_a_tbyte_get(swigCPtr, this);
   }
 
-  public void setA_packreal(String value) {
-    IdaJavaJNI.asm_t_a_packreal_set(swigCPtr, this, value);
-  }
-
   public String getA_packreal() {
     return IdaJavaJNI.asm_t_a_packreal_get(swigCPtr, this);
-  }
-
-  public void setA_dups(String value) {
-    IdaJavaJNI.asm_t_a_dups_set(swigCPtr, this, value);
   }
 
   public String getA_dups() {
     return IdaJavaJNI.asm_t_a_dups_get(swigCPtr, this);
   }
 
-  public void setA_bss(String value) {
-    IdaJavaJNI.asm_t_a_bss_set(swigCPtr, this, value);
-  }
-
   public String getA_bss() {
     return IdaJavaJNI.asm_t_a_bss_get(swigCPtr, this);
-  }
-
-  public void setA_equ(String value) {
-    IdaJavaJNI.asm_t_a_equ_set(swigCPtr, this, value);
   }
 
   public String getA_equ() {
     return IdaJavaJNI.asm_t_a_equ_get(swigCPtr, this);
   }
 
-  public void setA_seg(String value) {
-    IdaJavaJNI.asm_t_a_seg_set(swigCPtr, this, value);
-  }
-
   public String getA_seg() {
     return IdaJavaJNI.asm_t_a_seg_get(swigCPtr, this);
   }
 
-  public void set_UNUSED1_was_atomprefix(SWIGTYPE_p_void value) {
-    IdaJavaJNI.asm_t__UNUSED1_was_atomprefix_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
+  public void setCheckarg_dispatch(SWIGTYPE_p_f_p_void_p_void_unsigned_char__bool value) {
+    IdaJavaJNI.asm_t_checkarg_dispatch_set(swigCPtr, this, SWIGTYPE_p_f_p_void_p_void_unsigned_char__bool.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_void_p_void_unsigned_char__bool getCheckarg_dispatch() {
+    long cPtr = IdaJavaJNI.asm_t_checkarg_dispatch_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_void_p_void_unsigned_char__bool(cPtr, false);
   }
 
   public SWIGTYPE_p_void get_UNUSED1_was_atomprefix() {
@@ -254,17 +175,9 @@ public class asm_t {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public void set_UNUSED2_was_checkarg_operations(SWIGTYPE_p_void value) {
-    IdaJavaJNI.asm_t__UNUSED2_was_checkarg_operations_set(swigCPtr, this, SWIGTYPE_p_void.getCPtr(value));
-  }
-
   public SWIGTYPE_p_void get_UNUSED2_was_checkarg_operations() {
     long cPtr = IdaJavaJNI.asm_t__UNUSED2_was_checkarg_operations_get(swigCPtr, this);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
-  }
-
-  public void setXlatAsciiOutput(SWIGTYPE_p_unsigned_char value) {
-    IdaJavaJNI.asm_t_XlatAsciiOutput_set(swigCPtr, this, SWIGTYPE_p_unsigned_char.getCPtr(value));
   }
 
   public SWIGTYPE_p_unsigned_char getXlatAsciiOutput() {
@@ -272,48 +185,51 @@ public class asm_t {
     return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
   }
 
-  public void setA_curip(String value) {
-    IdaJavaJNI.asm_t_a_curip_set(swigCPtr, this, value);
-  }
-
   public String getA_curip() {
     return IdaJavaJNI.asm_t_a_curip_get(swigCPtr, this);
   }
 
-  public void setA_public(String value) {
-    IdaJavaJNI.asm_t_a_public_set(swigCPtr, this, value);
+  public void setFunc_header(SWIGTYPE_p_f_p_func_t__void value) {
+    IdaJavaJNI.asm_t_func_header_set(swigCPtr, this, SWIGTYPE_p_f_p_func_t__void.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_func_t__void getFunc_header() {
+    long cPtr = IdaJavaJNI.asm_t_func_header_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_func_t__void(cPtr, false);
+  }
+
+  public void setFunc_footer(SWIGTYPE_p_f_p_func_t__void value) {
+    IdaJavaJNI.asm_t_func_footer_set(swigCPtr, this, SWIGTYPE_p_f_p_func_t__void.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_p_func_t__void getFunc_footer() {
+    long cPtr = IdaJavaJNI.asm_t_func_footer_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_p_func_t__void(cPtr, false);
   }
 
   public String getA_public() {
     return IdaJavaJNI.asm_t_a_public_get(swigCPtr, this);
   }
 
-  public void setA_weak(String value) {
-    IdaJavaJNI.asm_t_a_weak_set(swigCPtr, this, value);
-  }
-
   public String getA_weak() {
     return IdaJavaJNI.asm_t_a_weak_get(swigCPtr, this);
-  }
-
-  public void setA_extrn(String value) {
-    IdaJavaJNI.asm_t_a_extrn_set(swigCPtr, this, value);
   }
 
   public String getA_extrn() {
     return IdaJavaJNI.asm_t_a_extrn_get(swigCPtr, this);
   }
 
-  public void setA_comdef(String value) {
-    IdaJavaJNI.asm_t_a_comdef_set(swigCPtr, this, value);
-  }
-
   public String getA_comdef() {
     return IdaJavaJNI.asm_t_a_comdef_get(swigCPtr, this);
   }
 
-  public void setA_align(String value) {
-    IdaJavaJNI.asm_t_a_align_set(swigCPtr, this, value);
+  public void setGet_type_name(SWIGTYPE_p_f_unsigned_int_unsigned_int_p_char_size_t__int value) {
+    IdaJavaJNI.asm_t_get_type_name_set(swigCPtr, this, SWIGTYPE_p_f_unsigned_int_unsigned_int_p_char_size_t__int.getCPtr(value));
+  }
+
+  public SWIGTYPE_p_f_unsigned_int_unsigned_int_p_char_size_t__int getGet_type_name() {
+    long cPtr = IdaJavaJNI.asm_t_get_type_name_get(swigCPtr, this);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_f_unsigned_int_unsigned_int_p_char_size_t__int(cPtr, false);
   }
 
   public String getA_align() {
@@ -336,64 +252,32 @@ public class asm_t {
     return IdaJavaJNI.asm_t_rbrace_get(swigCPtr, this);
   }
 
-  public void setA_mod(String value) {
-    IdaJavaJNI.asm_t_a_mod_set(swigCPtr, this, value);
-  }
-
   public String getA_mod() {
     return IdaJavaJNI.asm_t_a_mod_get(swigCPtr, this);
-  }
-
-  public void setA_band(String value) {
-    IdaJavaJNI.asm_t_a_band_set(swigCPtr, this, value);
   }
 
   public String getA_band() {
     return IdaJavaJNI.asm_t_a_band_get(swigCPtr, this);
   }
 
-  public void setA_bor(String value) {
-    IdaJavaJNI.asm_t_a_bor_set(swigCPtr, this, value);
-  }
-
   public String getA_bor() {
     return IdaJavaJNI.asm_t_a_bor_get(swigCPtr, this);
-  }
-
-  public void setA_xor(String value) {
-    IdaJavaJNI.asm_t_a_xor_set(swigCPtr, this, value);
   }
 
   public String getA_xor() {
     return IdaJavaJNI.asm_t_a_xor_get(swigCPtr, this);
   }
 
-  public void setA_bnot(String value) {
-    IdaJavaJNI.asm_t_a_bnot_set(swigCPtr, this, value);
-  }
-
   public String getA_bnot() {
     return IdaJavaJNI.asm_t_a_bnot_get(swigCPtr, this);
-  }
-
-  public void setA_shl(String value) {
-    IdaJavaJNI.asm_t_a_shl_set(swigCPtr, this, value);
   }
 
   public String getA_shl() {
     return IdaJavaJNI.asm_t_a_shl_get(swigCPtr, this);
   }
 
-  public void setA_shr(String value) {
-    IdaJavaJNI.asm_t_a_shr_set(swigCPtr, this, value);
-  }
-
   public String getA_shr() {
     return IdaJavaJNI.asm_t_a_shr_get(swigCPtr, this);
-  }
-
-  public void setA_sizeof_fmt(String value) {
-    IdaJavaJNI.asm_t_a_sizeof_fmt_set(swigCPtr, this, value);
   }
 
   public String getA_sizeof_fmt() {
@@ -408,80 +292,40 @@ public class asm_t {
     return IdaJavaJNI.asm_t_flag2_get(swigCPtr, this);
   }
 
-  public void setCmnt2(String value) {
-    IdaJavaJNI.asm_t_cmnt2_set(swigCPtr, this, value);
-  }
-
   public String getCmnt2() {
     return IdaJavaJNI.asm_t_cmnt2_get(swigCPtr, this);
-  }
-
-  public void setLow8(String value) {
-    IdaJavaJNI.asm_t_low8_set(swigCPtr, this, value);
   }
 
   public String getLow8() {
     return IdaJavaJNI.asm_t_low8_get(swigCPtr, this);
   }
 
-  public void setHigh8(String value) {
-    IdaJavaJNI.asm_t_high8_set(swigCPtr, this, value);
-  }
-
   public String getHigh8() {
     return IdaJavaJNI.asm_t_high8_get(swigCPtr, this);
-  }
-
-  public void setLow16(String value) {
-    IdaJavaJNI.asm_t_low16_set(swigCPtr, this, value);
   }
 
   public String getLow16() {
     return IdaJavaJNI.asm_t_low16_get(swigCPtr, this);
   }
 
-  public void setHigh16(String value) {
-    IdaJavaJNI.asm_t_high16_set(swigCPtr, this, value);
-  }
-
   public String getHigh16() {
     return IdaJavaJNI.asm_t_high16_get(swigCPtr, this);
-  }
-
-  public void setA_include_fmt(String value) {
-    IdaJavaJNI.asm_t_a_include_fmt_set(swigCPtr, this, value);
   }
 
   public String getA_include_fmt() {
     return IdaJavaJNI.asm_t_a_include_fmt_get(swigCPtr, this);
   }
 
-  public void setA_vstruc_fmt(String value) {
-    IdaJavaJNI.asm_t_a_vstruc_fmt_set(swigCPtr, this, value);
-  }
-
   public String getA_vstruc_fmt() {
     return IdaJavaJNI.asm_t_a_vstruc_fmt_get(swigCPtr, this);
-  }
-
-  public void setA_3byte(String value) {
-    IdaJavaJNI.asm_t_a_3byte_set(swigCPtr, this, value);
   }
 
   public String getA_3byte() {
     return IdaJavaJNI.asm_t_a_3byte_get(swigCPtr, this);
   }
 
-  public void setA_rva(String value) {
-    IdaJavaJNI.asm_t_a_rva_set(swigCPtr, this, value);
-  }
-
   public String getA_rva() {
     return IdaJavaJNI.asm_t_a_rva_get(swigCPtr, this);
-  }
-
-  public asm_t() {
-    this(IdaJavaJNI.new_asm_t(), true);
   }
 
 }
