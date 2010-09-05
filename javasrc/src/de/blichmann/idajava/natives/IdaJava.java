@@ -557,8 +557,8 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.qivalue(mes);
   }
 
-  public static int get_predef_insn_cmt(SWIGTYPE_p_insn_t cmd, String buf, long bufsize) {
-    return IdaJavaJNI.get_predef_insn_cmt(SWIGTYPE_p_insn_t.getCPtr(cmd), buf, bufsize);
+  public static int get_predef_insn_cmt(insn_t cmd, String buf, long bufsize) {
+    return IdaJavaJNI.get_predef_insn_cmt(insn_t.getCPtr(cmd), cmd, buf, bufsize);
   }
 
   public static int get_predef_cmt(String info, int wrktyp, String buf, long bufsize) {
@@ -2069,13 +2069,13 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.get_operand_immvals(ea, n, SWIGTYPE_p_unsigned_int.getCPtr(v));
   }
 
-  public static void setCmd(SWIGTYPE_p_insn_t value) {
-    IdaJavaJNI.cmd_set(SWIGTYPE_p_insn_t.getCPtr(value));
+  public static void setCmd(insn_t value) {
+    IdaJavaJNI.cmd_set(insn_t.getCPtr(value), value);
   }
 
-  public static SWIGTYPE_p_insn_t getCmd() {
+  public static insn_t getCmd() {
     long cPtr = IdaJavaJNI.cmd_get();
-    return (cPtr == 0) ? null : new SWIGTYPE_p_insn_t(cPtr, false);
+    return (cPtr == 0) ? null : new insn_t(cPtr, false);
   }
 
   public static void setLookback(int value) {
@@ -2262,20 +2262,20 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.ua_stkvar2(SWIGTYPE_p_op_t.getCPtr(x), v, flags);
   }
 
-  public static void ua_add_cref(int opoff, long to, SWIGTYPE_p_cref_t type) {
-    IdaJavaJNI.ua_add_cref(opoff, to, SWIGTYPE_p_cref_t.getCPtr(type));
+  public static void ua_add_cref(int opoff, long to, cref_t type) {
+    IdaJavaJNI.ua_add_cref(opoff, to, type.swigValue());
   }
 
-  public static void ua_add_dref(int opoff, long to, SWIGTYPE_p_dref_t type) {
-    IdaJavaJNI.ua_add_dref(opoff, to, SWIGTYPE_p_dref_t.getCPtr(type));
+  public static void ua_add_dref(int opoff, long to, dref_t type) {
+    IdaJavaJNI.ua_add_dref(opoff, to, type.swigValue());
   }
 
-  public static long ua_add_off_drefs(SWIGTYPE_p_op_t x, SWIGTYPE_p_dref_t type) {
-    return IdaJavaJNI.ua_add_off_drefs(SWIGTYPE_p_op_t.getCPtr(x), SWIGTYPE_p_dref_t.getCPtr(type));
+  public static long ua_add_off_drefs(SWIGTYPE_p_op_t x, dref_t type) {
+    return IdaJavaJNI.ua_add_off_drefs(SWIGTYPE_p_op_t.getCPtr(x), type.swigValue());
   }
 
-  public static long ua_add_off_drefs2(SWIGTYPE_p_op_t x, SWIGTYPE_p_dref_t type, int outf) {
-    return IdaJavaJNI.ua_add_off_drefs2(SWIGTYPE_p_op_t.getCPtr(x), SWIGTYPE_p_dref_t.getCPtr(type), outf);
+  public static long ua_add_off_drefs2(SWIGTYPE_p_op_t x, dref_t type, int outf) {
+    return IdaJavaJNI.ua_add_off_drefs2(SWIGTYPE_p_op_t.getCPtr(x), type.swigValue(), outf);
   }
 
   public static long get_dtyp_flag(char dtype) {
@@ -5568,6 +5568,130 @@ public class IdaJava implements IdaJavaConstants {
 
   public static long calc_target(long from, long ea, int n, int opval) {
     return IdaJavaJNI.calc_target(from, ea, n, opval);
+  }
+
+  public static char xrefchar(char xrtype) {
+    return IdaJavaJNI.xrefchar(xrtype);
+  }
+
+  public static boolean add_cref(long from, long to, cref_t type) {
+    return IdaJavaJNI.add_cref(from, to, type.swigValue());
+  }
+
+  public static int del_cref(long from, long to, boolean expand) {
+    return IdaJavaJNI.del_cref(from, to, expand);
+  }
+
+  public static boolean add_dref(long from, long to, dref_t type) {
+    return IdaJavaJNI.add_dref(from, to, type.swigValue());
+  }
+
+  public static void del_dref(long from, long to) {
+    IdaJavaJNI.del_dref(from, to);
+  }
+
+  public static void setLastXR(char value) {
+    IdaJavaJNI.lastXR_set(value);
+  }
+
+  public static char getLastXR() {
+    return IdaJavaJNI.lastXR_get();
+  }
+
+  public static long get_first_dref_from(long from) {
+    return IdaJavaJNI.get_first_dref_from(from);
+  }
+
+  public static long get_next_dref_from(long from, long current) {
+    return IdaJavaJNI.get_next_dref_from(from, current);
+  }
+
+  public static long get_first_dref_to(long to) {
+    return IdaJavaJNI.get_first_dref_to(to);
+  }
+
+  public static long get_next_dref_to(long to, long current) {
+    return IdaJavaJNI.get_next_dref_to(to, current);
+  }
+
+  public static long get_first_cref_from(long from) {
+    return IdaJavaJNI.get_first_cref_from(from);
+  }
+
+  public static long get_next_cref_from(long from, long current) {
+    return IdaJavaJNI.get_next_cref_from(from, current);
+  }
+
+  public static long get_first_cref_to(long to) {
+    return IdaJavaJNI.get_first_cref_to(to);
+  }
+
+  public static long get_next_cref_to(long from, long current) {
+    return IdaJavaJNI.get_next_cref_to(from, current);
+  }
+
+  public static long get_first_fcref_from(long from) {
+    return IdaJavaJNI.get_first_fcref_from(from);
+  }
+
+  public static long get_next_fcref_from(long from, long current) {
+    return IdaJavaJNI.get_next_fcref_from(from, current);
+  }
+
+  public static long get_first_fcref_to(long to) {
+    return IdaJavaJNI.get_first_fcref_to(to);
+  }
+
+  public static long get_next_fcref_to(long to, long current) {
+    return IdaJavaJNI.get_next_fcref_to(to, current);
+  }
+
+  public static boolean has_external_refs(func_t pfn, long ea) {
+    return IdaJavaJNI.has_external_refs(func_t.getCPtr(pfn), pfn, ea);
+  }
+
+  public static void create_switch_table(long insn_ea, SWIGTYPE_p_switch_info_ex_t si) {
+    IdaJavaJNI.create_switch_table(insn_ea, SWIGTYPE_p_switch_info_ex_t.getCPtr(si));
+  }
+
+  public static void create_switch_xrefs(long insn_ea, SWIGTYPE_p_switch_info_ex_t si) {
+    IdaJavaJNI.create_switch_xrefs(insn_ea, SWIGTYPE_p_switch_info_ex_t.getCPtr(si));
+  }
+
+  public static boolean calc_switch_cases(long insn_ea, SWIGTYPE_p_switch_info_ex_t si, SWIGTYPE_p_qvectorT_qvectorT_int_t_t casevec, SWIGTYPE_p_qvectorT_unsigned_int_t targets) {
+    return IdaJavaJNI.calc_switch_cases(insn_ea, SWIGTYPE_p_switch_info_ex_t.getCPtr(si), SWIGTYPE_p_qvectorT_qvectorT_int_t_t.getCPtr(casevec), SWIGTYPE_p_qvectorT_unsigned_int_t.getCPtr(targets));
+  }
+
+  public static int create_xrefs_from(long ea) {
+    return IdaJavaJNI.create_xrefs_from(ea);
+  }
+
+  public static void create_xrefs_from_data(long ea) {
+    IdaJavaJNI.create_xrefs_from_data(ea);
+  }
+
+  public static void delete_all_xrefs_from(long ea, int expand) {
+    IdaJavaJNI.delete_all_xrefs_from(ea, expand);
+  }
+
+  public static void delete_data_xrefs_from(long ea) {
+    IdaJavaJNI.delete_data_xrefs_from(ea);
+  }
+
+  public static void delete_code_xrefs_from(long ea, int expand) {
+    IdaJavaJNI.delete_code_xrefs_from(ea, expand);
+  }
+
+  public static boolean has_jump_or_flow_xref(long ea) {
+    return IdaJavaJNI.has_jump_or_flow_xref(ea);
+  }
+
+  public static boolean has_call_xref(long ea) {
+    return IdaJavaJNI.has_call_xref(ea);
+  }
+
+  public static boolean destroy_switch_info(long ea) {
+    return IdaJavaJNI.destroy_switch_info(ea);
   }
 
   public static String getParameter(String key) {

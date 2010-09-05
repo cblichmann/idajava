@@ -30,14 +30,13 @@ struct funcset_t
 };
 %ignore funcset_t;
 
-typedef bool (idaapi *extlang_t_compile_cb)(const char *name, ea_t current_ea, const char *expr, char *OUTPUT, size_t errbufsize);
-%{typedef bool (idaapi *extlang_t_compile_cb)(const char *name, ea_t current_ea, const char *expr, char *errbuf, size_t errbufsize);%}
-typedef bool (idaapi *extlang_t_run_cb)(const char *name, int nargs, const idc_value_t args[], idc_value_t *result, char *OUTPUT, size_t errbufsize);
-%{typedef bool (idaapi *extlang_t_run_cb)(const char *name, int nargs, const idc_value_t args[], idc_value_t *result, char *errbuf, size_t errbufsize);%}
-typedef bool (idaapi *extlang_t_calcexpr_cb)(ea_t current_ea, const char *expr, idc_value_t *rv, char *OUTPUT, size_t errbufsize);
-%{typedef bool (idaapi *extlang_t_calcexpr_cb)(ea_t current_ea, const char *expr, idc_value_t *rv, char *errbuf, size_t errbufsize);%}
-typedef bool (idaapi *extlang_t_compile_file_cb)(const char *file, char *OUTPUT, size_t errbufsize);
-%{typedef bool (idaapi *extlang_t_compile_file_cb)(const char *file, char *errbuf, size_t errbufsize);%}
+%inline
+%{
+	typedef bool (idaapi *extlang_t_compile_cb)(const char *name, ea_t current_ea, const char *expr, char *errbuf, size_t errbufsize);
+	typedef bool (idaapi *extlang_t_run_cb)(const char *name, int nargs, const idc_value_t args[], idc_value_t *result, char *errbuf, size_t errbufsize);
+	typedef bool (idaapi *extlang_t_calcexpr_cb)(ea_t current_ea, const char *expr, idc_value_t *rv, char *errbuf, size_t errbufsize);
+	typedef bool (idaapi *extlang_t_compile_file_cb)(const char *file, char *errbuf, size_t errbufsize);
+%}
 struct extlang_t
 {
   size_t size;
@@ -51,8 +50,9 @@ struct extlang_t
 };
 %ignore extlang_t;
 
-typedef uval_t (idaapi *getname_cb)(const char *name);
-%{typedef uval_t (idaapi *getname_cb)(const char *name);%}
+%inline %{
+	typedef uval_t (idaapi *getname_cb)(const char *name);
+%}
 idaman bool ida_export CompileLine(const char *line, char *errbuf, size_t errbufsize, getname_cb getname_func=NULL);
 %ignore CompileLine;
 idaman bool ida_export ExecuteLine(const char *line, const char *func, getname_cb getname_func, int argsnum, const idc_value_t args[], idc_value_t *result, char *errbuf, size_t errbufsize);

@@ -1,8 +1,8 @@
 /*
- * IDAJava version 0.3
- * Copyright (c)2007-2010 Christian Blichmann
+ * IdaJava version 0.3
+ * Copyright (c)2007-2010 by Christian Blichmann
  *
- * EmbeddedFrameCreationException Class
+ * SWIG interface file for plugin exports
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.blichmann.idajava.api.ui;
+%ignore xrefblk_t_first_from; // Helper function, not to be called directly
+%ignore xrefblk_t_next_from; // Helper function, not to be called directly
+%ignore xrefblk_t_first_to; // Helper function, not to be called directly
+%ignore xrefblk_t_next_to; // Helper function, not to be called directly
 
-/**
- * Thrown on error in {@link IdaEmbeddedFrameFactory}.
- * @author Christian Blichmann
- * @since 0.2
- */
-public class EmbeddedFrameCreationException extends Exception {
-	private static final long serialVersionUID = 543946868130872544L;
-
-	public EmbeddedFrameCreationException(String message) {
-		super(message);
-	}
-
-    public EmbeddedFrameCreationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-}
+%include <xref.hpp>

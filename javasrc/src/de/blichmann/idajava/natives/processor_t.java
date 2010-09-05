@@ -234,22 +234,22 @@ public class processor_t {
     return IdaJavaJNI.processor_t_regDataSreg_get(swigCPtr, this);
   }
 
-  public void setCodestart(SWIGTYPE_p_bytes_t value) {
-    IdaJavaJNI.processor_t_codestart_set(swigCPtr, this, SWIGTYPE_p_bytes_t.getCPtr(value));
+  public void setCodestart(bytes_t value) {
+    IdaJavaJNI.processor_t_codestart_set(swigCPtr, this, bytes_t.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_bytes_t getCodestart() {
+  public bytes_t getCodestart() {
     long cPtr = IdaJavaJNI.processor_t_codestart_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_bytes_t(cPtr, false);
+    return (cPtr == 0) ? null : new bytes_t(cPtr, false);
   }
 
-  public void setRetcodes(SWIGTYPE_p_bytes_t value) {
-    IdaJavaJNI.processor_t_retcodes_set(swigCPtr, this, SWIGTYPE_p_bytes_t.getCPtr(value));
+  public void setRetcodes(bytes_t value) {
+    IdaJavaJNI.processor_t_retcodes_set(swigCPtr, this, bytes_t.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_bytes_t getRetcodes() {
+  public bytes_t getRetcodes() {
     long cPtr = IdaJavaJNI.processor_t_retcodes_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_bytes_t(cPtr, false);
+    return (cPtr == 0) ? null : new bytes_t(cPtr, false);
   }
 
   public void setInstruc_start(int value) {
@@ -272,13 +272,13 @@ public class processor_t {
     return IdaJavaJNI.processor_t_is_canon_insn(swigCPtr, this, itype);
   }
 
-  public void setInstruc(SWIGTYPE_p_instruc_t value) {
-    IdaJavaJNI.processor_t_instruc_set(swigCPtr, this, SWIGTYPE_p_instruc_t.getCPtr(value));
+  public void setInstruc(instruc_t value) {
+    IdaJavaJNI.processor_t_instruc_set(swigCPtr, this, instruc_t.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_instruc_t getInstruc() {
+  public instruc_t getInstruc() {
     long cPtr = IdaJavaJNI.processor_t_instruc_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_instruc_t(cPtr, false);
+    return (cPtr == 0) ? null : new instruc_t(cPtr, false);
   }
 
   public void setTbyte_size(long value) {

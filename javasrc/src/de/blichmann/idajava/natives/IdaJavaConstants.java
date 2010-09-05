@@ -614,6 +614,23 @@ public interface IdaJavaConstants {
   public final static int SET_MEMTI_FUNCARG = 0x0004;
   public final static int IDP_INTERFACE_VERSION = 76;
   public final static int IDPOPT_I64 = 5;
+  public final static int CF_STOP = 0x00001;
+  public final static int CF_CALL = 0x00002;
+  public final static int CF_CHG1 = 0x00004;
+  public final static int CF_CHG2 = 0x00008;
+  public final static int CF_CHG3 = 0x00010;
+  public final static int CF_CHG4 = 0x00020;
+  public final static int CF_CHG5 = 0x00040;
+  public final static int CF_CHG6 = 0x00080;
+  public final static int CF_USE1 = 0x00100;
+  public final static int CF_USE2 = 0x00200;
+  public final static int CF_USE3 = 0x00400;
+  public final static int CF_USE4 = 0x00800;
+  public final static int CF_USE5 = 0x01000;
+  public final static int CF_USE6 = 0x02000;
+  public final static int CF_JUMP = 0x04000;
+  public final static int CF_SHFT = 0x08000;
+  public final static int CF_HLL = 0x10000;
   public final static int AS_OFFST = 0x00000001;
   public final static int AS_COLON = 0x00000002;
   public final static int AS_UDATA = 0x00000004;
@@ -795,4 +812,12 @@ public interface IdaJavaConstants {
   public final static int FIXUP_EXTDEF = 0x20;
   public final static int FIXUP_UNUSED = 0x40;
   public final static int FIXUP_CREATED = 0x80;
+  public final static int XREF_USER = 0x20;
+  public final static int XREF_TAIL = 0x40;
+  public final static int XREF_BASE = 0x80;
+  public final static int XREF_MASK = 0x1F;
+  public final static int XREF_PASTEND = 0x100;
+  public final static int XREF_ALL = 0x00;
+  public final static int XREF_FAR = 0x01;
+  public final static int XREF_DATA = 0x02;
 }

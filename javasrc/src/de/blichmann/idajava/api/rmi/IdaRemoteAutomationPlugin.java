@@ -1,6 +1,6 @@
 /*
- * IDAJava version 0.2
- * Copyright (c)2007-2009 Christian Blichmann
+ * IDAJava version 0.3
+ * Copyright (c)2007-2010 Christian Blichmann
  *
  * IdaRemoteAutomationPlugin Class
  *
@@ -251,13 +251,13 @@ public class IdaRemoteAutomationPlugin extends IdaPlugin
 	
 	public boolean runScript(String code) throws RemoteException {
 		// UNTESTED
-		return false;// IdaJava.execute(code);
+		return IdaJava.execute(code);
 	}
 	
 	public boolean runScriptFile(String fileName) throws RemoteException {
 		// UNTESTED
 		String errbuf = "";
-		return false;//IdaJava.ExecuteFile(fileName, "main", 0, null, null, errbuf, 1024);
+		return IdaJava.ExecuteFile(fileName, "main", 0, null, null, errbuf, 1024);
 	}
 	
 	public boolean runPlugin(String name, int arg) throws RemoteException {

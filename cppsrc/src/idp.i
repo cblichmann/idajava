@@ -20,7 +20,6 @@
 %ignore AbstractRegister; // Deprecated
 %ignore WorkReg; // Deprecated
 %ignore rginfo;
-%ignore bytes_t;
 %ignore IDPOPT_STR;
 %ignore IDPOPT_NUM;
 %ignore IDPOPT_BIT;
@@ -31,7 +30,7 @@
 %ignore IDPOPT_BADVALUE;
 %ignore set_options_t; // Not exported in ida.lib
 %ignore read_user_config_file; // Not exported in ida.lib
-%ignore instruc_t;
+//%ignore instruc_t;
 %ignore s_preline;
 %ignore ca_operation_t;
 %ignore _chkarg_cmd;

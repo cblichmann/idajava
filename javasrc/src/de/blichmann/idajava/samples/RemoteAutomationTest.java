@@ -1,6 +1,6 @@
 /*
- * IDAJava version 0.2
- * Copyright (c)2007-2009 Christian Blichmann
+ * IDAJava version 0.3
+ * Copyright (c)2007-2010 Christian Blichmann
  *
  * RemoteAutomationTest Class
  *

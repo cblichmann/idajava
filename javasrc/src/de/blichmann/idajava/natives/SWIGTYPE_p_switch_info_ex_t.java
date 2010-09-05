@@ -8,18 +8,18 @@
 
 package de.blichmann.idajava.natives;
 
-public class SWIGTYPE_p_bytes_t {
+public class SWIGTYPE_p_switch_info_ex_t {
   private long swigCPtr;
 
-  protected SWIGTYPE_p_bytes_t(long cPtr, boolean futureUse) {
+  protected SWIGTYPE_p_switch_info_ex_t(long cPtr, boolean futureUse) {
     swigCPtr = cPtr;
   }
 
-  protected SWIGTYPE_p_bytes_t() {
+  protected SWIGTYPE_p_switch_info_ex_t() {
     swigCPtr = 0;
   }
 
-  protected static long getCPtr(SWIGTYPE_p_bytes_t obj) {
+  protected static long getCPtr(SWIGTYPE_p_switch_info_ex_t obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 }

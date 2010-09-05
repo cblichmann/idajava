@@ -1,6 +1,6 @@
 /*
- * IDAJava version 0.2
- * Copyright (c)2007-2009 Christian Blichmann
+ * IDAJava version 0.3
+ * Copyright (c)2007-2010 Christian Blichmann
  *
  * IdaCompat Class
  *
@@ -23,18 +23,15 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sun.awt.image.BadDepthException;
 import de.blichmann.idajava.api.IdaConsole;
 import de.blichmann.idajava.natives.IdaJava;
 import de.blichmann.idajava.natives.IdaJavaConstants;
-import de.blichmann.idajava.natives.SWIGTYPE_p_unsigned_int;
-import de.blichmann.idajava.natives.SWIGTYPE_p_void;
 import de.blichmann.idajava.natives.func_t;
 import de.blichmann.idajava.natives.idc_value_t;
 import de.blichmann.idajava.natives.member_t;
+import de.blichmann.idajava.natives.opinfo_t;
 import de.blichmann.idajava.natives.segment_t;
 import de.blichmann.idajava.natives.struc_t;
-import de.blichmann.idajava.natives.opinfo_t;
 
 /**
  * This class contains IDA built-in function declarations and internal bit

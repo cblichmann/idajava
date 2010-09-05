@@ -1,6 +1,6 @@
 /*
- * IDAJava version 0.2
- * Copyright (c)2007-2009 Christian Blichmann
+ * IDAJava version 0.3
+ * Copyright (c)2007-2010 Christian Blichmann
  *
  * HelloIdaPlugin Class
  *
@@ -22,6 +22,7 @@ package de.blichmann.idajava.samples;
 import de.blichmann.idajava.api.IdaConsole;
 import de.blichmann.idajava.api.plugin.IdaPlugin;
 import de.blichmann.idajava.natives.IdaJava;
+import de.blichmann.idajava.natives.insn_t;
 
 /**
  * Sample plugin that demonstrates how to write IDA plugins in Java.
@@ -54,16 +55,19 @@ public class HelloIdaPlugin extends IdaPlugin {
 
 	@Override
 	public void run(int arg) {
-		IdaConsole.out.println("Java in run() method");
+		IdaConsole.out.println("Java plugin in run() method");
 		IdaConsole.out.println("Hello, IDA!");
 
 		// Actually do something
 		IdaConsole.out.println("Current address is: " +
 				IdaJava.get_screen_ea());
+
+		insn_t inst;
+		inst = IdaJava.getCmd();
 	}
 
 	@Override
 	public void terminate() {
-		IdaConsole.out.println("Java in terminate() method");
+		IdaConsole.out.println("Java plugin in terminate() method");
 	}
 }

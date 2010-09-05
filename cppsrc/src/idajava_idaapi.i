@@ -53,6 +53,7 @@
 #include <frame.hpp>
 #include <fixup.hpp>
 #include <offset.hpp>
+#include <xref.hpp>
 
 // Windows specific includes, omit rarely used APIs
 #define WIN32_LEAN_AND_MEAN
@@ -108,6 +109,7 @@
 %include "frame.i"
 %include "fixup.i"
 %include "offset.i"
+%include "xref.i"
 
 // idajava_natives.i, should come last
 %include "idajava_natives.i"

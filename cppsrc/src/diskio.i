@@ -17,10 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-typedef int (idaapi *enumerate_files_cb)(const char *file, void *ud);
-%{typedef int (idaapi *enumerate_files_cb)(const char *file, void *ud);%}
+%inline
+%{
+	typedef int (idaapi *enumerate_files_cb)(const char *file, void *ud);
+%}
 idaman int ida_export enumerate_files(char *answer, size_t answer_size, const char *path, const char *fname, enumerate_files_cb func, void *ud);
 %ignore enumerate_files;
+
 inline int idaapi enumerate_system_files(char *answer, size_t answer_size, const char *subdir, const char *fname, enumerate_files_cb func, void *ud);
 %ignore enumerate_system_files;
 
