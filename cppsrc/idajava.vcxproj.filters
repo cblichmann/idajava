@@ -148,5 +148,35 @@
     <None Include="src\demangle.i">
       <Filter>SWIG</Filter>
     </None>
+    <None Include="src\entry.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\enum.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\exehdr.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\gdl.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\graph.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\idd.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\ieee.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\intel.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\md5.i">
+      <Filter>SWIG</Filter>
+    </None>
+    <None Include="src\lex.i">
+      <Filter>SWIG</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -26,37 +26,64 @@
 %{
 #define USE_DANGEROUS_FUNCTIONS
 #define USE_STANDARD_FILE_FUNCTIONS
-#include <pro.h>
-#include <ida.hpp>
 #pragma warning(push)
 #pragma warning(disable: 4267) // netnode.hpp: Conversion nodeidx_t <-> size_t
-#include <idp.hpp>
-#pragma warning( pop )
-#include <allins.hpp>
-#include <expr.hpp>
-#include <bytes.hpp>
-#include <loader.hpp>
-#include <ints.hpp>
-#include <kernwin.hpp>
-#include <diskio.hpp>
-#include <demangle.hpp>
-#include <llong.hpp>
+#pragma warning(disable: 4800) // graph.hpp: Performance int forced to bool
+#include <pro.h>
+#include <ida.hpp>
 #include <fpro.h>
-#include <help.h>
-#include <ua.hpp>
-#include <area.hpp>
-#include <segment.hpp>
-#include <srarea.hpp>
+#include <netnode.hpp>
 #include <nalt.hpp>
-#include <auto.hpp>
-#include <funcs.hpp>
-#include <name.hpp>
-#include <struct.hpp>
 #include <idp.hpp>
-#include <frame.hpp>
+#include <kernwin.hpp>
+
+#include <allins.hpp>
+#include <area.hpp>
+#include <auto.hpp>
+#include <bytes.hpp>
+//#include <compress.hpp>
+//#include <dbg.hpp>
+#include <demangle.hpp>
+#include <diskio.hpp>
+#include <entry.hpp>
+#include <enum.hpp>
+#include <exehdr.h>
+#include <expr.hpp>
 #include <fixup.hpp>
+#include <funcs.hpp>
+#include <frame.hpp>
+#include <gdl.hpp>
+#include <graph.hpp>
+
+#include <help.h>
+#include <idd.hpp>
+#include <idp.hpp>
+#include <ieee.h>
+#include <intel.hpp>
+#include <ints.hpp>
+#include <lex.hpp>
+#include <lines.hpp>
+#include <llong.hpp>
+#include <loader.hpp>
+#include <md5.h>
+//#include <moves.hpp>
+#include <name.hpp>
 #include <offset.hpp>
+//#include <prodir.h>
+//#include <queue.hpp>
+//#include <regex.hpp>
+//#include <search.hpp>
+#include <segment.hpp>
+//#include <sistack.hpp>
+#include <srarea.hpp>
+//#include <strlist.hpp>
+#include <struct.hpp>
+//#include <typeinf.hpp>
+#include <ua.hpp>
+//#include <va.hpp>
+//#include <vm.hpp>
 #include <xref.hpp>
+#pragma warning(pop)
 
 // Windows specific includes, omit rarely used APIs
 #define WIN32_LEAN_AND_MEAN
@@ -90,12 +117,16 @@
 %include "operators.i"
 
 %include "pro.i"
-%include "llong.i"
 %include "ida.i"
 %include "fpro.i"
+//%include "netnode.i" // Not yet wrapped
+%include "nalt.i"
+%include "idp.i"
+%include "kernwin.i"
+
+%include "llong.i"
 %include "help.i"
 %include "ints.i"
-%include "kernwin.i"
 %include "loader.i"
 %include "diskio.i"
 %include "expr.i"
@@ -103,13 +134,11 @@
 %include "area.i"
 %include "segment.i"
 %include "srarea.i"
-%include "nalt.i"
 %include "bytes.i"
 %include "auto.i"
 %include "funcs.i"
 %include "name.i"
 %include "struct.i"
-%include "idp.i"
 %include "frame.i"
 %include "fixup.i"
 %include "offset.i"
@@ -117,10 +146,30 @@
 %include "allins.i"
 //%include "compress.i" // Not yet wrapped, use Java Zip routines
 //%include "dbg.i" // Not yet wrapped, need to work around #ifndef SWIG
-//%include "demangle.i"
-//%include "entry.i" // Not yet wrapped
-//%include "enum.i" // Not yet wrapped
-//%include "err.i" // Not yet wrapped
+%include "demangle.i"
+%include "entry.i"
+%include "enum.i"
+//%include "err.i" // Not used in IDA
+%include "exehdr.i"
+%include "gdl.i"
+%include "graph.i"
+%include "idd.i"
+%include "ieee.i"
+%include "intel.i"
+%include "lex.i"
+%include "md5.i"
+//%include "moves.i" // Not yet wrapped
+//%include "name.i" // Not yet wrapped
+//%include "offset.i" // Not yet wrapped
+//%include "prodir.i" // Not yet wrapped
+//%include "queue.i" // Not yet wrapped
+//%include "regex.i" // Not yet wrapped
+//%include "search.i" // Not yet wrapped
+//%include "sistack.i" // Not yet wrapped
+//%include "strlist.i" // Not yet wrapped
+//%include "typeinf.i" // Not yet wrapped
+//%include "va.i" // Not yet wrapped
+//%include "vm.i" // Not yet wrapped
 
 // idajava_natives.i, should come last
 %include "idajava_natives.i"

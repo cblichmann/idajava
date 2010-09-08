@@ -20,7 +20,7 @@
 %inline
 %{
 	typedef area_t *(idaapi *set_dbgmem_source_dbg_get_memory_config_cb)(int *n);
-	typedef int (idaapi *set_dbgmem_source_memory_read_cb) (ea_t ea, void *buffer, int size);
+	typedef int (idaapi *set_dbgmem_source_memory_read_cb)(ea_t ea, void *buffer, int size);
 	typedef int (idaapi *set_dbgmem_source_memory_write_cb)(ea_t ea, const void *buffer, int size);
 %}
 idaman void ida_export set_dbgmem_source(set_dbgmem_source_dbg_get_memory_config_cb dbg_get_memory_config_func, set_dbgmem_source_memory_read_cb memory_read_func, set_dbgmem_source_memory_write_cb memory_write_func);

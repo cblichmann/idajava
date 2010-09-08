@@ -43,7 +43,7 @@ public:
 	inline const char * get_canon_mnem(void) const;
 	uint16 size;
 	uint16 auxpref;
-	// auxpref_chars omitted SWIG cannot handle unnamed nested structs
+	// auxpref_chars union omitted: SWIG cannot handle unnamed nested structs
 	char segpref;
 	char insnpref;
 	op_t Operands[UA_MAXOP];

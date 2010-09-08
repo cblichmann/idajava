@@ -409,37 +409,64 @@ namespace Swig {
 
 #define USE_DANGEROUS_FUNCTIONS
 #define USE_STANDARD_FILE_FUNCTIONS
-#include <pro.h>
-#include <ida.hpp>
 #pragma warning(push)
 #pragma warning(disable: 4267) // netnode.hpp: Conversion nodeidx_t <-> size_t
-#include <idp.hpp>
-#pragma warning( pop )
-#include <allins.hpp>
-#include <expr.hpp>
-#include <bytes.hpp>
-#include <loader.hpp>
-#include <ints.hpp>
-#include <kernwin.hpp>
-#include <diskio.hpp>
-#include <demangle.hpp>
-#include <llong.hpp>
+#pragma warning(disable: 4800) // graph.hpp: Performance int forced to bool
+#include <pro.h>
+#include <ida.hpp>
 #include <fpro.h>
-#include <help.h>
-#include <ua.hpp>
-#include <area.hpp>
-#include <segment.hpp>
-#include <srarea.hpp>
+#include <netnode.hpp>
 #include <nalt.hpp>
-#include <auto.hpp>
-#include <funcs.hpp>
-#include <name.hpp>
-#include <struct.hpp>
 #include <idp.hpp>
-#include <frame.hpp>
+#include <kernwin.hpp>
+
+#include <allins.hpp>
+#include <area.hpp>
+#include <auto.hpp>
+#include <bytes.hpp>
+//#include <compress.hpp>
+//#include <dbg.hpp>
+#include <demangle.hpp>
+#include <diskio.hpp>
+#include <entry.hpp>
+#include <enum.hpp>
+#include <exehdr.h>
+#include <expr.hpp>
 #include <fixup.hpp>
+#include <funcs.hpp>
+#include <frame.hpp>
+#include <gdl.hpp>
+#include <graph.hpp>
+
+#include <help.h>
+#include <idd.hpp>
+#include <idp.hpp>
+#include <ieee.h>
+#include <intel.hpp>
+#include <ints.hpp>
+#include <lex.hpp>
+#include <lines.hpp>
+#include <llong.hpp>
+#include <loader.hpp>
+#include <md5.h>
+//#include <moves.hpp>
+#include <name.hpp>
 #include <offset.hpp>
+//#include <prodir.h>
+//#include <queue.hpp>
+//#include <regex.hpp>
+//#include <search.hpp>
+#include <segment.hpp>
+//#include <sistack.hpp>
+#include <srarea.hpp>
+//#include <strlist.hpp>
+#include <struct.hpp>
+//#include <typeinf.hpp>
+#include <ua.hpp>
+//#include <va.hpp>
+//#include <vm.hpp>
 #include <xref.hpp>
+#pragma warning(pop)
 
 // Windows specific includes, omit rarely used APIs
 #define WIN32_LEAN_AND_MEAN
@@ -1068,6 +1095,11 @@ jdoubleArray SWIG_JavaArrayOutDouble (JNIEnv *jenv, double *result, jsize sz) {
 
 #endif
 
+
+	typedef bool (idaapi* asm_t_checkarg_dispatch_cb)(void *a1, void *a2, uchar cmd);
+	typedef void (idaapi *asm_t_func_cb)(func_t *);
+	typedef ssize_t (idaapi *asm_t_get_type_name_cb)(flags_t flag, ea_t ea_or_id, char *buf, size_t bufsize);
+
 typedef int (idaapi *enum_processor_modules_cb)(const char *file, void *ud);
 typedef int (idaapi *enum_plugins_cb)(const char *file, void *ud);
 
@@ -1094,7 +1126,7 @@ typedef int (idaapi *enum_plugins_cb)(const char *file, void *ud);
 
 
 	typedef area_t *(idaapi *set_dbgmem_source_dbg_get_memory_config_cb)(int *n);
-	typedef int (idaapi *set_dbgmem_source_memory_read_cb) (ea_t ea, void *buffer, int size);
+	typedef int (idaapi *set_dbgmem_source_memory_read_cb)(ea_t ea, void *buffer, int size);
 	typedef int (idaapi *set_dbgmem_source_memory_write_cb)(ea_t ea, const void *buffer, int size);
 
 
@@ -1109,9 +1141,43 @@ ea_t get_fchunk_referer(ea_t ea, size_t idx)
 
 SWIGINTERN member_t *struc_t_get_member(struc_t *self,int index){ return &(self->members[index]); }
 
-	typedef bool (idaapi* asm_t_checkarg_dispatch_cb)(void *a1, void *a2, uchar cmd);
-	typedef void (idaapi *asm_t_func_cb)(func_t *);
-	typedef ssize_t (idaapi *asm_t_get_type_name_cb)(flags_t flag, ea_t ea_or_id, char *buf, size_t bufsize);
+	typedef bool (idaapi *debugger_t_init_debugger_cb)(const char *hostname, int portnum, const char *password);
+	typedef bool (idaapi *debugger_t_term_debugger_cb)(void);
+	typedef int (idaapi *debugger_t_process_get_info_cb)(int n, process_info_t *info);
+	typedef int (idaapi *debugger_t_start_process_cb)(const char *path, const char *args, const char *startdir, uint32 input_file_crc32);
+	typedef int (idaapi *debugger_t_attach_process_cb)(pid_t pid, int event_id);
+	typedef int (idaapi *debugger_t_detach_process_cb)(void);
+	typedef void (idaapi *debugger_t_rebase_if_required_to_cb)(ea_t new_base);
+	typedef int (idaapi *debugger_t_prepare_to_pause_process_cb)(void);
+	typedef int (idaapi *debugger_t_exit_process_cb)(void);
+	typedef gdecode_t (idaapi *debugger_t_get_debug_event_cb)(debug_event_t *event, bool ida_is_idle);
+	typedef int (idaapi *debugger_t_continue_after_event_cb)(const debug_event_t *event);
+	typedef void (idaapi *debugger_t_set_exception_info_cb)(const exception_info_t *info, int qty);
+	typedef void (idaapi *debugger_t_stopped_at_debug_event_cb)(bool dlls_added);
+	typedef int (idaapi *debugger_t_thread_suspend_cb) (thid_t tid);
+	typedef int (idaapi *debugger_t_thread_continue_cb)(thid_t tid);
+	typedef int (idaapi *debugger_t_thread_set_step_cb)(thid_t tid);
+	typedef int (idaapi *debugger_t_read_registers_cb)(thid_t tid, int clsmask, regval_t *values);
+	typedef int (idaapi *debugger_t_write_register_cb)(thid_t tid, int regidx, const regval_t *value);
+	typedef int (idaapi *debugger_t_thread_get_sreg_base_cb)(thid_t tid, int sreg_value, ea_t *answer);
+	typedef int (idaapi *debugger_t_get_memory_info_cb)(meminfo_vec_t &areas);
+	typedef ssize_t (idaapi *debugger_t_read_memory_cb)(ea_t ea, void *buffer, size_t size);
+	typedef ssize_t (idaapi *debugger_t_write_memory_cb)(ea_t ea, const void *buffer, size_t size);
+	typedef int (idaapi *debugger_t_is_ok_bpt_cb)(bpttype_t type, ea_t ea, int len);
+	typedef int (idaapi *debugger_t_add_bpt_cb)(bpttype_t type, ea_t ea, int len);
+	typedef int (idaapi *debugger_t_del_bpt_cb)(ea_t ea, const uchar *orig_bytes, int len);
+	typedef int  (idaapi *debugger_t_open_file_cb)(const char *file, uint32 *fsize, bool readonly);
+	typedef void (idaapi *debugger_t_close_file_cb)(int fn);
+	typedef ssize_t (idaapi *debugger_t_read_file_cb)(int fn, uint32 off, void *buf, size_t size);
+	typedef ea_t (idaapi *debugger_t_map_address_cb)(ea_t off, const regval_t *regs, int regnum);
+	typedef const char *(idaapi *debugger_t_set_dbg_options_cb)(const char *keyword, int value_type, const void *value);
+	typedef const void *(idaapi *debugger_t_get_debmod_extensions_cb)(void);
+	typedef bool (idaapi *debugger_t_update_call_stack_cb)(thid_t tid, call_stack_t *trace);
+	typedef ea_t (idaapi *debugger_t_appcall_cb)(ea_t func_ea, thid_t tid, const struct func_type_info_t *fti, int nargs, const struct regobjs_t *regargs, struct relobj_t *stkargs, struct regobjs_t *retregs, qstring *errbuf, debug_event_t *event, int options);
+	typedef int (idaapi *debugger_t_cleanup_appcall_cb)(thid_t tid);
+
+
+	typedef const regval_t &(idaapi *pc_get_operand_info_getreg_cb_t)(const char *name, const regval_t *regvalues);
 
 
 
@@ -3577,274 +3643,6 @@ SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qvector
   result = (bool)(arg1)->del((unsigned char const &)*arg2);
   jresult = (jboolean)result; 
   return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_print_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jint jarg4, jint jarg5, jint jarg6) {
-  jstring jresult = 0 ;
-  uint32 arg1 ;
-  uint32 arg2 ;
-  char *arg3 = (char *) 0 ;
-  int arg4 ;
-  int arg5 ;
-  int arg6 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (uint32)jarg1; 
-  arg2 = (uint32)jarg2; 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = (int)jarg4; 
-  arg5 = (int)jarg5; 
-  arg6 = (int)jarg6; 
-  result = (char *)print(arg1,arg2,arg3,arg4,arg5,arg6);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_make_1longlong(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
-  jlong jresult = 0 ;
-  uint32 arg1 ;
-  int32 arg2 ;
-  longlong result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (uint32)jarg1; 
-  arg2 = (int32)jarg2; 
-  result = make_longlong(arg1,arg2);
-  *(longlong **)&jresult = new longlong((const longlong &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_make_1ulonglong(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
-  jlong jresult = 0 ;
-  uint32 arg1 ;
-  int32 arg2 ;
-  ulonglong result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (uint32)jarg1; 
-  arg2 = (int32)jarg2; 
-  result = make_ulonglong(arg1,arg2);
-  *(ulonglong **)&jresult = new ulonglong((const ulonglong &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_low_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ulonglong *arg1 = 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(ulonglong **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ulonglong const & reference is null");
-    return 0;
-  } 
-  result = (uint32)low((ulonglong const &)*arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_high_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ulonglong *arg1 = 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(ulonglong **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ulonglong const & reference is null");
-    return 0;
-  } 
-  result = (uint32)high((ulonglong const &)*arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_low_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  longlong *arg1 = 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(longlong **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "longlong const & reference is null");
-    return 0;
-  } 
-  result = (uint32)low((longlong const &)*arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_high_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jint jresult = 0 ;
-  longlong *arg1 = 0 ;
-  int32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(longlong **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "longlong const & reference is null");
-    return 0;
-  } 
-  result = (int32)high((longlong const &)*arg1);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_print_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3, jint jarg4) {
-  jstring jresult = 0 ;
-  longlong arg1 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  int arg4 ;
-  longlong *argp1 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(longlong **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null longlong");
-    return 0;
-  }
-  arg1 = *argp1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = (int)jarg3; 
-  arg4 = (int)jarg4; 
-  result = (char *)print(arg1,arg2,arg3,arg4);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_print_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3, jint jarg4) {
-  jstring jresult = 0 ;
-  ulonglong arg1 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  int arg4 ;
-  ulonglong *argp1 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(ulonglong **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ulonglong");
-    return 0;
-  }
-  arg1 = *argp1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = (int)jarg3; 
-  arg4 = (int)jarg4; 
-  result = (char *)print(arg1,arg2,arg3,arg4);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_llong_1scan(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jlong jarg3) {
-  jlong jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  int arg2 ;
-  char **arg3 = (char **) 0 ;
-  longlong result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (int)jarg2; 
-  arg3 = *(char ***)&jarg3; 
-  result = llong_scan((char const *)arg1,arg2,(char const **)arg3);
-  *(longlong **)&jresult = new longlong((const longlong &)result); 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_swap64_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ulonglong arg1 ;
-  ulonglong *argp1 ;
-  ulonglong result;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(ulonglong **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ulonglong");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = swap64(arg1);
-  *(ulonglong **)&jresult = new ulonglong((const ulonglong &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_swap64_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  longlong arg1 ;
-  longlong *argp1 ;
-  longlong result;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(longlong **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null longlong");
-    return 0;
-  }
-  arg1 = *argp1; 
-  result = swap64(arg1);
-  *(longlong **)&jresult = new longlong((const longlong &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_swap128(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  uint128 *arg1 = (uint128 *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(uint128 **)&jarg1; 
-  swap128(arg1);
 }
 
 
@@ -7729,77 +7527,1388 @@ SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fwrite8byte
 }
 
 
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ivalue(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jlong jarg3) {
-  jstring jresult = 0 ;
-  help_t arg1 ;
-  char *arg2 = (char *) 0 ;
-  size_t arg3 ;
-  char *result = 0 ;
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_net_1patch_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  netnode arg1 ;
+  netnode *argp1 ;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (help_t)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
+  argp1 = *(netnode **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
+    return ;
   }
-  arg3 = (size_t)jarg3; 
-  result = (char *)ivalue(arg1,arg2,arg3);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
+  arg1 = *argp1; 
+  net_patch = arg1;
 }
 
 
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qivalue(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jstring jresult = 0 ;
-  help_t arg1 ;
-  char *result = 0 ;
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_net_1patch_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  netnode result;
   
   (void)jenv;
   (void)jcls;
-  arg1 = (help_t)jarg1; 
-  result = (char *)qivalue(arg1);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  result = net_patch;
+  *(netnode **)&jresult = new netnode((const netnode &)result); 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1predef_1insn_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
-  jint jresult = 0 ;
-  insn_t *arg1 = 0 ;
-  char *arg2 = (char *) 0 ;
-  size_t arg3 ;
-  ssize_t result;
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_import_1node_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  netnode arg1 ;
+  netnode *argp1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(netnode **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
+    return ;
+  }
+  arg1 = *argp1; 
+  import_node = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_import_1node_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  netnode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = import_node;
+  *(netnode **)&jresult = new netnode((const netnode &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1aflags0(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (uint32)jarg2; 
+  set_aflags0(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1aflags0(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (uint32)get_aflags0(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1aflags0(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  del_aflags0(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1aflags(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (uint32)jarg2; 
+  set_aflags(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1abits(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (uint32)jarg2; 
+  set_abits(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_clr_1abits(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (uint32)jarg2; 
+  clr_abits(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1aflags(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (uint32)get_aflags(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1aflags(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  del_aflags(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1visible_1item(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
+  ea_t arg1 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  set_visible_item(arg1,arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1visible_1item(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_visible_item(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1finally_1visible_1item(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_finally_visible_item(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1source_1linnum(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  uval_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  set_source_linnum(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1source_1linnum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (uval_t)get_source_linnum(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1source_1linnum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  del_source_linnum(arg1);
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1str_1type_1code(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jchar jresult = 0 ;
+  uval_t arg1 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  result = (char)get_str_type_code(arg1);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1str_1term1(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jchar jresult = 0 ;
+  int32 arg1 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int32)jarg1; 
+  result = (char)get_str_term1(arg1);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1str_1term2(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jchar jresult = 0 ;
+  int32 arg1 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int32)jarg1; 
+  result = (char)get_str_term2(arg1);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1unicode(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int32)jarg1; 
+  result = (bool)is_unicode(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1pascal(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int32)jarg1; 
+  result = (bool)is_pascal(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1item_1color(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  bgcolor_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (bgcolor_t)jarg2; 
+  set_item_color(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1item_1color(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  bgcolor_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bgcolor_t)get_item_color(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1item_1color(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  del_item_color(arg1);
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF8_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_OFF8;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF16_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_OFF16;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF32_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_OFF32;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1LOW8_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_LOW8;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1LOW16_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_LOW16;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1HIGH8_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_HIGH8;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1HIGH16_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_HIGH16;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1VHIGH_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_VHIGH;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1VLOW_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_VLOW;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF64_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_OFF64;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1LAST_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reftype_t)(reftype_t)REF_LAST;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reftype_1by_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jshort jresult = 0 ;
+  size_t arg1 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (size_t)jarg1; 
+  result = (reftype_t)get_reftype_by_size(arg1);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1target_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  ea_t arg2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(insn_t **)&jarg1;
-  if (!arg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "insn_t const & reference is null");
-    return 0;
-  } 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = (size_t)jarg3; 
-  result = (ssize_t)get_predef_insn_cmt((insn_t const &)*arg1,arg2,arg3);
-  jresult = (jint)result; 
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->target = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1target_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (ea_t) ((arg1)->target);
+  jresult = (jlong)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1predef_1cmt(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jstring jarg3, jlong jarg4) {
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->base = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (ea_t) ((arg1)->base);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1tdelta_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  adiff_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (adiff_t)jarg2; 
+  if (arg1) (arg1)->tdelta = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1tdelta_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  adiff_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (adiff_t) ((arg1)->tdelta);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (uint32) ((arg1)->flags);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  reftype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (reftype_t)((refinfo_t const *)arg1)->type();
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1no_1base_1xref(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (bool)((refinfo_t const *)arg1)->no_base_xref();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1pastend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (bool)((refinfo_t const *)arg1)->is_pastend();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1rvaoff(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (bool)((refinfo_t const *)arg1)->is_rvaoff();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1custom(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (bool)((refinfo_t const *)arg1)->is_custom();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1subtract(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (bool)((refinfo_t const *)arg1)->is_subtract();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  result = (bool)((refinfo_t const *)arg1)->is_signed();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1set_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  reftype_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (reftype_t)jarg2; 
+  (arg1)->set_type(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  uint32 arg2 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  adiff_t arg5 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (adiff_t)jarg5; 
+  (arg1)->init(arg2,arg3,arg4,arg5);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  uint32 arg2 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  (arg1)->init(arg2,arg3,arg4);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  uint32 arg2 ;
+  ea_t arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  arg3 = (ea_t)jarg3; 
+  (arg1)->init(arg2,arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(refinfo_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  (arg1)->init(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1refinfo_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  refinfo_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (refinfo_t *)new refinfo_t();
+  *(refinfo_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1refinfo_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  refinfo_t *arg1 = (refinfo_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(refinfo_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1len_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(strpath_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->len = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1len_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(strpath_t **)&jarg1; 
+  result = (int) ((arg1)->len);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1ids_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlongArray jarg2) {
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  tid_t *arg2 ;
+  jlong *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(strpath_t **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 32) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUint(jenv, &jarr2, &arg2, jarg2)) return ; 
+  {
+    size_t ii;
+    tid_t *b = (tid_t *) arg1->ids;
+    for (ii = 0; ii < (size_t)32; ii++) b[ii] = *((tid_t *) arg2 + ii);
+  }
+  SWIG_JavaArrayArgoutUint(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jlongArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1ids_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlongArray jresult = 0 ;
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  tid_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(strpath_t **)&jarg1; 
+  result = (tid_t *)(tid_t *) ((arg1)->ids);
+  jresult = SWIG_JavaArrayOutUint(jenv, result, 32); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1delta_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  adiff_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(strpath_t **)&jarg1; 
+  arg2 = (adiff_t)jarg2; 
+  if (arg1) (arg1)->delta = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1delta_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  adiff_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(strpath_t **)&jarg1; 
+  result = (adiff_t) ((arg1)->delta);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1strpath_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  strpath_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (strpath_t *)new strpath_t();
+  *(strpath_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1strpath_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  strpath_t *arg1 = (strpath_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(strpath_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1tid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  enum_const_t *arg1 = (enum_const_t *) 0 ;
+  tid_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(enum_const_t **)&jarg1; 
+  arg2 = (tid_t)jarg2; 
+  if (arg1) (arg1)->tid = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1tid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  enum_const_t *arg1 = (enum_const_t *) 0 ;
+  tid_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(enum_const_t **)&jarg1; 
+  result = (tid_t) ((arg1)->tid);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1serial_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  enum_const_t *arg1 = (enum_const_t *) 0 ;
+  uchar arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(enum_const_t **)&jarg1; 
+  arg2 = (uchar)jarg2; 
+  if (arg1) (arg1)->serial = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1serial_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  enum_const_t *arg1 = (enum_const_t *) 0 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(enum_const_t **)&jarg1; 
+  result = (uchar) ((arg1)->serial);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1enum_1const_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  enum_const_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (enum_const_t *)new enum_const_t();
+  *(enum_const_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1enum_1const_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  enum_const_t *arg1 = (enum_const_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(enum_const_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ri_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  refinfo_t *arg2 = (refinfo_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  arg2 = *(refinfo_t **)&jarg2; 
+  if (arg1) (arg1)->ri = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ri_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  refinfo_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  result = (refinfo_t *)& ((arg1)->ri);
+  *(refinfo_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1tid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  tid_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  arg2 = (tid_t)jarg2; 
+  if (arg1) (arg1)->tid = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1tid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  tid_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  result = (tid_t) ((arg1)->tid);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1path_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  strpath_t *arg2 = (strpath_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  arg2 = *(strpath_t **)&jarg2; 
+  if (arg1) (arg1)->path = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1path_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  strpath_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  result = (strpath_t *)& ((arg1)->path);
+  *(strpath_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1strtype_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  int32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  arg2 = (int32)jarg2; 
+  if (arg1) (arg1)->strtype = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1strtype_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  int32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  result = (int32) ((arg1)->strtype);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ec_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  enum_const_t *arg2 = (enum_const_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  arg2 = *(enum_const_t **)&jarg2; 
+  if (arg1) (arg1)->ec = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ec_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  enum_const_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  result = (enum_const_t *)& ((arg1)->ec);
+  *(enum_const_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1cd_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  custom_data_type_ids_t arg2 ;
+  custom_data_type_ids_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  argp2 = *(custom_data_type_ids_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null custom_data_type_ids_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->cd = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1cd_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  custom_data_type_ids_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opinfo_t **)&jarg1; 
+  result =  ((arg1)->cd);
+  *(custom_data_type_ids_t **)&jresult = new custom_data_type_ids_t((const custom_data_type_ids_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1opinfo_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  opinfo_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (opinfo_t *)new opinfo_t();
+  *(opinfo_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1opinfo_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  opinfo_t *arg1 = (opinfo_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(opinfo_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1ex(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  refinfo_t *arg3 = (refinfo_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg3_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(refinfo_t **)&jarg3; 
+  result = (int)set_refinfo_ex(arg1,arg2,(refinfo_t const *)arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3, jlong jarg4, jlong jarg5, jint jarg6) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  reftype_t arg3 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  adiff_t arg6 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (reftype_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  arg6 = (adiff_t)jarg6; 
+  result = (int)set_refinfo(arg1,arg2,arg3,arg4,arg5,arg6);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3, jlong jarg4, jlong jarg5) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  reftype_t arg3 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (reftype_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  result = (int)set_refinfo(arg1,arg2,arg3,arg4,arg5);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  reftype_t arg3 ;
+  ea_t arg4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (reftype_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  result = (int)set_refinfo(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  reftype_t arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (reftype_t)jarg3; 
+  result = (int)set_refinfo(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1refinfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  refinfo_t *arg3 = (refinfo_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg3_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(refinfo_t **)&jarg3; 
+  result = (int)get_refinfo(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1refinfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)del_refinfo(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_write_1struc_1path(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jint jarg4, jint jarg5) {
+  netnode arg1 ;
+  int arg2 ;
+  tid_t *arg3 = (tid_t *) 0 ;
+  int arg4 ;
+  adiff_t arg5 ;
+  netnode *argp1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(netnode **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
+    return ;
+  }
+  arg1 = *argp1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(tid_t **)&jarg3; 
+  arg4 = (int)jarg4; 
+  arg5 = (adiff_t)jarg5; 
+  write_struc_path(arg1,arg2,(unsigned int const *)arg3,arg4,arg5);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_read_1struc_1path(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  netnode arg1 ;
+  int arg2 ;
+  tid_t *arg3 = (tid_t *) 0 ;
+  adiff_t *arg4 = (adiff_t *) 0 ;
+  netnode *argp1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(netnode **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
+    return 0;
+  }
+  arg1 = *argp1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(tid_t **)&jarg3; 
+  arg4 = *(adiff_t **)&jarg4; 
+  result = (int)read_struc_path(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1input_1file_1path(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jint jresult = 0 ;
   char *arg1 = (char *) 0 ;
-  int arg2 ;
-  char *arg3 = (char *) 0 ;
-  size_t arg4 ;
+  size_t arg2 ;
   ssize_t result;
   
   (void)jenv;
@@ -7809,6 +8918,215 @@ SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1predef
     arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
     if (!arg1) return 0;
   }
+  arg2 = (size_t)jarg2; 
+  result = (ssize_t)get_input_file_path(arg1,arg2);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1root_1filename(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (size_t)jarg2; 
+  result = (ssize_t)get_root_filename(arg1,arg2);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1root_1filename(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  char *arg1 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return ;
+  }
+  set_root_filename((char const *)arg1);
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_retrieve_1input_1file_1crc32(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint32)retrieve_input_file_crc32();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_retrieve_1input_1file_1md5(JNIEnv *jenv, jclass jcls, jshortArray jarg1) {
+  jboolean jresult = 0 ;
+  uchar *arg1 ;
+  jshort *jarr1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 16) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUchar(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  result = (bool)retrieve_input_file_md5(arg1);
+  jresult = (jboolean)result; 
+  SWIG_JavaArrayArgoutUchar(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1asm_1inc_1file(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (size_t)jarg2; 
+  result = (ssize_t)get_asm_inc_file(arg1,arg2);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1asm_1inc_1file(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (bool)set_asm_inc_file((char const *)arg1);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1imagebase(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (ea_t)get_imagebase();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1imagebase(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  set_imagebase(arg1);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1ids_1modnode(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  netnode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = get_ids_modnode();
+  *(netnode **)&jresult = new netnode((const netnode &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1ids_1modnode(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  netnode arg1 ;
+  netnode *argp1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(netnode **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
+    return ;
+  }
+  arg1 = *argp1; 
+  set_ids_modnode(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ExtraUpdate(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3) {
+  ea_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  arg3 = (int)jarg3; 
+  ExtraUpdate(arg1,(char const *)arg2,arg3);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ExtraDel(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  ea_t arg1 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  ExtraDel(arg1,arg2);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ExtraGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
   arg2 = (int)jarg2; 
   arg3 = 0;
   if (jarg3) {
@@ -7816,10 +9134,2945 @@ SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1predef
     if (!arg3) return 0;
   }
   arg4 = (size_t)jarg4; 
-  result = (ssize_t)get_predef_cmt((char const *)arg1,arg2,arg3,arg4);
+  result = (ssize_t)ExtraGet(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1auto_1plugins(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (size_t)jarg2; 
+  result = (ssize_t)get_auto_plugins(arg1,arg2);
   jresult = (jint)result; 
   if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1auto_1plugins_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (size_t)jarg2; 
+  result = (bool)set_auto_plugins((char const *)arg1,arg2);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1auto_1plugins_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (bool)set_auto_plugins((char const *)arg1);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_dbg_1get_1input_1path(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (size_t)jarg2; 
+  result = dbg_get_input_path(arg1,arg2);
+  jresult = (jlong)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1import_1module_1qty(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)get_import_module_qty();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1import_1module_1name(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jlong jarg3) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (bool)get_import_module_name(arg1,arg2,arg3);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1import_1names_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  int arg1 ;
+  import_enum_cb_t *arg2 = (import_enum_cb_t *) 0 ;
+  void *arg3 = (void *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = *(import_enum_cb_t **)&jarg2; 
+  arg3 = *(void **)&jarg3; 
+  result = (int)enum_import_names(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1import_1names_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  int arg1 ;
+  import_enum_cb_t *arg2 = (import_enum_cb_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = *(import_enum_cb_t **)&jarg2; 
+  result = (int)enum_import_names(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flag = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (uint32) ((arg1)->flag);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1uflag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint16 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (uint16)jarg2; 
+  if (arg1) (arg1)->uflag = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1uflag_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint16 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (uint16) ((arg1)->uflag);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->name);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1help_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  help_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (help_t)jarg2; 
+  if (arg1) (arg1)->help = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1help_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  help_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (help_t) ((arg1)->help);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1header_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char **) ((arg1)->header);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1badworks_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint16 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (uint16 *) ((arg1)->badworks);
+  *(uint16 **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1origin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->origin);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->end);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1cmnt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->cmnt);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1ascsep_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  char arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (char)jarg2; 
+  if (arg1) (arg1)->ascsep = arg2;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1ascsep_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jchar jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char) ((arg1)->ascsep);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1accsep_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  char arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (char)jarg2; 
+  if (arg1) (arg1)->accsep = arg2;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1accsep_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jchar jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char) ((arg1)->accsep);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1esccodes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->esccodes);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1ascii_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_ascii);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1byte_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_byte);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1word_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_word);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1dword_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_dword);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1qword_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_qword);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1oword_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_oword);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1float_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_float);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1double_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_double);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1tbyte_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_tbyte);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1packreal_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_packreal);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1dups_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_dups);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1bss_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_bss);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1equ_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_equ);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1seg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_seg);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1checkarg_1dispatch_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_checkarg_dispatch_cb arg2 = (asm_t_checkarg_dispatch_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = *(asm_t_checkarg_dispatch_cb *)&jarg2; 
+  if (arg1) (arg1)->checkarg_dispatch = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1checkarg_1dispatch_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_checkarg_dispatch_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (asm_t_checkarg_dispatch_cb) ((arg1)->checkarg_dispatch);
+  *(asm_t_checkarg_dispatch_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1_1UNUSED1_1was_1atomprefix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (void *) ((arg1)->_UNUSED1_was_atomprefix);
+  *(void **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1_1UNUSED2_1was_1checkarg_1operations_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (void *) ((arg1)->_UNUSED2_was_checkarg_operations);
+  *(void **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1XlatAsciiOutput_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  uchar *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (uchar *) ((arg1)->XlatAsciiOutput);
+  *(uchar **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1curip_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_curip);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1header_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_func_cb arg2 = (asm_t_func_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = *(asm_t_func_cb *)&jarg2; 
+  if (arg1) (arg1)->func_header = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1header_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_func_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (asm_t_func_cb) ((arg1)->func_header);
+  *(asm_t_func_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1footer_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_func_cb arg2 = (asm_t_func_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = *(asm_t_func_cb *)&jarg2; 
+  if (arg1) (arg1)->func_footer = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1footer_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_func_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (asm_t_func_cb) ((arg1)->func_footer);
+  *(asm_t_func_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1public_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_public);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1weak_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_weak);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1extrn_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_extrn);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1comdef_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_comdef);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1get_1type_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_get_type_name_cb arg2 = (asm_t_get_type_name_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = *(asm_t_get_type_name_cb *)&jarg2; 
+  if (arg1) (arg1)->get_type_name = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1get_1type_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  asm_t_get_type_name_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (asm_t_get_type_name_cb) ((arg1)->get_type_name);
+  *(asm_t_get_type_name_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1align_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_align);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1lbrace_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  char arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (char)jarg2; 
+  if (arg1) (arg1)->lbrace = arg2;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1lbrace_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jchar jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char) ((arg1)->lbrace);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1rbrace_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  char arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (char)jarg2; 
+  if (arg1) (arg1)->rbrace = arg2;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1rbrace_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jchar jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char) ((arg1)->rbrace);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1mod_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_mod);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1band_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_band);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1bor_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_bor);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1xor_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_xor);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1bnot_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_bnot);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1shl_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_shl);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1shr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_shr);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1sizeof_1fmt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_sizeof_fmt);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flag2 = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (uint32) ((arg1)->flag2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1cmnt2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->cmnt2);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1low8_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->low8);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1high8_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->high8);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1low16_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->low16);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1high16_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->high16);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1include_1fmt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_include_fmt);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1vstruc_1fmt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_vstruc_fmt);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_13byte_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_3byte);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1rva_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  asm_t *arg1 = (asm_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  result = (char *) ((arg1)->a_rva);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1asm_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(asm_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1len_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  bytes_t *arg1 = (bytes_t *) 0 ;
+  uchar arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(bytes_t **)&jarg1; 
+  arg2 = (uchar)jarg2; 
+  if (arg1) (arg1)->len = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1len_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  bytes_t *arg1 = (bytes_t *) 0 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(bytes_t **)&jarg1; 
+  result = (uchar) ((arg1)->len);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1bytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  bytes_t *arg1 = (bytes_t *) 0 ;
+  uchar *arg2 = (uchar *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(bytes_t **)&jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  if (arg1) (arg1)->bytes = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1bytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  bytes_t *arg1 = (bytes_t *) 0 ;
+  uchar *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(bytes_t **)&jarg1; 
+  result = (uchar *) ((arg1)->bytes);
+  *(uchar **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1bytes_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  bytes_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bytes_t *)new bytes_t();
+  *(bytes_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1bytes_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  bytes_t *arg1 = (bytes_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(bytes_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_instruc_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  instruc_t *arg1 = (instruc_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(instruc_t **)&jarg1; 
+  result = (char *) ((arg1)->name);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_instruc_1t_1feature_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  instruc_t *arg1 = (instruc_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(instruc_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->feature = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_instruc_1t_1feature_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  instruc_t *arg1 = (instruc_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(instruc_t **)&jarg1; 
+  result = (uint32) ((arg1)->feature);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1instruc_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  instruc_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (instruc_t *)new instruc_t();
+  *(instruc_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1instruc_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  instruc_t *arg1 = (instruc_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(instruc_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_InstrIsSet(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)InstrIsSet(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1call_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_call_insn(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1ret_1insn_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  result = (bool)is_ret_insn(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1ret_1insn_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_ret_insn(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1indirect_1jump_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_indirect_jump_insn(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1basic_1block_1end(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
+  jboolean jresult = 0 ;
+  bool arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = jarg1 ? true : false; 
+  result = (bool)is_basic_block_end(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1version_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->version = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1version_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->version);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1id_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->id = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1id_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->id);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1flag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flag = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1flag_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (uint32) ((arg1)->flag);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1has_1segregs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bool)((processor_t const *)arg1)->has_segregs();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1use32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bool)((processor_t const *)arg1)->use32();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1use64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bool)((processor_t const *)arg1)->use64();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1ti(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bool)((processor_t const *)arg1)->ti();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1stkup(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bool)((processor_t const *)arg1)->stkup();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1use_1tbyte(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bool)((processor_t const *)arg1)->use_tbyte();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1get_1segm_1bitness(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int)((processor_t const *)arg1)->get_segm_bitness();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1cnbits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->cnbits = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1cnbits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->cnbits);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1dnbits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->dnbits = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1dnbits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->dnbits);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1cbsize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int)(arg1)->cbsize();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1dbsize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int)(arg1)->dbsize();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1psnames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->psnames = (char const **)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1psnames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (char **) ((arg1)->psnames);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1plnames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->plnames = (char const **)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1plnames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (char **) ((arg1)->plnames);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1assemblers_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  asm_t **arg2 = (asm_t **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(asm_t ***)&jarg2; 
+  if (arg1) (arg1)->assemblers = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1assemblers_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  asm_t **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (asm_t **) ((arg1)->assemblers);
+  *(asm_t ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1get_1stkvar_1scale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int)(arg1)->get_stkvar_scale();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regsNum_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->regsNum = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regsNum_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->regsNum);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regNames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->regNames = (char const **)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regNames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (char **) ((arg1)->regNames);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFiles_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->rFiles = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFiles_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->rFiles);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFnames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->rFnames = (char const **)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFnames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (char **) ((arg1)->rFnames);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFdescs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  rginfo *arg2 = (rginfo *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(rginfo **)&jarg2; 
+  if (arg1) (arg1)->rFdescs = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFdescs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  rginfo *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (rginfo *) ((arg1)->rFdescs);
+  *(rginfo **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1CPUregs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  WorkReg *arg2 = (WorkReg *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(WorkReg **)&jarg2; 
+  if (arg1) (arg1)->CPUregs = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1CPUregs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  WorkReg *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (WorkReg *) ((arg1)->CPUregs);
+  *(WorkReg **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regFirstSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->regFirstSreg = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regFirstSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->regFirstSreg);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regLastSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->regLastSreg = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regLastSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->regLastSreg);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1segreg_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->segreg_size = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1segreg_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->segreg_size);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regCodeSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->regCodeSreg = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regCodeSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->regCodeSreg);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regDataSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->regDataSreg = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regDataSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->regDataSreg);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1codestart_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  bytes_t *arg2 = (bytes_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(bytes_t **)&jarg2; 
+  if (arg1) (arg1)->codestart = (bytes_t const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1codestart_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bytes_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bytes_t *) ((arg1)->codestart);
+  *(bytes_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1retcodes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  bytes_t *arg2 = (bytes_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(bytes_t **)&jarg2; 
+  if (arg1) (arg1)->retcodes = (bytes_t const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1retcodes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  bytes_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (bytes_t *) ((arg1)->retcodes);
+  *(bytes_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1start_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->instruc_start = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1start_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->instruc_start);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->instruc_end = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->instruc_end);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1is_1canon_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  uint16 arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (uint16)jarg2; 
+  result = (bool)((processor_t const *)arg1)->is_canon_insn(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  instruc_t *arg2 = (instruc_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(instruc_t **)&jarg2; 
+  if (arg1) (arg1)->instruc = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  instruc_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (instruc_t *) ((arg1)->instruc);
+  *(instruc_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1tbyte_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  size_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  if (arg1) (arg1)->tbyte_size = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1tbyte_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result =  ((arg1)->tbyte_size);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1real_1width_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->real_width, (const char *)arg2, 4-1);
+      arg1->real_width[4-1] = 0;
+    } else {
+      arg1->real_width[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1real_1width_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (char *)(char *) ((arg1)->real_width);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1icode_1return_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->icode_return = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1icode_1return_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->icode_return);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1mvm_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  mvm_t *arg2 = (mvm_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = *(mvm_t **)&jarg2; 
+  if (arg1) (arg1)->mvm = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1mvm_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  mvm_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (mvm_t *) ((arg1)->mvm);
+  *(mvm_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1high_1fixup_1bits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->high_fixup_bits = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1high_1fixup_1bits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  processor_t *arg1 = (processor_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  result = (int) ((arg1)->high_fixup_bits);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1processor_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  processor_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (processor_t *)new processor_t();
+  *(processor_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1processor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(processor_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ph_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  processor_t *arg1 = (processor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(processor_t **)&jarg1; 
+  ph = *arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ph_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  processor_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (processor_t *)&ph;
+  *(processor_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ash_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  asm_t *arg1 = (asm_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(asm_t **)&jarg1; 
+  ash = *arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ash_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  asm_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (asm_t *)&ash;
+  *(asm_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_str2regf(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (int)str2regf((char const *)arg1);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_str2reg(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (int)str2reg((char const *)arg1);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reg_1name_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jstring jarg3, jlong jarg4, jint jarg5) {
+  jint jresult = 0 ;
+  int arg1 ;
+  size_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  int arg5 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (size_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  arg5 = (int)jarg5; 
+  result = (ssize_t)get_reg_name(arg1,arg2,arg3,arg4,arg5);
+  jresult = (jint)result; 
   if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reg_1name_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  int arg1 ;
+  size_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (size_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_reg_name(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reg_1info(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jstring jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  uint64 *arg2 = (uint64 *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = *(uint64 **)&jarg2; 
+  result = (char *)get_reg_info((char const *)arg1,arg2);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1reg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(reg_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->reg = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1reg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(reg_info_t **)&jarg1; 
+  result = (int) ((arg1)->reg);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(reg_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->size = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(reg_info_t **)&jarg1; 
+  result = (int) ((arg1)->size);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  reg_info_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(reg_info_t **)&jarg1; 
+  arg2 = *(reg_info_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "reg_info_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((reg_info_t const *)arg1)->operator ==((reg_info_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  reg_info_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(reg_info_t **)&jarg1; 
+  arg2 = *(reg_info_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "reg_info_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((reg_info_t const *)arg1)->operator !=((reg_info_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1reg_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  reg_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (reg_info_t *)new reg_info_t();
+  *(reg_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1reg_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  reg_info_t *arg1 = (reg_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(reg_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_parse_1reg_1name(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  reg_info_t *arg2 = (reg_info_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = *(reg_info_t **)&jarg2; 
+  result = (bool)parse_reg_name((char const *)arg1,arg2);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_sizeof_1ldbl(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = sizeof_ldbl();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1data(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  intel_data(arg1);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1spcdef(JNIEnv *jenv, jclass jcls, jlong jarg1, jshort jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  uchar arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (uchar)jarg2; 
+  result = (bool)gen_spcdef(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1extern(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)gen_extern(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1abssym(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)gen_abssym(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1comvar(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)gen_comvar(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1processor_1type(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
+  jstring jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int arg2 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (int)jarg2; 
+  result = (char *)set_processor_type((char const *)arg1,arg2);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1idp_1name(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
+  jstring jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (size_t)jarg2; 
+  result = (char *)get_idp_name(arg1,arg2);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1target_1assembler(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)set_target_assembler(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_nbits(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (int)nbits(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytesize(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (int)bytesize(arg1);
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -10859,6 +15112,483 @@ SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_askfile_
 }
 
 
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_print_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jint jarg4, jint jarg5, jint jarg6) {
+  jstring jresult = 0 ;
+  uint32 arg1 ;
+  uint32 arg2 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  int arg5 ;
+  int arg6 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  arg2 = (uint32)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (int)jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = (int)jarg6; 
+  result = (char *)print(arg1,arg2,arg3,arg4,arg5,arg6);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_make_1longlong(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  uint32 arg1 ;
+  int32 arg2 ;
+  longlong result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  arg2 = (int32)jarg2; 
+  result = make_longlong(arg1,arg2);
+  *(longlong **)&jresult = new longlong((const longlong &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_make_1ulonglong(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  uint32 arg1 ;
+  int32 arg2 ;
+  ulonglong result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  arg2 = (int32)jarg2; 
+  result = make_ulonglong(arg1,arg2);
+  *(ulonglong **)&jresult = new ulonglong((const ulonglong &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_low_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ulonglong *arg1 = 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ulonglong **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ulonglong const & reference is null");
+    return 0;
+  } 
+  result = (uint32)low((ulonglong const &)*arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_high_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ulonglong *arg1 = 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(ulonglong **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ulonglong const & reference is null");
+    return 0;
+  } 
+  result = (uint32)high((ulonglong const &)*arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_low_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  longlong *arg1 = 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(longlong **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "longlong const & reference is null");
+    return 0;
+  } 
+  result = (uint32)low((longlong const &)*arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_high_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  longlong *arg1 = 0 ;
+  int32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(longlong **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "longlong const & reference is null");
+    return 0;
+  } 
+  result = (int32)high((longlong const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_print_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3, jint jarg4) {
+  jstring jresult = 0 ;
+  longlong arg1 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  longlong *argp1 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(longlong **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null longlong");
+    return 0;
+  }
+  arg1 = *argp1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (char *)print(arg1,arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_print_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3, jint jarg4) {
+  jstring jresult = 0 ;
+  ulonglong arg1 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  ulonglong *argp1 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(ulonglong **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ulonglong");
+    return 0;
+  }
+  arg1 = *argp1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (char *)print(arg1,arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_llong_1scan(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int arg2 ;
+  char **arg3 = (char **) 0 ;
+  longlong result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (int)jarg2; 
+  arg3 = *(char ***)&jarg3; 
+  result = llong_scan((char const *)arg1,arg2,(char const **)arg3);
+  *(longlong **)&jresult = new longlong((const longlong &)result); 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_swap64_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ulonglong arg1 ;
+  ulonglong *argp1 ;
+  ulonglong result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(ulonglong **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null ulonglong");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = swap64(arg1);
+  *(ulonglong **)&jresult = new ulonglong((const ulonglong &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_swap64_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  longlong arg1 ;
+  longlong *argp1 ;
+  longlong result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(longlong **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null longlong");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = swap64(arg1);
+  *(longlong **)&jresult = new longlong((const longlong &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_swap128(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  uint128 *arg1 = (uint128 *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint128 **)&jarg1; 
+  swap128(arg1);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ivalue(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jlong jarg3) {
+  jstring jresult = 0 ;
+  help_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (help_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (char *)ivalue(arg1,arg2,arg3);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qivalue(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jstring jresult = 0 ;
+  help_t arg1 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (help_t)jarg1; 
+  result = (char *)qivalue(arg1);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_Err(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  help_t arg1 ;
+  void *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (help_t)jarg1; 
+  Err(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_Warn(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  help_t arg1 ;
+  void *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (help_t)jarg1; 
+  Warn(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_Info(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  help_t arg1 ;
+  void *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (help_t)jarg1; 
+  Info(arg1,arg2);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_Message(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jint jresult = 0 ;
+  help_t arg1 ;
+  void *arg2 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (help_t)jarg1; 
+  result = (int)Message(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_askyn_1v(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  int arg1 ;
+  help_t arg2 ;
+  va_list arg3 ;
+  va_list *argp3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (help_t)jarg2; 
+  argp3 = *(va_list **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null va_list");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (int)askyn_v(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_askyn(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  int arg1 ;
+  help_t arg2 ;
+  void *arg3 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (help_t)jarg2; 
+  result = (int)askyn(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1predef_1insn_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  insn_t *arg1 = 0 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(insn_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "insn_t const & reference is null");
+    return 0;
+  } 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (ssize_t)get_predef_insn_cmt((insn_t const &)*arg1,arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1predef_1cmt(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_predef_cmt((char const *)arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1vxd_1func_1name(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jstring jarg3, jlong jarg4) {
+  jstring jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (char *)get_vxd_func_name(arg1,arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1processor_1modules_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jlong jarg4, jlong jarg5) {
   jint jresult = 0 ;
   enum_processor_modules_cb arg1 = (enum_processor_modules_cb) 0 ;
@@ -12605,13 +17335,14 @@ SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_dbg_1info_
 }
 
 
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_dbg_1info_1t_1dbg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_dbg_1info_1t_1dbg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   dbg_info_t *arg1 = (dbg_info_t *) 0 ;
   debugger_t *arg2 = (debugger_t *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg2_;
   arg1 = *(dbg_info_t **)&jarg1; 
   arg2 = *(debugger_t **)&jarg2; 
   if (arg1) (arg1)->dbg = arg2;
@@ -12633,7 +17364,7 @@ SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_dbg_1info_
 }
 
 
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1dbg_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1dbg_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jlong jresult = 0 ;
   plugin_info_t *arg1 = (plugin_info_t *) 0 ;
   debugger_t *arg2 = (debugger_t *) 0 ;
@@ -12642,6 +17373,7 @@ SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1dbg_1
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
+  (void)jarg2_;
   arg1 = *(plugin_info_t **)&jarg1; 
   arg2 = *(debugger_t **)&jarg2; 
   result = (dbg_info_t *)new dbg_info_t(arg1,arg2);
@@ -23982,1771 +28714,6 @@ SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1defaul
 }
 
 
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_net_1patch_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  netnode arg1 ;
-  netnode *argp1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(netnode **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
-    return ;
-  }
-  arg1 = *argp1; 
-  net_patch = arg1;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_net_1patch_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  netnode result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = net_patch;
-  *(netnode **)&jresult = new netnode((const netnode &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_import_1node_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  netnode arg1 ;
-  netnode *argp1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(netnode **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
-    return ;
-  }
-  arg1 = *argp1; 
-  import_node = arg1;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_import_1node_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  netnode result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = import_node;
-  *(netnode **)&jresult = new netnode((const netnode &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1aflags0(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  ea_t arg1 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (uint32)jarg2; 
-  set_aflags0(arg1,arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1aflags0(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ea_t arg1 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (uint32)get_aflags0(arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1aflags0(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ea_t arg1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  del_aflags0(arg1);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1aflags(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  ea_t arg1 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (uint32)jarg2; 
-  set_aflags(arg1,arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1abits(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  ea_t arg1 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (uint32)jarg2; 
-  set_abits(arg1,arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_clr_1abits(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  ea_t arg1 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (uint32)jarg2; 
-  clr_abits(arg1,arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1aflags(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ea_t arg1 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (uint32)get_aflags(arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1aflags(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ea_t arg1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  del_aflags(arg1);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1visible_1item(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
-  ea_t arg1 ;
-  bool arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = jarg2 ? true : false; 
-  set_visible_item(arg1,arg2);
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1visible_1item(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (bool)is_visible_item(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1finally_1visible_1item(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (bool)is_finally_visible_item(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1source_1linnum(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  ea_t arg1 ;
-  uval_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (uval_t)jarg2; 
-  set_source_linnum(arg1,arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1source_1linnum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ea_t arg1 ;
-  uval_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (uval_t)get_source_linnum(arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1source_1linnum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ea_t arg1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  del_source_linnum(arg1);
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1str_1type_1code(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jchar jresult = 0 ;
-  uval_t arg1 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (uval_t)jarg1; 
-  result = (char)get_str_type_code(arg1);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1str_1term1(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jchar jresult = 0 ;
-  int32 arg1 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int32)jarg1; 
-  result = (char)get_str_term1(arg1);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1str_1term2(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jchar jresult = 0 ;
-  int32 arg1 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int32)jarg1; 
-  result = (char)get_str_term2(arg1);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1unicode(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jboolean jresult = 0 ;
-  int32 arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int32)jarg1; 
-  result = (bool)is_unicode(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1pascal(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jboolean jresult = 0 ;
-  int32 arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int32)jarg1; 
-  result = (bool)is_pascal(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1item_1color(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
-  ea_t arg1 ;
-  bgcolor_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (bgcolor_t)jarg2; 
-  set_item_color(arg1,arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1item_1color(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  ea_t arg1 ;
-  bgcolor_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (bgcolor_t)get_item_color(arg1);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1item_1color(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ea_t arg1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  del_item_color(arg1);
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF8_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_OFF8;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF16_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_OFF16;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF32_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_OFF32;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1LOW8_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_LOW8;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1LOW16_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_LOW16;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1HIGH8_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_HIGH8;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1HIGH16_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_HIGH16;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1VHIGH_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_VHIGH;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1VLOW_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_VLOW;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1OFF64_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_OFF64;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REF_1LAST_1get(JNIEnv *jenv, jclass jcls) {
-  jshort jresult = 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reftype_t)(reftype_t)REF_LAST;
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reftype_1by_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jshort jresult = 0 ;
-  size_t arg1 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (size_t)jarg1; 
-  result = (reftype_t)get_reftype_by_size(arg1);
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1target_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  ea_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (ea_t)jarg2; 
-  if (arg1) (arg1)->target = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1target_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  ea_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (ea_t) ((arg1)->target);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  ea_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (ea_t)jarg2; 
-  if (arg1) (arg1)->base = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  ea_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (ea_t) ((arg1)->base);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1tdelta_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  adiff_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (adiff_t)jarg2; 
-  if (arg1) (arg1)->tdelta = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1tdelta_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  adiff_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (adiff_t) ((arg1)->tdelta);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  if (arg1) (arg1)->flags = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (uint32) ((arg1)->flags);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jshort jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  reftype_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (reftype_t)((refinfo_t const *)arg1)->type();
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1no_1base_1xref(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (bool)((refinfo_t const *)arg1)->no_base_xref();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1pastend(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (bool)((refinfo_t const *)arg1)->is_pastend();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1rvaoff(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (bool)((refinfo_t const *)arg1)->is_rvaoff();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1custom(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (bool)((refinfo_t const *)arg1)->is_custom();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1subtract(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (bool)((refinfo_t const *)arg1)->is_subtract();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1is_1signed(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  result = (bool)((refinfo_t const *)arg1)->is_signed();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1set_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  reftype_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (reftype_t)jarg2; 
-  (arg1)->set_type(arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  uint32 arg2 ;
-  ea_t arg3 ;
-  ea_t arg4 ;
-  adiff_t arg5 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  arg3 = (ea_t)jarg3; 
-  arg4 = (ea_t)jarg4; 
-  arg5 = (adiff_t)jarg5; 
-  (arg1)->init(arg2,arg3,arg4,arg5);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  uint32 arg2 ;
-  ea_t arg3 ;
-  ea_t arg4 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  arg3 = (ea_t)jarg3; 
-  arg4 = (ea_t)jarg4; 
-  (arg1)->init(arg2,arg3,arg4);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  uint32 arg2 ;
-  ea_t arg3 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  arg3 = (ea_t)jarg3; 
-  (arg1)->init(arg2,arg3);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refinfo_1t_1init_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(refinfo_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  (arg1)->init(arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1refinfo_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  refinfo_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (refinfo_t *)new refinfo_t();
-  *(refinfo_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1refinfo_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  refinfo_t *arg1 = (refinfo_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(refinfo_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1len_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(strpath_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->len = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1len_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(strpath_t **)&jarg1; 
-  result = (int) ((arg1)->len);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1ids_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlongArray jarg2) {
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  tid_t *arg2 ;
-  jlong *jarr2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(strpath_t **)&jarg1; 
-  if (jarg2 && jenv->GetArrayLength(jarg2) != 32) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
-    return ;
-  }
-  if (!SWIG_JavaArrayInUint(jenv, &jarr2, &arg2, jarg2)) return ; 
-  {
-    size_t ii;
-    tid_t *b = (tid_t *) arg1->ids;
-    for (ii = 0; ii < (size_t)32; ii++) b[ii] = *((tid_t *) arg2 + ii);
-  }
-  SWIG_JavaArrayArgoutUint(jenv, jarr2, arg2, jarg2); 
-  delete [] arg2; 
-}
-
-
-SWIGEXPORT jlongArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1ids_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlongArray jresult = 0 ;
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  tid_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(strpath_t **)&jarg1; 
-  result = (tid_t *)(tid_t *) ((arg1)->ids);
-  jresult = SWIG_JavaArrayOutUint(jenv, result, 32); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1delta_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  adiff_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(strpath_t **)&jarg1; 
-  arg2 = (adiff_t)jarg2; 
-  if (arg1) (arg1)->delta = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_strpath_1t_1delta_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  adiff_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(strpath_t **)&jarg1; 
-  result = (adiff_t) ((arg1)->delta);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1strpath_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  strpath_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (strpath_t *)new strpath_t();
-  *(strpath_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1strpath_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  strpath_t *arg1 = (strpath_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(strpath_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1tid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  enum_const_t *arg1 = (enum_const_t *) 0 ;
-  tid_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(enum_const_t **)&jarg1; 
-  arg2 = (tid_t)jarg2; 
-  if (arg1) (arg1)->tid = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1tid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  enum_const_t *arg1 = (enum_const_t *) 0 ;
-  tid_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(enum_const_t **)&jarg1; 
-  result = (tid_t) ((arg1)->tid);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1serial_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
-  enum_const_t *arg1 = (enum_const_t *) 0 ;
-  uchar arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(enum_const_t **)&jarg1; 
-  arg2 = (uchar)jarg2; 
-  if (arg1) (arg1)->serial = arg2;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1const_1t_1serial_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jshort jresult = 0 ;
-  enum_const_t *arg1 = (enum_const_t *) 0 ;
-  uchar result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(enum_const_t **)&jarg1; 
-  result = (uchar) ((arg1)->serial);
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1enum_1const_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  enum_const_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (enum_const_t *)new enum_const_t();
-  *(enum_const_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1enum_1const_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  enum_const_t *arg1 = (enum_const_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(enum_const_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ri_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  refinfo_t *arg2 = (refinfo_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  arg2 = *(refinfo_t **)&jarg2; 
-  if (arg1) (arg1)->ri = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ri_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  refinfo_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  result = (refinfo_t *)& ((arg1)->ri);
-  *(refinfo_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1tid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  tid_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  arg2 = (tid_t)jarg2; 
-  if (arg1) (arg1)->tid = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1tid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  tid_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  result = (tid_t) ((arg1)->tid);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1path_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  strpath_t *arg2 = (strpath_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  arg2 = *(strpath_t **)&jarg2; 
-  if (arg1) (arg1)->path = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1path_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  strpath_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  result = (strpath_t *)& ((arg1)->path);
-  *(strpath_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1strtype_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  int32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  arg2 = (int32)jarg2; 
-  if (arg1) (arg1)->strtype = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1strtype_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  int32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  result = (int32) ((arg1)->strtype);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ec_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  enum_const_t *arg2 = (enum_const_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  arg2 = *(enum_const_t **)&jarg2; 
-  if (arg1) (arg1)->ec = *arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1ec_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  enum_const_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  result = (enum_const_t *)& ((arg1)->ec);
-  *(enum_const_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1cd_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  custom_data_type_ids_t arg2 ;
-  custom_data_type_ids_t *argp2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  argp2 = *(custom_data_type_ids_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null custom_data_type_ids_t");
-    return ;
-  }
-  arg2 = *argp2; 
-  if (arg1) (arg1)->cd = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_opinfo_1t_1cd_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  custom_data_type_ids_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(opinfo_t **)&jarg1; 
-  result =  ((arg1)->cd);
-  *(custom_data_type_ids_t **)&jresult = new custom_data_type_ids_t((const custom_data_type_ids_t &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1opinfo_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  opinfo_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (opinfo_t *)new opinfo_t();
-  *(opinfo_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1opinfo_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  opinfo_t *arg1 = (opinfo_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(opinfo_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1ex(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  refinfo_t *arg3 = (refinfo_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg3_;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = *(refinfo_t **)&jarg3; 
-  result = (int)set_refinfo_ex(arg1,arg2,(refinfo_t const *)arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3, jlong jarg4, jlong jarg5, jint jarg6) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  reftype_t arg3 ;
-  ea_t arg4 ;
-  ea_t arg5 ;
-  adiff_t arg6 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (reftype_t)jarg3; 
-  arg4 = (ea_t)jarg4; 
-  arg5 = (ea_t)jarg5; 
-  arg6 = (adiff_t)jarg6; 
-  result = (int)set_refinfo(arg1,arg2,arg3,arg4,arg5,arg6);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3, jlong jarg4, jlong jarg5) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  reftype_t arg3 ;
-  ea_t arg4 ;
-  ea_t arg5 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (reftype_t)jarg3; 
-  arg4 = (ea_t)jarg4; 
-  arg5 = (ea_t)jarg5; 
-  result = (int)set_refinfo(arg1,arg2,arg3,arg4,arg5);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3, jlong jarg4) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  reftype_t arg3 ;
-  ea_t arg4 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (reftype_t)jarg3; 
-  arg4 = (ea_t)jarg4; 
-  result = (int)set_refinfo(arg1,arg2,arg3,arg4);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1refinfo_1_1SWIG_13(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jshort jarg3) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  reftype_t arg3 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = (reftype_t)jarg3; 
-  result = (int)set_refinfo(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1refinfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jobject jarg3_) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  refinfo_t *arg3 = (refinfo_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg3_;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = *(refinfo_t **)&jarg3; 
-  result = (int)get_refinfo(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1refinfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  result = (int)del_refinfo(arg1,arg2);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_write_1struc_1path(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jint jarg4, jint jarg5) {
-  netnode arg1 ;
-  int arg2 ;
-  tid_t *arg3 = (tid_t *) 0 ;
-  int arg4 ;
-  adiff_t arg5 ;
-  netnode *argp1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(netnode **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
-    return ;
-  }
-  arg1 = *argp1; 
-  arg2 = (int)jarg2; 
-  arg3 = *(tid_t **)&jarg3; 
-  arg4 = (int)jarg4; 
-  arg5 = (adiff_t)jarg5; 
-  write_struc_path(arg1,arg2,(unsigned int const *)arg3,arg4,arg5);
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_read_1struc_1path(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4) {
-  jint jresult = 0 ;
-  netnode arg1 ;
-  int arg2 ;
-  tid_t *arg3 = (tid_t *) 0 ;
-  adiff_t *arg4 = (adiff_t *) 0 ;
-  netnode *argp1 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(netnode **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
-    return 0;
-  }
-  arg1 = *argp1; 
-  arg2 = (int)jarg2; 
-  arg3 = *(tid_t **)&jarg3; 
-  arg4 = *(adiff_t **)&jarg4; 
-  result = (int)read_struc_path(arg1,arg2,arg3,arg4);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1input_1file_1path(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = (ssize_t)get_input_file_path(arg1,arg2);
-  jresult = (jint)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1root_1filename(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = (ssize_t)get_root_filename(arg1,arg2);
-  jresult = (jint)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1root_1filename(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  char *arg1 = (char *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return ;
-  }
-  set_root_filename((char const *)arg1);
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_retrieve_1input_1file_1crc32(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (uint32)retrieve_input_file_crc32();
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_retrieve_1input_1file_1md5(JNIEnv *jenv, jclass jcls, jshortArray jarg1) {
-  jboolean jresult = 0 ;
-  uchar *arg1 ;
-  jshort *jarr1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  if (jarg1 && jenv->GetArrayLength(jarg1) != 16) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
-    return 0;
-  }
-  if (!SWIG_JavaArrayInUchar(jenv, &jarr1, &arg1, jarg1)) return 0; 
-  result = (bool)retrieve_input_file_md5(arg1);
-  jresult = (jboolean)result; 
-  SWIG_JavaArrayArgoutUchar(jenv, jarr1, arg1, jarg1); 
-  delete [] arg1; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1asm_1inc_1file(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = (ssize_t)get_asm_inc_file(arg1,arg2);
-  jresult = (jint)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1asm_1inc_1file(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jboolean jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (bool)set_asm_inc_file((char const *)arg1);
-  jresult = (jboolean)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1imagebase(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  ea_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (ea_t)get_imagebase();
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1imagebase(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ea_t arg1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  set_imagebase(arg1);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1ids_1modnode(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  netnode result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = get_ids_modnode();
-  *(netnode **)&jresult = new netnode((const netnode &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1ids_1modnode(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  netnode arg1 ;
-  netnode *argp1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  argp1 = *(netnode **)&jarg1; 
-  if (!argp1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
-    return ;
-  }
-  arg1 = *argp1; 
-  set_ids_modnode(arg1);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ExtraUpdate(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jint jarg3) {
-  ea_t arg1 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return ;
-  }
-  arg3 = (int)jarg3; 
-  ExtraUpdate(arg1,(char const *)arg2,arg3);
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ExtraDel(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
-  ea_t arg1 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  ExtraDel(arg1,arg2);
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ExtraGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3, jlong jarg4) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int arg2 ;
-  char *arg3 = (char *) 0 ;
-  size_t arg4 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = (size_t)jarg4; 
-  result = (ssize_t)ExtraGet(arg1,arg2,arg3,arg4);
-  jresult = (jint)result; 
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1auto_1plugins(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = (ssize_t)get_auto_plugins(arg1,arg2);
-  jresult = (jint)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1auto_1plugins_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jboolean jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = (bool)set_auto_plugins((char const *)arg1,arg2);
-  jresult = (jboolean)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1auto_1plugins_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jboolean jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (bool)set_auto_plugins((char const *)arg1);
-  jresult = (jboolean)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_dbg_1get_1input_1path(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jlong jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  size_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = dbg_get_input_path(arg1,arg2);
-  jresult = (jlong)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1import_1module_1qty(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (int)get_import_module_qty();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1import_1module_1name(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2, jlong jarg3) {
-  jboolean jresult = 0 ;
-  int arg1 ;
-  char *arg2 = (char *) 0 ;
-  size_t arg3 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  arg3 = (size_t)jarg3; 
-  result = (bool)get_import_module_name(arg1,arg2,arg3);
-  jresult = (jboolean)result; 
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1import_1names_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jlong jarg3) {
-  jint jresult = 0 ;
-  int arg1 ;
-  import_enum_cb_t *arg2 = (import_enum_cb_t *) 0 ;
-  void *arg3 = (void *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(import_enum_cb_t **)&jarg2; 
-  arg3 = *(void **)&jarg3; 
-  result = (int)enum_import_names(arg1,arg2,arg3);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1import_1names_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2) {
-  jint jresult = 0 ;
-  int arg1 ;
-  import_enum_cb_t *arg2 = (import_enum_cb_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = *(import_enum_cb_t **)&jarg2; 
-  result = (int)enum_import_names(arg1,arg2);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1dbgmem_1source(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   set_dbgmem_source_dbg_get_memory_config_cb arg1 = (set_dbgmem_source_dbg_get_memory_config_cb) 0 ;
   set_dbgmem_source_memory_read_cb arg2 = (set_dbgmem_source_memory_read_cb) 0 ;
@@ -30741,6 +33708,153 @@ SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_noExtra(JNI
 }
 
 
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1data_1type_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  flags_t arg1 ;
+  opinfo_t *arg2 = (opinfo_t *) 0 ;
+  asize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = (flags_t)jarg1; 
+  arg2 = *(opinfo_t **)&jarg2; 
+  result = (asize_t)get_data_type_size(arg1,(opinfo_t const *)arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_f_1isUnknown(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  flags_t arg1 ;
+  void *arg2 = (void *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (flags_t)jarg1; 
+  arg2 = *(void **)&jarg2; 
+  result = (bool)f_isUnknown(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlongArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_power2_1get(JNIEnv *jenv, jclass jcls) {
+  jlongArray jresult = 0 ;
+  uint32 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint32 *)(uint32 *)power2;
+  jresult = SWIG_JavaArrayOutUint(jenv, result, 32); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlongArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_lowbits_1get(JNIEnv *jenv, jclass jcls) {
+  jlongArray jresult = 0 ;
+  uint32 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint32 *)(uint32 *)lowbits;
+  jresult = SWIG_JavaArrayOutUint(jenv, result, 33); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1id(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jshort jarg4) {
+  ea_t arg1 ;
+  int arg2 ;
+  enum_t arg3 ;
+  uchar arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (enum_t)jarg3; 
+  arg4 = (uchar)jarg4; 
+  set_enum_id(arg1,arg2,arg3,arg4);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_FlagsEnable(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  ea_t arg2 ;
+  error_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  result = FlagsEnable(arg1,arg2);
+  *(error_t **)&jresult = new error_t((const error_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_FlagsDisable(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  ea_t arg2 ;
+  error_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  result = FlagsDisable(arg1,arg2);
+  *(error_t **)&jresult = new error_t((const error_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1typeinfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  flags_t arg3 ;
+  opinfo_t *arg4 = (opinfo_t *) 0 ;
+  opinfo_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg4_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (flags_t)jarg3; 
+  arg4 = *(opinfo_t **)&jarg4; 
+  result = (opinfo_t *)get_typeinfo(arg1,arg2,arg3,arg4);
+  *(opinfo_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1typeinfo(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4, jobject jarg4_) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  flags_t arg3 ;
+  opinfo_t *arg4 = (opinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg4_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (flags_t)jarg3; 
+  arg4 = *(opinfo_t **)&jarg4; 
+  result = (bool)set_typeinfo(arg1,arg2,arg3,(opinfo_t const *)arg4);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_AU_1NONE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   atype_t result;
@@ -33959,7 +37073,7 @@ SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1regarg
     arg4 = (char *)jenv->GetStringUTFChars(jarg4, 0);
     if (!arg4) return ;
   }
-  add_regarg(arg1,arg2,(type_t const *)arg3,(char const *)arg4);
+  add_regarg(arg1,arg2,(unsigned char const *)arg3,(char const *)arg4);
   if (arg4) jenv->ReleaseStringUTFChars(jarg4, (const char *)arg4);
 }
 
@@ -37066,7 +40180,7 @@ SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1me
   arg5 = *(type_t **)&jarg5; 
   arg6 = *(p_list **)&jarg6; 
   arg7 = (int)jarg7; 
-  result = (bool)set_member_tinfo(arg1,arg2,arg3,arg4,(type_t const *)arg5,(p_list const *)arg6,arg7);
+  result = (bool)set_member_tinfo(arg1,arg2,arg3,arg4,(unsigned char const *)arg5,(unsigned char const *)arg6,arg7);
   jresult = (jboolean)result; 
   return jresult;
 }
@@ -37194,2787 +40308,91 @@ SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_stroff_
 }
 
 
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint32 arg2 ;
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_save_1struc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  struc_t *arg1 = (struc_t *) 0 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  if (arg1) (arg1)->flag = arg2;
+  arg1 = *(struc_t **)&jarg1; 
+  save_struc((struc_t const *)arg1);
 }
 
 
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (uint32) ((arg1)->flag);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1uflag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint16 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (uint16)jarg2; 
-  if (arg1) (arg1)->uflag = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1uflag_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint16 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (uint16) ((arg1)->uflag);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->name);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1help_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  help_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (help_t)jarg2; 
-  if (arg1) (arg1)->help = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1help_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  help_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (help_t) ((arg1)->help);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1header_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char **result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char **) ((arg1)->header);
-  *(char ***)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1badworks_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint16 *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (uint16 *) ((arg1)->badworks);
-  *(uint16 **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1origin_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->origin);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->end);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1cmnt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->cmnt);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1ascsep_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  char arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (char)jarg2; 
-  if (arg1) (arg1)->ascsep = arg2;
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1ascsep_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jchar jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char) ((arg1)->ascsep);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1accsep_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  char arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (char)jarg2; 
-  if (arg1) (arg1)->accsep = arg2;
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1accsep_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jchar jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char) ((arg1)->accsep);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1esccodes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->esccodes);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1ascii_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_ascii);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1byte_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_byte);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1word_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_word);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1dword_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_dword);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1qword_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_qword);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1oword_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_oword);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1float_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_float);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1double_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_double);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1tbyte_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_tbyte);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1packreal_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_packreal);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1dups_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_dups);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1bss_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_bss);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1equ_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_equ);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1seg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_seg);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1checkarg_1dispatch_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_checkarg_dispatch_cb arg2 = (asm_t_checkarg_dispatch_cb) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = *(asm_t_checkarg_dispatch_cb *)&jarg2; 
-  if (arg1) (arg1)->checkarg_dispatch = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1checkarg_1dispatch_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_checkarg_dispatch_cb result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (asm_t_checkarg_dispatch_cb) ((arg1)->checkarg_dispatch);
-  *(asm_t_checkarg_dispatch_cb *)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1_1UNUSED1_1was_1atomprefix_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  void *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (void *) ((arg1)->_UNUSED1_was_atomprefix);
-  *(void **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1_1UNUSED2_1was_1checkarg_1operations_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  void *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (void *) ((arg1)->_UNUSED2_was_checkarg_operations);
-  *(void **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1XlatAsciiOutput_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  uchar *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (uchar *) ((arg1)->XlatAsciiOutput);
-  *(uchar **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1curip_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_curip);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1header_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_func_cb arg2 = (asm_t_func_cb) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = *(asm_t_func_cb *)&jarg2; 
-  if (arg1) (arg1)->func_header = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1header_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_func_cb result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (asm_t_func_cb) ((arg1)->func_header);
-  *(asm_t_func_cb *)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1footer_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_func_cb arg2 = (asm_t_func_cb) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = *(asm_t_func_cb *)&jarg2; 
-  if (arg1) (arg1)->func_footer = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1func_1footer_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_func_cb result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (asm_t_func_cb) ((arg1)->func_footer);
-  *(asm_t_func_cb *)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1public_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_public);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1weak_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_weak);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1extrn_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_extrn);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1comdef_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_comdef);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1get_1type_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_get_type_name_cb arg2 = (asm_t_get_type_name_cb) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = *(asm_t_get_type_name_cb *)&jarg2; 
-  if (arg1) (arg1)->get_type_name = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1get_1type_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  asm_t_get_type_name_cb result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (asm_t_get_type_name_cb) ((arg1)->get_type_name);
-  *(asm_t_get_type_name_cb *)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1align_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_align);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1lbrace_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  char arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (char)jarg2; 
-  if (arg1) (arg1)->lbrace = arg2;
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1lbrace_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jchar jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char) ((arg1)->lbrace);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1rbrace_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  char arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (char)jarg2; 
-  if (arg1) (arg1)->rbrace = arg2;
-}
-
-
-SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1rbrace_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jchar jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char) ((arg1)->rbrace);
-  jresult = (jchar)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1mod_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_mod);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1band_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_band);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1bor_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_bor);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1xor_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_xor);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1bnot_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_bnot);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1shl_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_shl);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1shr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_shr);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1sizeof_1fmt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_sizeof_fmt);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag2_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  if (arg1) (arg1)->flag2 = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1flag2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (uint32) ((arg1)->flag2);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1cmnt2_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->cmnt2);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1low8_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->low8);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1high8_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->high8);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1low16_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->low16);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1high16_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->high16);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1include_1fmt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_include_fmt);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1vstruc_1fmt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_vstruc_fmt);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_13byte_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_3byte);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asm_1t_1a_1rva_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  asm_t *arg1 = (asm_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  result = (char *) ((arg1)->a_rva);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1asm_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(asm_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1len_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
-  bytes_t *arg1 = (bytes_t *) 0 ;
-  uchar arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(bytes_t **)&jarg1; 
-  arg2 = (uchar)jarg2; 
-  if (arg1) (arg1)->len = arg2;
-}
-
-
-SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1len_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jshort jresult = 0 ;
-  bytes_t *arg1 = (bytes_t *) 0 ;
-  uchar result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(bytes_t **)&jarg1; 
-  result = (uchar) ((arg1)->len);
-  jresult = (jshort)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1bytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  bytes_t *arg1 = (bytes_t *) 0 ;
-  uchar *arg2 = (uchar *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(bytes_t **)&jarg1; 
-  arg2 = *(uchar **)&jarg2; 
-  if (arg1) (arg1)->bytes = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytes_1t_1bytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  bytes_t *arg1 = (bytes_t *) 0 ;
-  uchar *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(bytes_t **)&jarg1; 
-  result = (uchar *) ((arg1)->bytes);
-  *(uchar **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1bytes_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  bytes_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (bytes_t *)new bytes_t();
-  *(bytes_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1bytes_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  bytes_t *arg1 = (bytes_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(bytes_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_instruc_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  instruc_t *arg1 = (instruc_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(instruc_t **)&jarg1; 
-  result = (char *) ((arg1)->name);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_instruc_1t_1feature_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  instruc_t *arg1 = (instruc_t *) 0 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(instruc_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  if (arg1) (arg1)->feature = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_instruc_1t_1feature_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  instruc_t *arg1 = (instruc_t *) 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(instruc_t **)&jarg1; 
-  result = (uint32) ((arg1)->feature);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1instruc_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  instruc_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (instruc_t *)new instruc_t();
-  *(instruc_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1instruc_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  instruc_t *arg1 = (instruc_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(instruc_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_InstrIsSet(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1or_1guess_1member_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jboolean jresult = 0 ;
-  int arg1 ;
-  int arg2 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (int)jarg2; 
-  result = (bool)InstrIsSet(arg1,arg2);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1call_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (bool)is_call_insn(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1ret_1insn_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  bool arg2 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = jarg2 ? true : false; 
-  result = (bool)is_ret_insn(arg1,arg2);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1ret_1insn_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (bool)is_ret_insn(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1indirect_1jump_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (bool)is_indirect_jump_insn(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1basic_1block_1end(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
-  jboolean jresult = 0 ;
-  bool arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = jarg1 ? true : false; 
-  result = (bool)is_basic_block_end(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1version_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->version = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1version_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->version);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1id_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->id = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1id_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->id);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1flag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  uint32 arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (uint32)jarg2; 
-  if (arg1) (arg1)->flag = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1flag_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  uint32 result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (uint32) ((arg1)->flag);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1has_1segregs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
+  member_t *arg1 = (member_t *) 0 ;
+  type_t *arg2 = (type_t *) 0 ;
+  size_t arg3 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bool)((processor_t const *)arg1)->has_segregs();
+  arg1 = *(member_t **)&jarg1; 
+  arg2 = *(type_t **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  result = (bool)get_or_guess_member_type(arg1,arg2,arg3);
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1use32(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1member_1ti(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
   jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
+  member_t *arg1 = (member_t *) 0 ;
+  type_t *arg2 = (type_t *) 0 ;
+  size_t arg3 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bool)((processor_t const *)arg1)->use32();
+  arg1 = *(member_t **)&jarg1; 
+  arg2 = *(type_t **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  result = (bool)get_member_ti((member_t const *)arg1,arg2,arg3);
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1use64(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1member_1ti(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jint jarg4) {
   jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bool)((processor_t const *)arg1)->use64();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1ti(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bool)((processor_t const *)arg1)->ti();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1stkup(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bool)((processor_t const *)arg1)->stkup();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1use_1tbyte(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bool)((processor_t const *)arg1)->use_tbyte();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1get_1segm_1bitness(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int)((processor_t const *)arg1)->get_segm_bitness();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1cnbits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->cnbits = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1cnbits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->cnbits);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1dnbits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->dnbits = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1dnbits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->dnbits);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1cbsize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int)(arg1)->cbsize();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1dbsize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int)(arg1)->dbsize();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1psnames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **arg2 = (char **) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(char ***)&jarg2; 
-  if (arg1) (arg1)->psnames = (char const **)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1psnames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (char **) ((arg1)->psnames);
-  *(char ***)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1plnames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **arg2 = (char **) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(char ***)&jarg2; 
-  if (arg1) (arg1)->plnames = (char const **)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1plnames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (char **) ((arg1)->plnames);
-  *(char ***)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1assemblers_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  asm_t **arg2 = (asm_t **) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(asm_t ***)&jarg2; 
-  if (arg1) (arg1)->assemblers = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1assemblers_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  asm_t **result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (asm_t **) ((arg1)->assemblers);
-  *(asm_t ***)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1get_1stkvar_1scale(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int)(arg1)->get_stkvar_scale();
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regsNum_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->regsNum = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regsNum_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->regsNum);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regNames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **arg2 = (char **) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(char ***)&jarg2; 
-  if (arg1) (arg1)->regNames = (char const **)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regNames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (char **) ((arg1)->regNames);
-  *(char ***)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFiles_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->rFiles = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFiles_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->rFiles);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFnames_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **arg2 = (char **) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(char ***)&jarg2; 
-  if (arg1) (arg1)->rFnames = (char const **)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFnames_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  char **result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (char **) ((arg1)->rFnames);
-  *(char ***)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFdescs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  rginfo *arg2 = (rginfo *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(rginfo **)&jarg2; 
-  if (arg1) (arg1)->rFdescs = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1rFdescs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  rginfo *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (rginfo *) ((arg1)->rFdescs);
-  *(rginfo **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1CPUregs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  WorkReg *arg2 = (WorkReg *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(WorkReg **)&jarg2; 
-  if (arg1) (arg1)->CPUregs = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1CPUregs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  WorkReg *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (WorkReg *) ((arg1)->CPUregs);
-  *(WorkReg **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regFirstSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->regFirstSreg = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regFirstSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->regFirstSreg);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regLastSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->regLastSreg = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regLastSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->regLastSreg);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1segreg_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->segreg_size = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1segreg_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->segreg_size);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regCodeSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->regCodeSreg = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regCodeSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->regCodeSreg);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regDataSreg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->regDataSreg = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1regDataSreg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->regDataSreg);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1codestart_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  bytes_t *arg2 = (bytes_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(bytes_t **)&jarg2; 
-  if (arg1) (arg1)->codestart = (bytes_t const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1codestart_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  bytes_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bytes_t *) ((arg1)->codestart);
-  *(bytes_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1retcodes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  bytes_t *arg2 = (bytes_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(bytes_t **)&jarg2; 
-  if (arg1) (arg1)->retcodes = (bytes_t const *)arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1retcodes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  bytes_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (bytes_t *) ((arg1)->retcodes);
-  *(bytes_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1start_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->instruc_start = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1start_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->instruc_start);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1end_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->instruc_end = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1end_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->instruc_end);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1is_1canon_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jboolean jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  uint16 arg2 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (uint16)jarg2; 
-  result = (bool)((processor_t const *)arg1)->is_canon_insn(arg2);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  instruc_t *arg2 = (instruc_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(instruc_t **)&jarg2; 
-  if (arg1) (arg1)->instruc = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1instruc_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  instruc_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (instruc_t *) ((arg1)->instruc);
-  *(instruc_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1tbyte_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  size_t arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (size_t)jarg2; 
-  if (arg1) (arg1)->tbyte_size = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1tbyte_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  size_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result =  ((arg1)->tbyte_size);
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1real_1width_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  char *arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return ;
-  }
-  {
-    if(arg2) {
-      strncpy((char*)arg1->real_width, (const char *)arg2, 4-1);
-      arg1->real_width[4-1] = 0;
-    } else {
-      arg1->real_width[0] = 0;
-    }
-  }
-  
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1real_1width_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (char *)(char *) ((arg1)->real_width);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1icode_1return_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->icode_return = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1icode_1return_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->icode_return);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1mvm_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  mvm_t *arg2 = (mvm_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = *(mvm_t **)&jarg2; 
-  if (arg1) (arg1)->mvm = arg2;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1mvm_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  mvm_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (mvm_t *) ((arg1)->mvm);
-  *(mvm_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1high_1fixup_1bits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->high_fixup_bits = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_processor_1t_1high_1fixup_1bits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  processor_t *arg1 = (processor_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  result = (int) ((arg1)->high_fixup_bits);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1processor_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  processor_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (processor_t *)new processor_t();
-  *(processor_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1processor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(processor_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ph_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  processor_t *arg1 = (processor_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(processor_t **)&jarg1; 
-  ph = *arg1;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ph_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  processor_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (processor_t *)&ph;
-  *(processor_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ash_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  asm_t *arg1 = (asm_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(asm_t **)&jarg1; 
-  ash = *arg1;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ash_1get(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  asm_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (asm_t *)&ash;
-  *(asm_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_str2regf(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jint jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (int)str2regf((char const *)arg1);
-  jresult = (jint)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_str2reg(JNIEnv *jenv, jclass jcls, jstring jarg1) {
-  jint jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  result = (int)str2reg((char const *)arg1);
-  jresult = (jint)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reg_1name_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jstring jarg3, jlong jarg4, jint jarg5) {
-  jint jresult = 0 ;
-  int arg1 ;
-  size_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  size_t arg4 ;
-  int arg5 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (size_t)jarg2; 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = (size_t)jarg4; 
-  arg5 = (int)jarg5; 
-  result = (ssize_t)get_reg_name(arg1,arg2,arg3,arg4,arg5);
-  jresult = (jint)result; 
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reg_1name_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jstring jarg3, jlong jarg4) {
-  jint jresult = 0 ;
-  int arg1 ;
-  size_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  size_t arg4 ;
-  ssize_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  arg2 = (size_t)jarg2; 
-  arg3 = 0;
-  if (jarg3) {
-    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
-    if (!arg3) return 0;
-  }
-  arg4 = (size_t)jarg4; 
-  result = (ssize_t)get_reg_name(arg1,arg2,arg3,arg4);
-  jresult = (jint)result; 
-  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1reg_1info(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jstring jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  uint64 *arg2 = (uint64 *) 0 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = *(uint64 **)&jarg2; 
-  result = (char *)get_reg_info((char const *)arg1,arg2);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1reg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(reg_info_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->reg = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1reg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(reg_info_t **)&jarg1; 
-  result = (int) ((arg1)->reg);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  int arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(reg_info_t **)&jarg1; 
-  arg2 = (int)jarg2; 
-  if (arg1) (arg1)->size = arg2;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(reg_info_t **)&jarg1; 
-  result = (int) ((arg1)->size);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  reg_info_t *arg2 = 0 ;
+  struc_t *arg1 = (struc_t *) 0 ;
+  member_t *arg2 = (member_t *) 0 ;
+  type_t *arg3 = (type_t *) 0 ;
+  int arg4 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg2_;
-  arg1 = *(reg_info_t **)&jarg1; 
-  arg2 = *(reg_info_t **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "reg_info_t const & reference is null");
-    return 0;
-  } 
-  result = (bool)((reg_info_t const *)arg1)->operator ==((reg_info_t const &)*arg2);
+  arg1 = *(struc_t **)&jarg1; 
+  arg2 = *(member_t **)&jarg2; 
+  arg3 = *(type_t **)&jarg3; 
+  arg4 = (int)jarg4; 
+  result = (bool)set_member_ti(arg1,arg2,(unsigned char const *)arg3,arg4);
   jresult = (jboolean)result; 
   return jresult;
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reg_1info_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1ti(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
   jboolean jresult = 0 ;
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  reg_info_t *arg2 = 0 ;
+  struc_t *arg1 = (struc_t *) 0 ;
+  member_t *arg2 = (member_t *) 0 ;
   bool result;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   (void)jarg2_;
-  arg1 = *(reg_info_t **)&jarg1; 
-  arg2 = *(reg_info_t **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "reg_info_t const & reference is null");
-    return 0;
-  } 
-  result = (bool)((reg_info_t const *)arg1)->operator !=((reg_info_t const &)*arg2);
+  arg1 = *(struc_t **)&jarg1; 
+  arg2 = *(member_t **)&jarg2; 
+  result = (bool)del_ti(arg1,arg2);
   jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1reg_1info_1t(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  reg_info_t *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (reg_info_t *)new reg_info_t();
-  *(reg_info_t **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1reg_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  reg_info_t *arg1 = (reg_info_t *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(reg_info_t **)&jarg1; 
-  delete arg1;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_parse_1reg_1name(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_) {
-  jboolean jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  reg_info_t *arg2 = (reg_info_t *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg2_;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = *(reg_info_t **)&jarg2; 
-  result = (bool)parse_reg_name((char const *)arg1,arg2);
-  jresult = (jboolean)result; 
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_sizeof_1ldbl(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  size_t result;
-  
-  (void)jenv;
-  (void)jcls;
-  result = sizeof_ldbl();
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1data(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  ea_t arg1 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  intel_data(arg1);
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1spcdef(JNIEnv *jenv, jclass jcls, jlong jarg1, jshort jarg2) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  uchar arg2 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = (uchar)jarg2; 
-  result = (bool)gen_spcdef(arg1,arg2);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1extern(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  char *arg2 = (char *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  result = (bool)gen_extern(arg1,(char const *)arg2);
-  jresult = (jboolean)result; 
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1abssym(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  char *arg2 = (char *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  result = (bool)gen_abssym(arg1,(char const *)arg2);
-  jresult = (jboolean)result; 
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1comvar(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
-  jboolean jresult = 0 ;
-  ea_t arg1 ;
-  char *arg2 = (char *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  arg2 = 0;
-  if (jarg2) {
-    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
-    if (!arg2) return 0;
-  }
-  result = (bool)gen_comvar(arg1,(char const *)arg2);
-  jresult = (jboolean)result; 
-  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1processor_1type(JNIEnv *jenv, jclass jcls, jstring jarg1, jint jarg2) {
-  jstring jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  int arg2 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (int)jarg2; 
-  result = (char *)set_processor_type((char const *)arg1,arg2);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1idp_1name(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
-  jstring jresult = 0 ;
-  char *arg1 = (char *) 0 ;
-  size_t arg2 ;
-  char *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
-    if (!arg1) return 0;
-  }
-  arg2 = (size_t)jarg2; 
-  result = (char *)get_idp_name(arg1,arg2);
-  if (result) jresult = jenv->NewStringUTF((const char *)result);
-  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1target_1assembler(JNIEnv *jenv, jclass jcls, jint jarg1) {
-  jboolean jresult = 0 ;
-  int arg1 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (int)jarg1; 
-  result = (bool)set_target_assembler(arg1);
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_nbits(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (int)nbits(arg1);
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_bytesize(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jint jresult = 0 ;
-  ea_t arg1 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (ea_t)jarg1; 
-  result = (int)bytesize(arg1);
-  jresult = (jint)result; 
   return jresult;
 }
 
@@ -40913,6 +41331,42 @@ SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_recalc_
   (void)jcls;
   arg1 = (ea_t)jarg1; 
   result = (bool)recalc_spd(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1auto_1stkpnt(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  sval_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (sval_t)jarg2; 
+  result = (bool)add_auto_stkpnt(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1stkvar(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = 0 ;
+  sval_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  arg2 = (sval_t)jarg2; 
+  result = (bool)add_stkvar((op_t const &)*arg1,arg2);
   jresult = (jboolean)result; 
   return jresult;
 }
@@ -42299,6 +42753,16790 @@ SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_calc_1s
 }
 
 
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_demangle(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  unsigned int arg2 ;
+  char *arg3 = (char *) 0 ;
+  unsigned int arg4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = (unsigned int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (unsigned int)jarg4; 
+  result = (int)demangle(arg1,arg2,(char const *)arg3,arg4);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MANGLED_1CODE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  mangled_name_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (mangled_name_type_t)(mangled_name_type_t)MANGLED_CODE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MANGLED_1DATA_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  mangled_name_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (mangled_name_type_t)(mangled_name_type_t)MANGLED_DATA;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MANGLED_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  mangled_name_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (mangled_name_type_t)(mangled_name_type_t)MANGLED_UNKNOWN;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1mangled_1name_1type(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  mangled_name_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (mangled_name_type_t)get_mangled_name_type((char const *)arg1);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1entry_1qty(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = get_entry_qty();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1entry(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jboolean jarg4) {
+  jboolean jresult = 0 ;
+  uval_t arg1 ;
+  ea_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  bool arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = jarg4 ? true : false; 
+  result = (bool)add_entry(arg1,arg2,(char const *)arg3,arg4);
+  jresult = (jboolean)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1entry_1ordinal(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  size_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (size_t)jarg1; 
+  result = (uval_t)get_entry_ordinal(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1entry(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  uval_t arg1 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  result = (ea_t)get_entry(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1entry_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  uval_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (ssize_t)get_entry_name(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rename_1entry(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  uval_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)rename_entry(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MAX_1ENUM_1SERIAL_1get(JNIEnv *jenv, jclass jcls) {
+  jshort jresult = 0 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uchar)(uchar)MAX_ENUM_SERIAL;
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_init_1enums(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  init_enums();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_save_1enums(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  save_enums();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_term_1enums(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  term_enums();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1qty(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = get_enum_qty();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  enum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (enum_t)get_enum((char const *)arg1);
+  jresult = (jlong)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1bf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (bool)is_bf(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1enum_1hidden(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (bool)is_enum_hidden(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1hidden(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bool arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  result = (bool)set_enum_hidden(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1enum_1fromtil(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (bool)is_enum_fromtil(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1fromtil(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bool arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  result = (bool)set_enum_fromtil(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (ssize_t)get_enum_name(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1width(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = get_enum_width(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)set_enum_width(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  bool arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_enum_cmt(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1size(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = get_enum_size(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1flag(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  flags_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (flags_t)get_enum_flag(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1by_1name(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (const_t)get_enum_member_by_name((char const *)arg1);
+  jresult = (jlong)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (uval_t)get_enum_member_value(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1enum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  enum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (enum_t)get_enum_member_enum(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1bmask(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  bmask_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (bmask_t)get_enum_member_bmask(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jshort jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar arg3 ;
+  bmask_t arg4 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (uchar)jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (const_t)get_enum_member(arg1,arg2,arg3,arg4);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1bmask(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (bmask_t)get_first_bmask(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1bmask(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (bmask_t)get_last_bmask(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1bmask(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  bmask_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = (bmask_t)get_next_bmask(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1bmask(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  bmask_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = (bmask_t)get_prev_bmask(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1enum_1member_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = (uval_t)get_first_enum_member(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1enum_1member_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (uval_t)get_first_enum_member(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1enum_1member_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = (uval_t)get_last_enum_member(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1enum_1member_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (uval_t)get_last_enum_member(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1enum_1member_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  bmask_t arg3 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (bmask_t)jarg3; 
+  result = (uval_t)get_next_enum_member(arg1,arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1enum_1member_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  result = (uval_t)get_next_enum_member(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1enum_1member_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  bmask_t arg3 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (bmask_t)jarg3; 
+  result = (uval_t)get_prev_enum_member(arg1,arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1enum_1member_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  result = (uval_t)get_prev_enum_member(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  const_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (ssize_t)get_enum_member_name(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  const_t arg1 ;
+  bool arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_enum_member_cmt(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1serial_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar *arg3 = (uchar *) 0 ;
+  bmask_t arg4 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = *(uchar **)&jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (const_t)get_first_serial_enum_member(arg1,arg2,arg3,arg4);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1serial_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar *arg3 = (uchar *) 0 ;
+  bmask_t arg4 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = *(uchar **)&jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (const_t)get_last_serial_enum_member(arg1,arg2,arg3,arg4);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1serial_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  uchar *arg2 = (uchar *) 0 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  result = (const_t)get_next_serial_enum_member(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1serial_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  uchar *arg2 = (uchar *) 0 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  result = (const_t)get_prev_serial_enum_member(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1member_1visitor_1t_1visit_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  enum_member_visitor_t *arg1 = (enum_member_visitor_t *) 0 ;
+  const_t arg2 ;
+  uval_t arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(enum_member_visitor_t **)&jarg1; 
+  arg2 = (const_t)jarg2; 
+  arg3 = (uval_t)jarg3; 
+  result = (int)(arg1)->visit_enum_member(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1enum_1member_1visitor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  enum_member_visitor_t *arg1 = (enum_member_visitor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(enum_member_visitor_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_for_1all_1enum_1members(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  enum_member_visitor_t *arg2 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = (enum_t)jarg1; 
+  arg2 = *(enum_member_visitor_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "enum_member_visitor_t & reference is null");
+    return 0;
+  } 
+  result = (int)for_all_enum_members(arg1,*arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1member_1serial(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jshort jresult = 0 ;
+  const_t arg1 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (uchar)get_enum_member_serial(arg1);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1enum_1type_1ordinal(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  int32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (int32)get_enum_type_ordinal(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1type_1ordinal(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  enum_t arg1 ;
+  int32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (int32)jarg2; 
+  set_enum_type_ordinal(arg1,arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1enum(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  size_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  flags_t arg3 ;
+  enum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (size_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (flags_t)jarg3; 
+  result = (enum_t)add_enum(arg1,(char const *)arg2,arg3);
+  jresult = (jlong)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1enum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  enum_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  del_enum(arg1);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1idx(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  size_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (size_t)jarg2; 
+  result = (bool)set_enum_idx(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1bf(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bool arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  result = (bool)set_enum_bf(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)set_enum_name(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jboolean jarg3) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = jarg3 ? true : false; 
+  result = (bool)set_enum_cmt(arg1,(char const *)arg2,arg3);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1enum_1member_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  uval_t arg3 ;
+  bmask_t arg4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (uval_t)jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (int)add_enum_member(arg1,(char const *)arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1enum_1member_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  uval_t arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (uval_t)jarg3; 
+  result = (int)add_enum_member(arg1,(char const *)arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1enum_1member(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jshort jarg3, jlong jarg4) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar arg3 ;
+  bmask_t arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (uchar)jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (bool)del_enum_member(arg1,arg2,arg3,arg4);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1member_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  const_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)set_enum_member_name(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1enum_1member_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jboolean jarg3) {
+  jboolean jresult = 0 ;
+  const_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = jarg3 ? true : false; 
+  result = (bool)set_enum_member_cmt(arg1,(char const *)arg2,arg3);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1selected_1enum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  size_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (size_t)jarg1; 
+  result = (uval_t)get_selected_enum(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1selected_1enum(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  size_t *arg1 = (size_t *) 0 ;
+  enum_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(size_t **)&jarg1; 
+  arg2 = (enum_t)jarg2; 
+  add_selected_enum(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_unmark_1selected_1enums(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  unmark_selected_enums();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1one_1bit_1mask(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  bmask_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (bmask_t)jarg1; 
+  result = (bool)is_one_bit_mask(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1bmask_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  netnode result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = get_bmask_node(arg1,arg2);
+  *(netnode **)&jresult = new netnode((const netnode &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1bmask_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  result = (bool)set_bmask_name(arg1,arg2,(char const *)arg3);
+  jresult = (jboolean)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1bmask_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_bmask_name(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1bmask_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jboolean jarg4) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  bool arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = jarg4 ? true : false; 
+  result = (bool)set_bmask_cmt(arg1,arg2,(char const *)arg3,arg4);
+  jresult = (jboolean)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1bmask_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jboolean jarg3, jstring jarg4, jlong jarg5) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  bool arg3 ;
+  char *arg4 = (char *) 0 ;
+  size_t arg5 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  arg3 = jarg3 ? true : false; 
+  arg4 = 0;
+  if (jarg4) {
+    arg4 = (char *)jenv->GetStringUTFChars(jarg4, 0);
+    if (!arg4) return 0;
+  }
+  arg5 = (size_t)jarg5; 
+  result = (ssize_t)get_bmask_cmt(arg1,arg2,arg3,arg4,arg5);
+  jresult = (jint)result; 
+  if (arg4) jenv->ReleaseStringUTFChars(jarg4, (const char *)arg4);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1encode(JNIEnv *jenv, jclass jcls, jlong jarg1, jshort jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uchar arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uchar)jarg2; 
+  result = (uval_t)enum_encode(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_enum_1decode(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  uval_t arg1 ;
+  uchar *arg2 = (uchar *) 0 ;
+  enum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  result = (enum_t)enum_decode(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1const_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  uval_t arg3 ;
+  bmask_t arg4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (uval_t)jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (int)add_const(arg1,(char const *)arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_add_1const_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  uval_t arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (uval_t)jarg3; 
+  result = (int)add_const(arg1,(char const *)arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jshort jarg3, jlong jarg4) {
+  jboolean jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar arg3 ;
+  bmask_t arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (uchar)jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (bool)del_const(arg1,arg2,arg3,arg4);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1const_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  const_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)set_const_name(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1const_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jboolean jarg3) {
+  jboolean jresult = 0 ;
+  const_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  bool arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = jarg3 ? true : false; 
+  result = (bool)set_const_cmt(arg1,(char const *)arg2,arg3);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1by_1name(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (const_t)get_const_by_name((char const *)arg1);
+  jresult = (jlong)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1value(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (uval_t)get_const_value(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1enum(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  enum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (enum_t)get_const_enum(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1bmask(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  bmask_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (bmask_t)get_const_bmask(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jshort jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar arg3 ;
+  bmask_t arg4 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (uchar)jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (const_t)get_const(arg1,arg2,arg3,arg4);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1const_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = (uval_t)get_first_const(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1const_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (uval_t)get_first_const(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1const_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  bmask_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (bmask_t)jarg2; 
+  result = (uval_t)get_last_const(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1const_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  result = (uval_t)get_last_const(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1const_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  bmask_t arg3 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (bmask_t)jarg3; 
+  result = (uval_t)get_next_const(arg1,arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1const_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  result = (uval_t)get_next_const(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1const_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  bmask_t arg3 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = (bmask_t)jarg3; 
+  result = (uval_t)get_prev_const(arg1,arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1const_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  result = (uval_t)get_prev_const(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  const_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (size_t)jarg3; 
+  result = (ssize_t)get_const_name(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1cmt(JNIEnv *jenv, jclass jcls, jlong jarg1, jboolean jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  const_t arg1 ;
+  bool arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_const_cmt(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1first_1serial_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar *arg3 = (uchar *) 0 ;
+  bmask_t arg4 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = *(uchar **)&jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (const_t)get_first_serial_const(arg1,arg2,arg3,arg4);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1last_1serial_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jlong jresult = 0 ;
+  enum_t arg1 ;
+  uval_t arg2 ;
+  uchar *arg3 = (uchar *) 0 ;
+  bmask_t arg4 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (enum_t)jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = *(uchar **)&jarg3; 
+  arg4 = (bmask_t)jarg4; 
+  result = (const_t)get_last_serial_const(arg1,arg2,arg3,arg4);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1next_1serial_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  uchar *arg2 = (uchar *) 0 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  result = (const_t)get_next_serial_const(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1prev_1serial_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  const_t arg1 ;
+  uchar *arg2 = (uchar *) 0 ;
+  const_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  result = (const_t)get_prev_serial_const(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_const_1visitor_1t_1visit_1const(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  const_visitor_t *arg1 = (const_visitor_t *) 0 ;
+  const_t arg2 ;
+  uval_t arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(const_visitor_t **)&jarg1; 
+  arg2 = (const_t)jarg2; 
+  arg3 = (uval_t)jarg3; 
+  result = (int)(arg1)->visit_const(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1const_1visitor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  const_visitor_t *arg1 = (const_visitor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(const_visitor_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_for_1all_1consts(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  enum_t arg1 ;
+  const_visitor_t *arg2 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = (enum_t)jarg1; 
+  arg2 = *(const_visitor_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "const_visitor_t & reference is null");
+    return 0;
+  } 
+  result = (int)for_all_consts(arg1,*arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1const_1serial(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jshort jresult = 0 ;
+  const_t arg1 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (const_t)jarg1; 
+  result = (uchar)get_const_serial(arg1);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intseq_1t_1index(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  intseq_t *arg1 = (intseq_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(intseq_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((intseq_t const *)arg1)->index(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intseq_1t_1contains(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  intseq_t *arg1 = (intseq_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(intseq_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((intseq_t const *)arg1)->contains(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intseq_1t_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  intseq_t *arg1 = (intseq_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(intseq_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->add(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intseq_1t_1add_1unique(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  intseq_t *arg1 = (intseq_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(intseq_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)(arg1)->add_unique(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intseq_1t_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  intseq_t *arg1 = (intseq_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(intseq_t **)&jarg1; 
+  result = (int)(arg1)->get();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1intseq_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (intseq_t *)new intseq_t();
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1intseq_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  intseq_t *arg1 = (intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(intseq_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intset_1t_1has(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  intset_t *arg1 = (intset_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(intset_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((intset_t const *)arg1)->has(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1intset_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  intset_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (intset_t *)new intset_t();
+  *(intset_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1intset_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  intset_t *arg1 = (intset_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(intset_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1intmap_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  intmap_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (intmap_t *)new intmap_t();
+  *(intmap_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1intmap_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  intmap_t *arg1 = (intmap_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(intmap_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1node_1set_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  node_set_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (node_set_t *)new node_set_t();
+  *(node_set_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1node_1set_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  node_set_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (node_set_t *)new node_set_t(arg1);
+  *(node_set_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1set_1t_1first(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  node_set_t *arg1 = (node_set_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_set_t **)&jarg1; 
+  result = (int)((node_set_t const *)arg1)->first();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1node_1set_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  node_set_t *arg1 = (node_set_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(node_set_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1node_1iterator(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  node_iterator *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (node_iterator *)new node_iterator((gdl_graph_t const *)arg1,arg2);
+  *(node_iterator **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1iterator_1_1_1preincr_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  node_iterator *arg1 = (node_iterator *) 0 ;
+  node_iterator *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_iterator **)&jarg1; 
+  result = (node_iterator *) &(arg1)->operator ++();
+  *(node_iterator **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1iterator_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  node_iterator *arg1 = (node_iterator *) 0 ;
+  node_iterator *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(node_iterator **)&jarg1; 
+  arg2 = *(node_iterator **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "node_iterator const & reference is null");
+    return 0;
+  } 
+  result = (bool)((node_iterator const *)arg1)->operator ==((node_iterator const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1iterator_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  node_iterator *arg1 = (node_iterator *) 0 ;
+  node_iterator *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(node_iterator **)&jarg1; 
+  arg2 = *(node_iterator **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "node_iterator const & reference is null");
+    return 0;
+  } 
+  result = (bool)((node_iterator const *)arg1)->operator !=((node_iterator const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1iterator_1_1_1deref_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  node_iterator *arg1 = (node_iterator *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_iterator **)&jarg1; 
+  result = (int)((node_iterator const *)arg1)->operator *();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1node_1iterator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  node_iterator *arg1 = (node_iterator *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(node_iterator **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1get_1node_1label(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3, jint jarg4) {
+  jstring jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (int)jarg4; 
+  result = (char *)((gdl_graph_t const *)arg1)->get_node_label(arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1print_1graph_1attributes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  ((gdl_graph_t const *)arg1)->print_graph_attributes(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1print_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+  jboolean jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  result = (bool)((gdl_graph_t const *)arg1)->print_node(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1print_1edge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3, jint jarg4) {
+  jboolean jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (bool)((gdl_graph_t const *)arg1)->print_edge(arg2,arg3,arg4);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1print_1node_1attributes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  ((gdl_graph_t const *)arg1)->print_node_attributes(arg2,arg3);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = (int)((gdl_graph_t const *)arg1)->size();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1node_1qty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = (int)((gdl_graph_t const *)arg1)->node_qty();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1exists(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((gdl_graph_t const *)arg1)->exists(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1entry(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = (int)((gdl_graph_t const *)arg1)->entry();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1exit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = (int)((gdl_graph_t const *)arg1)->exit();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1nsucc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((gdl_graph_t const *)arg1)->nsucc(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1npred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((gdl_graph_t const *)arg1)->npred(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1succ(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((gdl_graph_t const *)arg1)->succ(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1pred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((gdl_graph_t const *)arg1)->pred(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = (bool)((gdl_graph_t const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1get_1node_1color(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  bgcolor_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bgcolor_t)((gdl_graph_t const *)arg1)->get_node_color(arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1get_1edge_1color(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  bgcolor_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (bgcolor_t)((gdl_graph_t const *)arg1)->get_edge_color(arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1nedge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jboolean jarg3) {
+  jlong jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = jarg3 ? true : false; 
+  result = ((gdl_graph_t const *)arg1)->nedge(arg2,arg3);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1edge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3, jboolean jarg4) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  bool arg4 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = jarg4 ? true : false; 
+  result = (int)((gdl_graph_t const *)arg1)->edge(arg2,arg3,arg4);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1front(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = (int)(arg1)->front();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1begin(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  SwigValueWrapper< node_iterator > result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = ((gdl_graph_t const *)arg1)->begin();
+  *(node_iterator **)&jresult = new node_iterator((const node_iterator &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gdl_1graph_1t_1end(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  SwigValueWrapper< node_iterator > result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  result = ((gdl_graph_t const *)arg1)->end();
+  *(node_iterator **)&jresult = new node_iterator((const node_iterator &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1gdl_1graph_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1gdl(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  gdl_graph_t *arg1 = (gdl_graph_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(gdl_graph_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  gen_gdl((gdl_graph_t const *)arg1,(char const *)arg2);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_display_1gdl(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (int)display_gdl((char const *)arg1);
+  jresult = (jint)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1flow_1graph(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jlong jarg3, jobject jarg3_, jlong jarg4, jlong jarg5, jint jarg6) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  func_t *arg3 = (func_t *) 0 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  int arg6 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg3_;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = *(func_t **)&jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  arg6 = (int)jarg6; 
+  result = (bool)gen_flow_graph((char const *)arg1,(char const *)arg2,arg3,arg4,arg5,arg6);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1simple_1call_1chart(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jstring jarg3, jint jarg4) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (int)jarg4; 
+  result = (bool)gen_simple_call_chart((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1complex_1call_1chart_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jstring jarg3, jlong jarg4, jlong jarg5, jint jarg6, jint jarg7) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  int arg6 ;
+  int32 arg7 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  arg6 = (int)jarg6; 
+  arg7 = (int32)jarg7; 
+  result = (bool)gen_complex_call_chart((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4,arg5,arg6,arg7);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1complex_1call_1chart_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jstring jarg3, jlong jarg4, jlong jarg5, jint jarg6) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  int arg6 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  arg6 = (int)jarg6; 
+  result = (bool)gen_complex_call_chart((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4,arg5,arg6);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cancellable_1graph_1t_1cancelled_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  cancellable_graph_t *arg1 = (cancellable_graph_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(cancellable_graph_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->cancelled = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cancellable_1graph_1t_1cancelled_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  cancellable_graph_t *arg1 = (cancellable_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(cancellable_graph_t **)&jarg1; 
+  result = (bool) ((arg1)->cancelled);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cancellable_1graph_1t_1padding_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  cancellable_graph_t *arg1 = (cancellable_graph_t *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(cancellable_graph_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->padding, (const char *)arg2, 3-1);
+      arg1->padding[3-1] = 0;
+    } else {
+      arg1->padding[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cancellable_1graph_1t_1padding_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  cancellable_graph_t *arg1 = (cancellable_graph_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(cancellable_graph_t **)&jarg1; 
+  result = (char *)(char *) ((arg1)->padding);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1cancellable_1graph_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  cancellable_graph_t *arg1 = (cancellable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(cancellable_graph_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qbasic_1block_1t_1succ_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  qbasic_block_t *arg1 = (qbasic_block_t *) 0 ;
+  intseq_t *arg2 = (intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(qbasic_block_t **)&jarg1; 
+  arg2 = *(intseq_t **)&jarg2; 
+  if (arg1) (arg1)->succ = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qbasic_1block_1t_1succ_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  qbasic_block_t *arg1 = (qbasic_block_t *) 0 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qbasic_block_t **)&jarg1; 
+  result = (intseq_t *)& ((arg1)->succ);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qbasic_1block_1t_1pred_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  qbasic_block_t *arg1 = (qbasic_block_t *) 0 ;
+  intseq_t *arg2 = (intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(qbasic_block_t **)&jarg1; 
+  arg2 = *(intseq_t **)&jarg2; 
+  if (arg1) (arg1)->pred = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qbasic_1block_1t_1pred_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  qbasic_block_t *arg1 = (qbasic_block_t *) 0 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qbasic_block_t **)&jarg1; 
+  result = (intseq_t *)& ((arg1)->pred);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1qbasic_1block_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  qbasic_block_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (qbasic_block_t *)new qbasic_block_t();
+  *(qbasic_block_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1qbasic_1block_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  qbasic_block_t *arg1 = (qbasic_block_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(qbasic_block_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1noret_1block(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  fc_block_type_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (fc_block_type_t)jarg1; 
+  result = (bool)is_noret_block(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1ret_1block(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  fc_block_type_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (fc_block_type_t)jarg1; 
+  result = (bool)is_ret_block(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1title_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->title = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1title_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->title);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1bounds_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  area_t *arg2 = (area_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = *(area_t **)&jarg2; 
+  if (arg1) (arg1)->bounds = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1bounds_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  area_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (area_t *)& ((arg1)->bounds);
+  *(area_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1pfn_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  func_t *arg2 = (func_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = *(func_t **)&jarg2; 
+  if (arg1) (arg1)->pfn = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1pfn_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  func_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (func_t *) ((arg1)->pfn);
+  *(func_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (int) ((arg1)->flags);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1blocks_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  qflow_chart_t::blocks_t *arg2 = (qflow_chart_t::blocks_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = *(qflow_chart_t::blocks_t **)&jarg2; 
+  if (arg1) (arg1)->blocks = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1blocks_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  qflow_chart_t::blocks_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (qflow_chart_t::blocks_t *)& ((arg1)->blocks);
+  *(qflow_chart_t::blocks_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1nproper_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->nproper = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1nproper_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (int) ((arg1)->nproper);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1qflow_1chart_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  qflow_chart_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (qflow_chart_t *)new qflow_chart_t();
+  *(qflow_chart_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1qflow_1chart_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jint jarg5) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  func_t *arg2 = (func_t *) 0 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  int arg5 ;
+  qflow_chart_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = *(func_t **)&jarg2; 
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (int)jarg5; 
+  result = (qflow_chart_t *)new qflow_chart_t((char const *)arg1,arg2,arg3,arg4,arg5);
+  *(qflow_chart_t **)&jresult = result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1create_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_, jlong jarg4, jlong jarg5, jint jarg6) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  func_t *arg3 = (func_t *) 0 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  int arg6 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  arg3 = *(func_t **)&jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  arg6 = (int)jarg6; 
+  (arg1)->create((char const *)arg2,arg3,arg4,arg5,arg6);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1create_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_, jint jarg4) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  areavec_t *arg3 = 0 ;
+  int arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  arg3 = *(areavec_t **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "areavec_t const & reference is null");
+    return ;
+  } 
+  arg4 = (int)jarg4; 
+  (arg1)->create((char const *)arg2,(areavec_t const &)*arg3,arg4);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1append_1to_1flowchart(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  ea_t arg2 ;
+  ea_t arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  arg3 = (ea_t)jarg3; 
+  (arg1)->append_to_flowchart(arg2,arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1refresh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  (arg1)->refresh();
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1calc_1block_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  size_t arg2 ;
+  fc_block_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  result = (fc_block_type_t)((qflow_chart_t const *)arg1)->calc_block_type(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1is_1ret_1block(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jboolean jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  size_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  result = (bool)((qflow_chart_t const *)arg1)->is_ret_block(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1is_1noret_1block(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jboolean jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  size_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  result = (bool)((qflow_chart_t const *)arg1)->is_noret_block(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1print_1node_1attributes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  ((qflow_chart_t const *)arg1)->print_node_attributes(arg2,arg3);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1nsucc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((qflow_chart_t const *)arg1)->nsucc(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1npred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((qflow_chart_t const *)arg1)->npred(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1succ(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((qflow_chart_t const *)arg1)->succ(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1pred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((qflow_chart_t const *)arg1)->pred(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1print_1names(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (bool)((qflow_chart_t const *)arg1)->print_names();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1get_1node_1label(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3, jint jarg4) {
+  jstring jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (int)jarg4; 
+  result = (char *)((qflow_chart_t const *)arg1)->get_node_label(arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  result = (int)((qflow_chart_t const *)arg1)->size();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1qflow_1chart_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  qflow_chart_t *arg1 = (qflow_chart_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(qflow_chart_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1intseq_1t_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  graph_intseq_t *arg1 = (graph_intseq_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_intseq_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->add(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1intseq_1t_1add_1unique(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  graph_intseq_t *arg1 = (graph_intseq_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_intseq_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->add_unique(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1graph_1intseq_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  graph_intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (graph_intseq_t *)new graph_intseq_t();
+  *(graph_intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1graph_1intseq_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_intseq_t *arg1 = (graph_intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_intseq_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_basic_1block_1t_1succ_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  basic_block_t *arg1 = (basic_block_t *) 0 ;
+  graph_intseq_t *arg2 = (graph_intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(basic_block_t **)&jarg1; 
+  arg2 = *(graph_intseq_t **)&jarg2; 
+  if (arg1) (arg1)->succ = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_basic_1block_1t_1succ_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  basic_block_t *arg1 = (basic_block_t *) 0 ;
+  graph_intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(basic_block_t **)&jarg1; 
+  result = (graph_intseq_t *)& ((arg1)->succ);
+  *(graph_intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1basic_1block_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  basic_block_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (basic_block_t *)new basic_block_t();
+  *(basic_block_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1basic_1block_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  basic_block_t *arg1 = (basic_block_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(basic_block_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1flow_1chart(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  flow_chart_t *arg1 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "flow_chart_t & reference is null");
+    return ;
+  } 
+  create_flow_chart(*arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1title_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->title = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1title_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->title);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1bounds_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  area_t *arg2 = (area_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(area_t **)&jarg2; 
+  if (arg1) (arg1)->bounds = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1bounds_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  area_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (area_t *)& ((arg1)->bounds);
+  *(area_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1pfn_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  func_t *arg2 = (func_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(func_t **)&jarg2; 
+  if (arg1) (arg1)->pfn = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1pfn_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  func_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (func_t *) ((arg1)->pfn);
+  *(func_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (int) ((arg1)->flags);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1blocks_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  flow_chart_t::blocks_t *arg2 = (flow_chart_t::blocks_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(flow_chart_t::blocks_t **)&jarg2; 
+  if (arg1) (arg1)->blocks = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1blocks_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  flow_chart_t::blocks_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (flow_chart_t::blocks_t *)& ((arg1)->blocks);
+  *(flow_chart_t::blocks_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1bn_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  bn_t arg2 ;
+  bn_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  argp2 = *(bn_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null bn_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->bn = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1bn_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  bn_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result =  ((arg1)->bn);
+  *(bn_t **)&jresult = new bn_t((const bn_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1nproper_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->nproper = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1nproper_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (int) ((arg1)->nproper);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1flow_1chart_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  flow_chart_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (flow_chart_t *)new flow_chart_t();
+  *(flow_chart_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1flow_1chart_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jboolean jarg5) {
+  jlong jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  func_t *arg2 = (func_t *) 0 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  bool arg5 ;
+  flow_chart_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = *(func_t **)&jarg2; 
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = jarg5 ? true : false; 
+  result = (flow_chart_t *)new flow_chart_t((char const *)arg1,arg2,arg3,arg4,arg5);
+  *(flow_chart_t **)&jresult = result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1create(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2, jlong jarg3, jobject jarg3_, jlong jarg4, jlong jarg5, jboolean jarg6) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  func_t *arg3 = (func_t *) 0 ;
+  ea_t arg4 ;
+  ea_t arg5 ;
+  bool arg6 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  arg3 = *(func_t **)&jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (ea_t)jarg5; 
+  arg6 = jarg6 ? true : false; 
+  (arg1)->create((char const *)arg2,arg3,arg4,arg5,arg6);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1refresh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  (arg1)->refresh();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1print_1graph_1attributes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  ((flow_chart_t const *)arg1)->print_graph_attributes(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1print_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+  jboolean jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  result = (bool)((flow_chart_t const *)arg1)->print_node(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1print_1edge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3, jint jarg4) {
+  jboolean jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (bool)((flow_chart_t const *)arg1)->print_edge(arg2,arg3,arg4);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1print_1node_1attributes(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jint jarg3) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  FILE *arg2 = (FILE *) 0 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = *(FILE **)&jarg2; 
+  arg3 = (int)jarg3; 
+  ((flow_chart_t const *)arg1)->print_node_attributes(arg2,arg3);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1nsucc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((flow_chart_t const *)arg1)->nsucc(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1npred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((flow_chart_t const *)arg1)->npred(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1succ(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((flow_chart_t const *)arg1)->succ(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1pred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((flow_chart_t const *)arg1)->pred(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1print_1names(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (bool)((flow_chart_t const *)arg1)->print_names();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1get_1node_1label(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jstring jarg3, jint jarg4) {
+  jstring jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (int)jarg4; 
+  result = (char *)((flow_chart_t const *)arg1)->get_node_label(arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  result = (int)((flow_chart_t const *)arg1)->size();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1flow_1chart_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  flow_chart_t *arg1 = (flow_chart_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(flow_chart_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_display_1flow_1graph(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jobject jarg2_, jlong jarg3, jlong jarg4, jboolean jarg5) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  func_t *arg2 = (func_t *) 0 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  bool arg5 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = *(func_t **)&jarg2; 
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = jarg5 ? true : false; 
+  result = (bool)display_flow_graph((char const *)arg1,arg2,arg3,arg4,arg5);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_display_1simple_1call_1chart(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jboolean jarg3) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  bool arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = jarg3 ? true : false; 
+  result = (bool)display_simple_call_chart((char const *)arg1,(char const *)arg2,arg3);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_display_1complex_1call_1chart_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jlong jarg3, jlong jarg4, jint jarg5, jint jarg6) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  int arg5 ;
+  int32 arg6 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = (int32)jarg6; 
+  result = (bool)display_complex_call_chart((char const *)arg1,(char const *)arg2,arg3,arg4,arg5,arg6);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_display_1complex_1call_1chart_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  ea_t arg3 ;
+  ea_t arg4 ;
+  int arg5 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (ea_t)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  arg5 = (int)jarg5; 
+  result = (bool)display_complex_call_chart((char const *)arg1,(char const *)arg2,arg3,arg4,arg5);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1node_1info(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4, jstring jarg5) {
+  ea_t arg1 ;
+  int arg2 ;
+  bgcolor_t *arg3 = (bgcolor_t *) 0 ;
+  ea_t *arg4 = (ea_t *) 0 ;
+  char *arg5 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(bgcolor_t **)&jarg3; 
+  arg4 = *(ea_t **)&jarg4; 
+  arg5 = 0;
+  if (jarg5) {
+    arg5 = (char *)jenv->GetStringUTFChars(jarg5, 0);
+    if (!arg5) return ;
+  }
+  set_node_info(arg1,arg2,arg3,arg4,(char const *)arg5);
+  if (arg5) jenv->ReleaseStringUTFChars(jarg5, (const char *)arg5);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1node_1info(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4) {
+  jstring jresult = 0 ;
+  ea_t arg1 ;
+  int arg2 ;
+  bgcolor_t *arg3 = (bgcolor_t *) 0 ;
+  ea_t *arg4 = (ea_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(bgcolor_t **)&jarg3; 
+  arg4 = *(ea_t **)&jarg4; 
+  result = (char *)get_node_info(arg1,arg2,arg3,arg4);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1graph_1dispatcher(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_dispatcher_t *arg1 = (graph_dispatcher_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_dispatcher_t **)&jarg1; 
+  set_graph_dispatcher(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_grentry_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_dispatcher_t *arg1 = (graph_dispatcher_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_dispatcher_t **)&jarg1; 
+  grentry = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_grentry_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  graph_dispatcher_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (graph_dispatcher_t *)grentry;
+  *(graph_dispatcher_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1ordering_1t_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  node_ordering_t *arg1 = (node_ordering_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_ordering_t **)&jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1ordering_1t_1resize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  node_ordering_t *arg1 = (node_ordering_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_ordering_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->resize(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1ordering_1t_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  node_ordering_t *arg1 = (node_ordering_t *) 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_ordering_t **)&jarg1; 
+  result = ((node_ordering_t const *)arg1)->size();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1ordering_1t_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  node_ordering_t *arg1 = (node_ordering_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_ordering_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  (arg1)->set(arg2,arg3);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1ordering_1t_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jint jresult = 0 ;
+  node_ordering_t *arg1 = (node_ordering_t *) 0 ;
+  size_t arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(node_ordering_t **)&jarg1; 
+  arg2 = (size_t)jarg2; 
+  result = (int)((node_ordering_t const *)arg1)->node(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1node_1ordering_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  node_ordering_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (node_ordering_t *)new node_ordering_t();
+  *(node_ordering_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1node_1ordering_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  node_ordering_t *arg1 = (node_ordering_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(node_ordering_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1src_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_t *arg1 = (edge_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->src = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1src_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_t *arg1 = (edge_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_t **)&jarg1; 
+  result = (int) ((arg1)->src);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1dst_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_t *arg1 = (edge_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->dst = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1dst_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_t *arg1 = (edge_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_t **)&jarg1; 
+  result = (int) ((arg1)->dst);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  edge_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (edge_t *)new edge_t();
+  *(edge_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  edge_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (edge_t *)new edge_t(arg1,arg2);
+  *(edge_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1_1_1lt_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  edge_t *arg1 = (edge_t *) 0 ;
+  edge_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((edge_t const *)arg1)->operator <((edge_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  edge_t *arg1 = (edge_t *) 0 ;
+  edge_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((edge_t const *)arg1)->operator ==((edge_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  edge_t *arg1 = (edge_t *) 0 ;
+  edge_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((edge_t const *)arg1)->operator !=((edge_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1edge_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  edge_t *arg1 = (edge_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(edge_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1typer_1t_1reset(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  edge_typer_t *arg1 = (edge_typer_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_typer_t **)&jarg1; 
+  (arg1)->reset();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1typer_1t_1edge_1type_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  edge_typer_t *arg1 = (edge_typer_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  edge_type_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_typer_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (edge_type_t *) &(arg1)->edge_type(arg2,arg3);
+  *(edge_type_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1typer_1t_1edge_1type_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  edge_typer_t *arg1 = (edge_typer_t *) 0 ;
+  edge_t *arg2 = 0 ;
+  edge_type_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_typer_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_t const & reference is null");
+    return 0;
+  } 
+  result = (edge_type_t *) &(arg1)->edge_type((edge_t const &)*arg2);
+  *(edge_type_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1edge_1typer_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  edge_typer_t *arg1 = (edge_typer_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(edge_typer_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_simple_1edge_1typer_1t_1edge_1types_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  simple_edge_typer_t *arg1 = (simple_edge_typer_t *) 0 ;
+  simple_edge_typer_t::edge_types_t arg2 ;
+  simple_edge_typer_t::edge_types_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(simple_edge_typer_t **)&jarg1; 
+  argp2 = *(simple_edge_typer_t::edge_types_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null simple_edge_typer_t::edge_types_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->edge_types = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_simple_1edge_1typer_1t_1edge_1types_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  simple_edge_typer_t *arg1 = (simple_edge_typer_t *) 0 ;
+  simple_edge_typer_t::edge_types_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(simple_edge_typer_t **)&jarg1; 
+  result =  ((arg1)->edge_types);
+  *(simple_edge_typer_t::edge_types_t **)&jresult = new simple_edge_typer_t::edge_types_t((const simple_edge_typer_t::edge_types_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_simple_1edge_1typer_1t_1reset(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  simple_edge_typer_t *arg1 = (simple_edge_typer_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(simple_edge_typer_t **)&jarg1; 
+  (arg1)->reset();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_simple_1edge_1typer_1t_1edge_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  simple_edge_typer_t *arg1 = (simple_edge_typer_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  edge_type_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(simple_edge_typer_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (edge_type_t *) &(arg1)->edge_type(arg2,arg3);
+  *(edge_type_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1simple_1edge_1typer_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  simple_edge_typer_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (simple_edge_typer_t *)new simple_edge_typer_t();
+  *(simple_edge_typer_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1simple_1edge_1typer_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  simple_edge_typer_t *arg1 = (simple_edge_typer_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(simple_edge_typer_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1node_1visitor_1t_1reinit(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  graph_node_visitor_t *arg1 = (graph_node_visitor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_node_visitor_t **)&jarg1; 
+  (arg1)->reinit();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1node_1visitor_1t_1set_1visited(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  graph_node_visitor_t *arg1 = (graph_node_visitor_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_node_visitor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->set_visited(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1node_1visitor_1t_1is_1visited(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  graph_node_visitor_t *arg1 = (graph_node_visitor_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_node_visitor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((graph_node_visitor_t const *)arg1)->is_visited(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1node_1visitor_1t_1visit_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  graph_node_visitor_t *arg1 = (graph_node_visitor_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_node_visitor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)(arg1)->visit_node(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1node_1visitor_1t_1is_1forbidden_1edge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jboolean jresult = 0 ;
+  graph_node_visitor_t *arg1 = (graph_node_visitor_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_node_visitor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (bool)((graph_node_visitor_t const *)arg1)->is_forbidden_edge(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1graph_1node_1visitor_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  graph_node_visitor_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (graph_node_visitor_t *)new graph_node_visitor_t();
+  *(graph_node_visitor_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1graph_1node_1visitor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_node_visitor_t *arg1 = (graph_node_visitor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_node_visitor_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1path_1visitor_1t_1path_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  intseq_t *arg2 = (intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  arg2 = *(intseq_t **)&jarg2; 
+  if (arg1) (arg1)->path = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1path_1visitor_1t_1path_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  result = (intseq_t *)& ((arg1)->path);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1path_1visitor_1t_1prune_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->prune = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1path_1visitor_1t_1prune_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  result = (bool) ((arg1)->prune);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1path_1visitor_1t_1walk_1forward(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)(arg1)->walk_forward(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1path_1visitor_1t_1walk_1backward(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)(arg1)->walk_backward(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1graph_1path_1visitor_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  graph_path_visitor_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (graph_path_visitor_t *)new graph_path_visitor_t();
+  *(graph_path_visitor_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1graph_1path_1visitor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_path_visitor_t *arg1 = (graph_path_visitor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_path_visitor_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1x_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  point_t *arg1 = (point_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(point_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->x = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1x_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  point_t *arg1 = (point_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(point_t **)&jarg1; 
+  result = (int) ((arg1)->x);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1y_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  point_t *arg1 = (point_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(point_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->y = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1y_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  point_t *arg1 = (point_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(point_t **)&jarg1; 
+  result = (int) ((arg1)->y);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1point_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (point_t *)new point_t();
+  *(point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1point_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (point_t *)new point_t(arg1,arg2);
+  *(point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  point_t *arg1 = (point_t *) 0 ;
+  point_t *arg2 = 0 ;
+  point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(point_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (point_t *) &(arg1)->add((point_t const &)*arg2);
+  *(point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1sub(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  point_t *arg1 = (point_t *) 0 ;
+  point_t *arg2 = 0 ;
+  point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(point_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (point_t *) &(arg1)->sub((point_t const &)*arg2);
+  *(point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1negate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  point_t *arg1 = (point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(point_t **)&jarg1; 
+  (arg1)->negate();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  point_t *arg1 = (point_t *) 0 ;
+  point_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(point_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((point_t const *)arg1)->operator ==((point_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_point_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  point_t *arg1 = (point_t *) 0 ;
+  point_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(point_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((point_t const *)arg1)->operator !=((point_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1point_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  point_t *arg1 = (point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(point_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_calc_1dist(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jdouble jresult = 0 ;
+  point_t arg1 ;
+  point_t arg2 ;
+  point_t *argp1 ;
+  point_t *argp2 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  argp1 = *(point_t **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null point_t");
+    return 0;
+  }
+  arg1 = *argp1; 
+  argp2 = *(point_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null point_t");
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = (double)calc_dist(arg1,arg2);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1pointseq_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  pointseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (pointseq_t *)new pointseq_t();
+  *(pointseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1pointseq_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  pointseq_t *arg1 = (pointseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(pointseq_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1left_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->left = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1left_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int) ((arg1)->left);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1top_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->top = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1top_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int) ((arg1)->top);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1right_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->right = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1right_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int) ((arg1)->right);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1bottom_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->bottom = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1bottom_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int) ((arg1)->bottom);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1rect_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  rect_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (rect_t *)new rect_t();
+  *(rect_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1rect_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2, jint jarg3, jint jarg4) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  rect_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (int)jarg4; 
+  result = (rect_t *)new rect_t(arg1,arg2,arg3,arg4);
+  *(rect_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1rect_1t_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  point_t *arg1 = 0 ;
+  point_t *arg2 = 0 ;
+  rect_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(point_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (rect_t *)new rect_t((point_t const &)*arg1,(point_t const &)*arg2);
+  *(rect_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1width(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int)((rect_t const *)arg1)->width();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1height(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int)((rect_t const *)arg1)->height();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1move_1to(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  point_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return ;
+  } 
+  (arg1)->move_to((point_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1move_1by(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  point_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return ;
+  } 
+  (arg1)->move_by((point_t const &)*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1center(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  point_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = ((rect_t const *)arg1)->center();
+  *(point_t **)&jresult = new point_t((const point_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1topleft(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  point_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = ((rect_t const *)arg1)->topleft();
+  *(point_t **)&jresult = new point_t((const point_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1bottomright(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  point_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = ((rect_t const *)arg1)->bottomright();
+  *(point_t **)&jresult = new point_t((const point_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1grow(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->grow(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1intersect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  rect_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(rect_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "rect_t const & reference is null");
+    return ;
+  } 
+  (arg1)->intersect((rect_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1make_1union(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  rect_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(rect_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "rect_t const & reference is null");
+    return ;
+  } 
+  (arg1)->make_union((rect_t const &)*arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (bool)((rect_t const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1is_1intersection_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  rect_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(rect_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "rect_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((rect_t const *)arg1)->is_intersection_empty((rect_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1contains(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  point_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((rect_t const *)arg1)->contains((point_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1area(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(rect_t **)&jarg1; 
+  result = (int)((rect_t const *)arg1)->area();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  rect_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(rect_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "rect_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((rect_t const *)arg1)->operator ==((rect_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_rect_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  rect_t *arg1 = (rect_t *) 0 ;
+  rect_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(rect_t **)&jarg1; 
+  arg2 = *(rect_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "rect_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((rect_t const *)arg1)->operator !=((rect_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1rect_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  rect_t *arg1 = (rect_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(rect_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1x_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  double arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  arg2 = (double)jarg2; 
+  if (arg1) (arg1)->x = arg2;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1x_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jdouble jresult = 0 ;
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  result = (double) ((arg1)->x);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1y_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jdouble jarg2) {
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  double arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  arg2 = (double)jarg2; 
+  if (arg1) (arg1)->y = arg2;
+}
+
+
+SWIGEXPORT jdouble JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1y_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jdouble jresult = 0 ;
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  result = (double) ((arg1)->y);
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1TPointDouble_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  TPointDouble *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (TPointDouble *)new TPointDouble();
+  *(TPointDouble **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1TPointDouble_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jdouble jarg1, jdouble jarg2) {
+  jlong jresult = 0 ;
+  double arg1 ;
+  double arg2 ;
+  TPointDouble *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (double)jarg1; 
+  arg2 = (double)jarg2; 
+  result = (TPointDouble *)new TPointDouble(arg1,arg2);
+  *(TPointDouble **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1TPointDouble_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  point_t *arg1 = 0 ;
+  TPointDouble *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(point_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "point_t const & reference is null");
+    return 0;
+  } 
+  result = (TPointDouble *)new TPointDouble((point_t const &)*arg1);
+  *(TPointDouble **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  TPointDouble *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  arg2 = *(TPointDouble **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TPointDouble const & reference is null");
+    return ;
+  } 
+  (arg1)->add((TPointDouble const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1sub(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  TPointDouble *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  arg2 = *(TPointDouble **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TPointDouble const & reference is null");
+    return ;
+  } 
+  (arg1)->sub((TPointDouble const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1negate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  (arg1)->negate();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  TPointDouble *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  arg2 = *(TPointDouble **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TPointDouble const & reference is null");
+    return 0;
+  } 
+  result = (bool)((TPointDouble const *)arg1)->operator ==((TPointDouble const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_TPointDouble_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  TPointDouble *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(TPointDouble **)&jarg1; 
+  arg2 = *(TPointDouble **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TPointDouble const & reference is null");
+    return 0;
+  } 
+  result = (bool)((TPointDouble const *)arg1)->operator !=((TPointDouble const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1TPointDouble(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  TPointDouble *arg1 = (TPointDouble *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(TPointDouble **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_layout_1none_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  layout_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (layout_type_t)(layout_type_t)layout_none;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_layout_1digraph_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  layout_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (layout_type_t)(layout_type_t)layout_digraph;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_layout_1tree_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  layout_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (layout_type_t)(layout_type_t)layout_tree;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_layout_1circle_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  layout_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (layout_type_t)(layout_type_t)layout_circle;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1color_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->color = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1color_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  result = (int) ((arg1)->color);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1width_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->width = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1width_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  result = (int) ((arg1)->width);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1srcoff_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->srcoff = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1srcoff_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  result = (int) ((arg1)->srcoff);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1dstoff_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->dstoff = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1dstoff_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  result = (int) ((arg1)->dstoff);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1layout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  pointseq_t *arg2 = (pointseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  arg2 = *(pointseq_t **)&jarg2; 
+  if (arg1) (arg1)->layout = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1layout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  pointseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  result = (pointseq_t *)& ((arg1)->layout);
+  *(pointseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1info_1t_1reverse_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_info_t **)&jarg1; 
+  (arg1)->reverse_layout();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  edge_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (edge_info_t *)new edge_info_t();
+  *(edge_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1edge_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  edge_info_t *arg1 = (edge_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(edge_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1pidx_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->pidx = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1pidx_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  result = (int) ((arg1)->pidx);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1e_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  edge_t *arg2 = (edge_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2; 
+  if (arg1) (arg1)->e = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1e_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  edge_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  result = (edge_t *)& ((arg1)->e);
+  *(edge_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1layout_1point_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  edge_layout_point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (edge_layout_point_t *)new edge_layout_point_t();
+  *(edge_layout_point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1layout_1point_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  edge_layout_point_t *arg1 = 0 ;
+  edge_layout_point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_layout_point_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_layout_point_t const & reference is null");
+    return 0;
+  } 
+  result = (edge_layout_point_t *)new edge_layout_point_t((edge_layout_point_t const &)*arg1);
+  *(edge_layout_point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1layout_1point_1t_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  edge_t *arg1 = 0 ;
+  int arg2 ;
+  edge_layout_point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_t const & reference is null");
+    return 0;
+  } 
+  arg2 = (int)jarg2; 
+  result = (edge_layout_point_t *)new edge_layout_point_t((edge_t const &)*arg1,arg2);
+  *(edge_layout_point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1compare(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  edge_layout_point_t *arg2 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  arg2 = *(edge_layout_point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_layout_point_t const & reference is null");
+    return 0;
+  } 
+  result = (int)((edge_layout_point_t const *)arg1)->compare((edge_layout_point_t const &)*arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  edge_layout_point_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  arg2 = *(edge_layout_point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_layout_point_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((edge_layout_point_t const *)arg1)->operator ==((edge_layout_point_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1layout_1point_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  edge_layout_point_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  arg2 = *(edge_layout_point_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_layout_point_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((edge_layout_point_t const *)arg1)->operator !=((edge_layout_point_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1edge_1layout_1point_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  edge_layout_point_t *arg1 = (edge_layout_point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(edge_layout_point_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1is_1node_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->is_node = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1is_1node_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  result = (bool) ((arg1)->is_node);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1node_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->node = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1node_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  result = (int) ((arg1)->node);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1elp_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  edge_layout_point_t *arg2 = (edge_layout_point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  arg2 = *(edge_layout_point_t **)&jarg2; 
+  if (arg1) (arg1)->elp = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1elp_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  edge_layout_point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  result = (edge_layout_point_t *)& ((arg1)->elp);
+  *(edge_layout_point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1compare(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  selection_item_t *arg2 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  arg2 = *(selection_item_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "selection_item_t const & reference is null");
+    return 0;
+  } 
+  result = (int)((selection_item_t const *)arg1)->compare((selection_item_t const &)*arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  selection_item_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  arg2 = *(selection_item_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "selection_item_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((selection_item_t const *)arg1)->operator ==((selection_item_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_selection_1item_1t_1_1_1lt_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  selection_item_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(selection_item_t **)&jarg1; 
+  arg2 = *(selection_item_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "selection_item_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((selection_item_t const *)arg1)->operator <((selection_item_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1selection_1item_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  selection_item_t *arg1 = (selection_item_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(selection_item_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1has(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  selection_item_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  arg2 = *(selection_item_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "selection_item_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((screen_graph_selection_t const *)arg1)->has((selection_item_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  screen_graph_selection_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  arg2 = *(screen_graph_selection_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "screen_graph_selection_t const & reference is null");
+    return ;
+  } 
+  (arg1)->add((screen_graph_selection_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1sub(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  screen_graph_selection_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  arg2 = *(screen_graph_selection_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "screen_graph_selection_t const & reference is null");
+    return ;
+  } 
+  (arg1)->sub((screen_graph_selection_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1add_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->add_node(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1del_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->del_node(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1add_1point(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  edge_t arg2 ;
+  int arg3 ;
+  edge_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  argp2 = *(edge_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null edge_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  arg3 = (int)jarg3; 
+  (arg1)->add_point(arg2,arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_screen_1graph_1selection_1t_1del_1point(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  edge_t arg2 ;
+  int arg3 ;
+  edge_t *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  argp2 = *(edge_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null edge_t");
+    return ;
+  }
+  arg2 = *argp2; 
+  arg3 = (int)jarg3; 
+  (arg1)->del_point(arg2,arg3);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1screen_1graph_1selection_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  screen_graph_selection_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (screen_graph_selection_t *)new screen_graph_selection_t();
+  *(screen_graph_selection_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1screen_1graph_1selection_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  screen_graph_selection_t *arg1 = (screen_graph_selection_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(screen_graph_selection_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1e_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  edge_t *arg2 = (edge_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2; 
+  if (arg1) (arg1)->e = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1e_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  edge_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  result = (edge_t *)& ((arg1)->e);
+  *(edge_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1nseg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->nseg = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1nseg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  result = (int) ((arg1)->nseg);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1x0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->x0 = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1x0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  result = (int) ((arg1)->x0);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1x1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->x1 = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1x1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  result = (int) ((arg1)->x1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  result = ((edge_segment_t const *)arg1)->length();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1toright(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  result = (bool)((edge_segment_t const *)arg1)->toright();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_edge_1segment_1t_1_1_1lt_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  edge_segment_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  arg2 = *(edge_segment_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_segment_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((edge_segment_t const *)arg1)->operator <((edge_segment_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1edge_1segment_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  edge_segment_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (edge_segment_t *)new edge_segment_t();
+  *(edge_segment_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1edge_1segment_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  edge_segment_t *arg1 = (edge_segment_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(edge_segment_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1type_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  graph_item_type_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  arg2 = (graph_item_type_t)jarg2; 
+  if (arg1) (arg1)->type = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1type_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  graph_item_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (graph_item_type_t) ((arg1)->type);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1e_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  edge_t *arg2 = (edge_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  arg2 = *(edge_t **)&jarg2; 
+  if (arg1) (arg1)->e = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1e_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  edge_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (edge_t *)& ((arg1)->e);
+  *(edge_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1n_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->n = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1n_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (int) ((arg1)->n);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1b_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->b = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1b_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (int) ((arg1)->b);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1p_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  point_t *arg2 = (point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2; 
+  if (arg1) (arg1)->p = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1p_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (point_t *)& ((arg1)->p);
+  *(point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1elp_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  edge_layout_point_t *arg2 = (edge_layout_point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  arg2 = *(edge_layout_point_t **)&jarg2; 
+  if (arg1) (arg1)->elp = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1elp_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  edge_layout_point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (edge_layout_point_t *)& ((arg1)->elp);
+  *(edge_layout_point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1is_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (bool)((graph_item_t const *)arg1)->is_node();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_graph_1item_1t_1is_1edge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(graph_item_t **)&jarg1; 
+  result = (bool)((graph_item_t const *)arg1)->is_edge();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1graph_1item_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  graph_item_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (graph_item_t *)new graph_item_t();
+  *(graph_item_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1graph_1item_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_item_t *arg1 = (graph_item_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_item_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1x0_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  interval_t *arg1 = (interval_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->x0 = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1x0_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  result = (int) ((arg1)->x0);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1x1_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  interval_t *arg1 = (interval_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->x1 = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1x1_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  result = (int) ((arg1)->x1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  result = (bool)((interval_t const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1intersect(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  interval_t *arg1 = (interval_t *) 0 ;
+  interval_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = *(interval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "interval_t const & reference is null");
+    return ;
+  } 
+  (arg1)->intersect((interval_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1make_1union(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  interval_t *arg1 = (interval_t *) 0 ;
+  interval_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = *(interval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "interval_t const & reference is null");
+    return ;
+  } 
+  (arg1)->make_union((interval_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1move_1by(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  interval_t *arg1 = (interval_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->move_by(arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1interval_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  interval_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (interval_t *)new interval_t();
+  *(interval_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1interval_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  interval_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (interval_t *)new interval_t(arg1,arg2);
+  *(interval_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1interval_1t_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  edge_segment_t *arg1 = 0 ;
+  interval_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(edge_segment_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "edge_segment_t const & reference is null");
+    return 0;
+  } 
+  result = (interval_t *)new interval_t((edge_segment_t const &)*arg1);
+  *(interval_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1length(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  result = (int)((interval_t const *)arg1)->length();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1contains(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((interval_t const *)arg1)->contains(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  interval_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = *(interval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "interval_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((interval_t const *)arg1)->operator ==((interval_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_interval_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  interval_t *arg1 = (interval_t *) 0 ;
+  interval_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(interval_t **)&jarg1; 
+  arg2 = *(interval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "interval_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((interval_t const *)arg1)->operator !=((interval_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1interval_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  interval_t *arg1 = (interval_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(interval_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1nodes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  intseq_t *arg2 = (intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(row_info_t **)&jarg1; 
+  arg2 = *(intseq_t **)&jarg2; 
+  if (arg1) (arg1)->nodes = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1nodes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(row_info_t **)&jarg1; 
+  result = (intseq_t *)& ((arg1)->nodes);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1top_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(row_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->top = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1top_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(row_info_t **)&jarg1; 
+  result = (int) ((arg1)->top);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1bottom_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(row_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->bottom = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1bottom_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(row_info_t **)&jarg1; 
+  result = (int) ((arg1)->bottom);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_row_1info_1t_1height(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(row_info_t **)&jarg1; 
+  result = (int)((row_info_t const *)arg1)->height();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1row_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  row_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (row_info_t *)new row_info_t();
+  *(row_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1row_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  row_info_t *arg1 = (row_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(row_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ygap_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)ygap;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_xgap_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)xgap;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_arrow_1height_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)arrow_height;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_arrow_1width_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)arrow_width;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1title_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->title = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1title_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->title);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1rect_1edges_1made_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->rect_edges_made = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1rect_1edges_1made_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (bool) ((arg1)->rect_edges_made);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1current_1layout_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  layout_type_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = (layout_type_t)jarg2; 
+  if (arg1) (arg1)->current_layout = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1current_1layout_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  layout_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (layout_type_t) ((arg1)->current_layout);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1circle_1center_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  point_t *arg2 = (point_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = *(point_t **)&jarg2; 
+  if (arg1) (arg1)->circle_center = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1circle_1center_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  point_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (point_t *)& ((arg1)->circle_center);
+  *(point_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1circle_1radius_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->circle_radius = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1circle_1radius_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (int) ((arg1)->circle_radius);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1callback_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  hook_cb_t *arg2 = (hook_cb_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = *(hook_cb_t **)&jarg2; 
+  if (arg1) (arg1)->callback = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1callback_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  hook_cb_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (hook_cb_t *) ((arg1)->callback);
+  *(hook_cb_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1callback_1ud_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  void *arg2 = (void *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = *(void **)&jarg2; 
+  if (arg1) (arg1)->callback_ud = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1callback_1ud_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (void *) ((arg1)->callback_ud);
+  *(void **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1nrect_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  int arg2 ;
+  rect_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (rect_t *) &((abstract_graph_t const *)arg1)->nrect(arg2);
+  *(rect_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1get_1edge_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  edge_t arg2 ;
+  edge_t *argp2 ;
+  edge_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  argp2 = *(edge_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null edge_t");
+    return 0;
+  }
+  arg2 = *argp2; 
+  result = (edge_info_t *)((abstract_graph_t const *)arg1)->get_edge(arg2);
+  *(edge_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1clone(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  abstract_graph_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (abstract_graph_t *)((abstract_graph_t const *)arg1)->clone();
+  *(abstract_graph_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1create_1tree_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  result = (bool)(arg1)->create_tree_layout();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1create_1circle_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jint jarg3) {
+  jboolean jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  point_t arg2 ;
+  int arg3 ;
+  point_t *argp2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  argp2 = *(point_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null point_t");
+    return 0;
+  }
+  arg2 = *argp2; 
+  arg3 = (int)jarg3; 
+  result = (bool)(arg1)->create_circle_layout(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1set_1callback(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  hook_cb_t *arg2 = (hook_cb_t *) 0 ;
+  void *arg3 = (void *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = *(hook_cb_t **)&jarg2; 
+  arg3 = *(void **)&jarg3; 
+  (arg1)->set_callback(arg2,arg3);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1vgrcall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  int arg2 ;
+  va_list arg3 ;
+  va_list *argp3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  argp3 = *(va_list **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null va_list");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (int)(arg1)->vgrcall(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1grcall(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  int arg2 ;
+  void *arg3 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)(arg1)->grcall(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1abstract_1graph_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  abstract_graph_t *arg1 = (abstract_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(abstract_graph_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1gid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  uval_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (uval_t)jarg2; 
+  if (arg1) (arg1)->gid = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1gid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (uval_t) ((arg1)->gid);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1belongs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  intseq_t *arg2 = (intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(intseq_t **)&jarg2; 
+  if (arg1) (arg1)->belongs = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1belongs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (intseq_t *)& ((arg1)->belongs);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1group_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  boolvec_t *arg2 = (boolvec_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(boolvec_t **)&jarg2; 
+  if (arg1) (arg1)->is_group = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1group_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  boolvec_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (boolvec_t *)& ((arg1)->is_group);
+  *(boolvec_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1org_1succs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *arg2 = (array_of_intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(array_of_intseq_t **)&jarg2; 
+  if (arg1) (arg1)->org_succs = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1org_1succs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (array_of_intseq_t *)& ((arg1)->org_succs);
+  *(array_of_intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1org_1preds_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *arg2 = (array_of_intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(array_of_intseq_t **)&jarg2; 
+  if (arg1) (arg1)->org_preds = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1org_1preds_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (array_of_intseq_t *)& ((arg1)->org_preds);
+  *(array_of_intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1succs_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *arg2 = (array_of_intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(array_of_intseq_t **)&jarg2; 
+  if (arg1) (arg1)->succs = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1succs_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (array_of_intseq_t *)& ((arg1)->succs);
+  *(array_of_intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1preds_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *arg2 = (array_of_intseq_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(array_of_intseq_t **)&jarg2; 
+  if (arg1) (arg1)->preds = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1preds_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  array_of_intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (array_of_intseq_t *)& ((arg1)->preds);
+  *(array_of_intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1nodes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  mutable_graph_t::node_layout_t *arg2 = (mutable_graph_t::node_layout_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(mutable_graph_t::node_layout_t **)&jarg2; 
+  if (arg1) (arg1)->nodes = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1nodes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  mutable_graph_t::node_layout_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (mutable_graph_t::node_layout_t *)& ((arg1)->nodes);
+  *(mutable_graph_t::node_layout_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1edges_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  edge_infos_t *arg2 = (edge_infos_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(edge_infos_t **)&jarg2; 
+  if (arg1) (arg1)->edges = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1edges_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  edge_infos_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (edge_infos_t *)& ((arg1)->edges);
+  *(edge_infos_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (int)((mutable_graph_t const *)arg1)->size();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1node_1qty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (int)((mutable_graph_t const *)arg1)->node_qty();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1empty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (bool)((mutable_graph_t const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1exists(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->exists(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1get_1node_1representative(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)(arg1)->get_node_representative(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1get_1node_1group(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((mutable_graph_t const *)arg1)->get_node_group(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1set_1node_1group(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  (arg1)->set_node_group(arg2,arg3);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1deleted_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_deleted_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1set_1deleted_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  (arg1)->set_deleted_node(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1subgraph_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_subgraph_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1group_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_group_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1simple_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_simple_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1collapsed_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_collapsed_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1uncollapsed_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_uncollapsed_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1visible_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)((mutable_graph_t const *)arg1)->is_visible_node(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1get_1first_1subgraph_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((mutable_graph_t const *)arg1)->get_first_subgraph_node(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1get_1next_1subgraph_1node(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((mutable_graph_t const *)arg1)->get_next_subgraph_node(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1create_1group(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  intset_t *arg2 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(intset_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "intset_t const & reference is null");
+    return 0;
+  } 
+  result = (int)(arg1)->create_group((intset_t const &)*arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1delete_1group(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (bool)(arg1)->delete_group(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1change_1group_1visibility(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jboolean jarg3) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  bool arg3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = jarg3 ? true : false; 
+  result = (bool)(arg1)->change_group_visibility(arg2,arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1nsucc(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((mutable_graph_t const *)arg1)->nsucc(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1npred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)((mutable_graph_t const *)arg1)->npred(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1succ(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((mutable_graph_t const *)arg1)->succ(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1pred(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  result = (int)((mutable_graph_t const *)arg1)->pred(arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1succset(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (intseq_t *) &((mutable_graph_t const *)arg1)->succset(arg2);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1predset(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  intseq_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (intseq_t *) &((mutable_graph_t const *)arg1)->predset(arg2);
+  *(intseq_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1reset(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  (arg1)->reset();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1nrect_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  int arg2 ;
+  rect_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (rect_t *) &((mutable_graph_t const *)arg1)->nrect(arg2);
+  *(rect_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1set_1edge(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_, jlong jarg3, jobject jarg3_) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  edge_t arg2 ;
+  edge_info_t *arg3 = (edge_info_t *) 0 ;
+  edge_t *argp2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  (void)jarg3_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  argp2 = *(edge_t **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null edge_t");
+    return 0;
+  }
+  arg2 = *argp2; 
+  arg3 = *(edge_info_t **)&jarg3; 
+  result = (bool)(arg1)->set_edge(arg2,(edge_info_t const *)arg3);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1create_1digraph_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (bool)(arg1)->create_digraph_layout();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1del_1custom_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  (arg1)->del_custom_layout();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1get_1custom_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (bool)(arg1)->get_custom_layout();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1set_1custom_1layout(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  ((mutable_graph_t const *)arg1)->set_custom_layout();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1get_1graph_1groups(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (bool)(arg1)->get_graph_groups();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1set_1graph_1groups(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  ((mutable_graph_t const *)arg1)->set_graph_groups();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1calc_1group_1ea(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  intset_t *arg2 = 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  arg2 = *(intset_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "intset_t const & reference is null");
+    return 0;
+  } 
+  result = (ea_t)(arg1)->calc_group_ea((intset_t const &)*arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1is_1user_1graph(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  result = (bool)(arg1)->is_user_graph();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1mutable_1graph_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  mutable_graph_t *arg1 = (mutable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(mutable_graph_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1graph_1visitor_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_visitor_t *arg1 = (graph_visitor_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_visitor_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1graph_1viewer(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
+  jlong jresult = 0 ;
+  TForm *arg1 = (TForm *) 0 ;
+  uval_t arg2 ;
+  hook_cb_t *arg3 = (hook_cb_t *) 0 ;
+  void *arg4 = (void *) 0 ;
+  int arg5 ;
+  graph_viewer_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(TForm **)&jarg1; 
+  arg2 = (uval_t)jarg2; 
+  arg3 = *(hook_cb_t **)&jarg3; 
+  arg4 = *(void **)&jarg4; 
+  arg5 = (int)jarg5; 
+  result = (graph_viewer_t *)create_graph_viewer(arg1,arg2,arg3,arg4,arg5);
+  *(graph_viewer_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1graph_1viewer(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  TForm *arg1 = (TForm *) 0 ;
+  graph_viewer_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(TForm **)&jarg1; 
+  result = (graph_viewer_t *)get_graph_viewer(arg1);
+  *(graph_viewer_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1viewer_1graph(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  mutable_graph_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  result = (mutable_graph_t *)get_viewer_graph(arg1);
+  *(mutable_graph_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1mutable_1graph(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  uval_t arg1 ;
+  mutable_graph_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uval_t)jarg1; 
+  result = (mutable_graph_t *)create_mutable_graph(arg1);
+  *(mutable_graph_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1disasm_1graph_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  mutable_graph_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (mutable_graph_t *)create_disasm_graph(arg1);
+  *(mutable_graph_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1disasm_1graph_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  areavec_t *arg1 = 0 ;
+  mutable_graph_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(areavec_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "areavec_t const & reference is null");
+    return 0;
+  } 
+  result = (mutable_graph_t *)create_disasm_graph((areavec_t const &)*arg1);
+  *(mutable_graph_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1viewer_1graph(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  mutable_graph_t *arg2 = (mutable_graph_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = *(mutable_graph_t **)&jarg2; 
+  set_viewer_graph(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_refresh_1viewer(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  refresh_viewer(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1fit_1window(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  viewer_fit_window(arg1);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1get_1curnode(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  result = (int)viewer_get_curnode(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1center_1on(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  viewer_center_on(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1set_1gli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  graph_location_info_t *arg2 = (graph_location_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = *(graph_location_info_t **)&jarg2; 
+  viewer_set_gli(arg1,(graph_location_info_t const *)arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1add_1menu_1item(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jlong jarg3, jlong jarg4, jstring jarg5, jint jarg6) {
+  jboolean jresult = 0 ;
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  menu_item_callback_t *arg3 = (menu_item_callback_t *) 0 ;
+  void *arg4 = (void *) 0 ;
+  char *arg5 = (char *) 0 ;
+  int arg6 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = *(menu_item_callback_t **)&jarg3; 
+  arg4 = *(void **)&jarg4; 
+  arg5 = 0;
+  if (jarg5) {
+    arg5 = (char *)jenv->GetStringUTFChars(jarg5, 0);
+    if (!arg5) return 0;
+  }
+  arg6 = (int)jarg6; 
+  result = (bool)viewer_add_menu_item(arg1,(char const *)arg2,arg3,arg4,(char const *)arg5,arg6);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  if (arg5) jenv->ReleaseStringUTFChars(jarg5, (const char *)arg5);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1del_1menu_1item(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jboolean jresult = 0 ;
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (bool)viewer_del_menu_item(arg1,(char const *)arg2);
+  jresult = (jboolean)result; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1get_1selection(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  screen_graph_selection_t *arg2 = (screen_graph_selection_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = *(screen_graph_selection_t **)&jarg2; 
+  result = (bool)viewer_get_selection(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_viewer_1set_1titlebar_1height(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  graph_viewer_t *arg1 = (graph_viewer_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(graph_viewer_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)viewer_set_titlebar_height(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_user_1graph_1place_1t_1node_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  user_graph_place_t *arg1 = (user_graph_place_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(user_graph_place_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->node = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_user_1graph_1place_1t_1node_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  user_graph_place_t *arg1 = (user_graph_place_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(user_graph_place_t **)&jarg1; 
+  result = (int) ((arg1)->node);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1user_1graph_1place_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  user_graph_place_t *arg1 = (user_graph_place_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(user_graph_place_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1user_1graph_1place(JNIEnv *jenv, jclass jcls, jint jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  int arg1 ;
+  int arg2 ;
+  user_graph_place_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (int)jarg2; 
+  result = (user_graph_place_t *)create_user_graph_place(arg1,arg2);
+  *(user_graph_place_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1version_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->version = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1version_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (int) ((arg1)->version);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if (arg2) {
+      arg1->name = (char const *) (new char[strlen((const char *)arg2)+1]);
+      strcpy((char *)arg1->name, (const char *)arg2);
+    } else {
+      arg1->name = 0;
+    }
+  }
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (char *) ((arg1)->name);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1id_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->id = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1id_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (int) ((arg1)->id);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1processor_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if (arg2) {
+      arg1->processor = (char const *) (new char[strlen((const char *)arg2)+1]);
+      strcpy((char *)arg1->processor, (const char *)arg2);
+    } else {
+      arg1->processor = 0;
+    }
+  }
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1processor_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (char *) ((arg1)->processor);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (uint32) ((arg1)->flags);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1is_1remote(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->is_remote();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1must_1have_1hostname(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->must_have_hostname();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1can_1continue_1from_1bpt(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->can_continue_from_bpt();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1may_1disturb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->may_disturb();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1is_1safe(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->is_safe();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1use_1sregs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->use_sregs();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1cache_1block_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = ((debugger_t const *)arg1)->cache_block_size();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1use_1memregs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->use_memregs();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1may_1take_1exit_1snapshot(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->may_take_exit_snapshot();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1virtual_1threads(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (bool)((debugger_t const *)arg1)->virtual_threads();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1register_1classes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->register_classes = (char const **)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1register_1classes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (char **) ((arg1)->register_classes);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1register_1classes_1default_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->register_classes_default = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1register_1classes_1default_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (int) ((arg1)->register_classes_default);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1registers_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  register_info_t *arg2 = (register_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(register_info_t **)&jarg2; 
+  if (arg1) (arg1)->registers = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1registers_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  register_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (register_info_t *) ((arg1)->registers);
+  *(register_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1registers_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->registers_size = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1registers_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (int) ((arg1)->registers_size);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1memory_1page_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->memory_page_size = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1memory_1page_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (int) ((arg1)->memory_page_size);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1bpt_1bytes_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  uchar *arg2 = (uchar *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  if (arg1) (arg1)->bpt_bytes = (uchar const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1bpt_1bytes_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  uchar *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (uchar *) ((arg1)->bpt_bytes);
+  *(uchar **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1bpt_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->bpt_size = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1bpt_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (int) ((arg1)->bpt_size);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1init_1debugger_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_init_debugger_cb arg2 = (debugger_t_init_debugger_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_init_debugger_cb *)&jarg2; 
+  if (arg1) (arg1)->init_debugger = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1init_1debugger_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_init_debugger_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_init_debugger_cb) ((arg1)->init_debugger);
+  *(debugger_t_init_debugger_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1term_1debugger_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_term_debugger_cb arg2 = (debugger_t_term_debugger_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_term_debugger_cb *)&jarg2; 
+  if (arg1) (arg1)->term_debugger = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1term_1debugger_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_term_debugger_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_term_debugger_cb) ((arg1)->term_debugger);
+  *(debugger_t_term_debugger_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1process_1get_1info_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_process_get_info_cb arg2 = (debugger_t_process_get_info_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_process_get_info_cb *)&jarg2; 
+  if (arg1) (arg1)->process_get_info = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1process_1get_1info_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_process_get_info_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_process_get_info_cb) ((arg1)->process_get_info);
+  *(debugger_t_process_get_info_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1start_1process_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_start_process_cb arg2 = (debugger_t_start_process_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_start_process_cb *)&jarg2; 
+  if (arg1) (arg1)->start_process = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1start_1process_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_start_process_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_start_process_cb) ((arg1)->start_process);
+  *(debugger_t_start_process_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1attach_1process_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_attach_process_cb arg2 = (debugger_t_attach_process_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_attach_process_cb *)&jarg2; 
+  if (arg1) (arg1)->attach_process = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1attach_1process_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_attach_process_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_attach_process_cb) ((arg1)->attach_process);
+  *(debugger_t_attach_process_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1detach_1process_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_detach_process_cb arg2 = (debugger_t_detach_process_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_detach_process_cb *)&jarg2; 
+  if (arg1) (arg1)->detach_process = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1detach_1process_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_detach_process_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_detach_process_cb) ((arg1)->detach_process);
+  *(debugger_t_detach_process_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1rebase_1if_1required_1to_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_rebase_if_required_to_cb arg2 = (debugger_t_rebase_if_required_to_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_rebase_if_required_to_cb *)&jarg2; 
+  if (arg1) (arg1)->rebase_if_required_to = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1rebase_1if_1required_1to_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_rebase_if_required_to_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_rebase_if_required_to_cb) ((arg1)->rebase_if_required_to);
+  *(debugger_t_rebase_if_required_to_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1prepare_1to_1pause_1process_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_prepare_to_pause_process_cb arg2 = (debugger_t_prepare_to_pause_process_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_prepare_to_pause_process_cb *)&jarg2; 
+  if (arg1) (arg1)->prepare_to_pause_process = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1prepare_1to_1pause_1process_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_prepare_to_pause_process_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_prepare_to_pause_process_cb) ((arg1)->prepare_to_pause_process);
+  *(debugger_t_prepare_to_pause_process_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1exit_1process_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_exit_process_cb arg2 = (debugger_t_exit_process_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_exit_process_cb *)&jarg2; 
+  if (arg1) (arg1)->exit_process = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1exit_1process_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_exit_process_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_exit_process_cb) ((arg1)->exit_process);
+  *(debugger_t_exit_process_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1get_1debug_1event_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_get_debug_event_cb arg2 = (debugger_t_get_debug_event_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_get_debug_event_cb *)&jarg2; 
+  if (arg1) (arg1)->get_debug_event = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1get_1debug_1event_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_get_debug_event_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_get_debug_event_cb) ((arg1)->get_debug_event);
+  *(debugger_t_get_debug_event_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1continue_1after_1event_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_continue_after_event_cb arg2 = (debugger_t_continue_after_event_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_continue_after_event_cb *)&jarg2; 
+  if (arg1) (arg1)->continue_after_event = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1continue_1after_1event_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_continue_after_event_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_continue_after_event_cb) ((arg1)->continue_after_event);
+  *(debugger_t_continue_after_event_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1set_1exception_1info_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_set_exception_info_cb arg2 = (debugger_t_set_exception_info_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_set_exception_info_cb *)&jarg2; 
+  if (arg1) (arg1)->set_exception_info = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1set_1exception_1info_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_set_exception_info_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_set_exception_info_cb) ((arg1)->set_exception_info);
+  *(debugger_t_set_exception_info_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1stopped_1at_1debug_1event_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_stopped_at_debug_event_cb arg2 = (debugger_t_stopped_at_debug_event_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_stopped_at_debug_event_cb *)&jarg2; 
+  if (arg1) (arg1)->stopped_at_debug_event = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1stopped_1at_1debug_1event_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_stopped_at_debug_event_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_stopped_at_debug_event_cb) ((arg1)->stopped_at_debug_event);
+  *(debugger_t_stopped_at_debug_event_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1suspend_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_suspend_cb arg2 = (debugger_t_thread_suspend_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_thread_suspend_cb *)&jarg2; 
+  if (arg1) (arg1)->thread_suspend = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1suspend_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_suspend_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_thread_suspend_cb) ((arg1)->thread_suspend);
+  *(debugger_t_thread_suspend_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1continue_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_continue_cb arg2 = (debugger_t_thread_continue_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_thread_continue_cb *)&jarg2; 
+  if (arg1) (arg1)->thread_continue = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1continue_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_continue_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_thread_continue_cb) ((arg1)->thread_continue);
+  *(debugger_t_thread_continue_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1set_1step_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_set_step_cb arg2 = (debugger_t_thread_set_step_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_thread_set_step_cb *)&jarg2; 
+  if (arg1) (arg1)->thread_set_step = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1set_1step_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_set_step_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_thread_set_step_cb) ((arg1)->thread_set_step);
+  *(debugger_t_thread_set_step_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1read_1registers_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_read_registers_cb arg2 = (debugger_t_read_registers_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_read_registers_cb *)&jarg2; 
+  if (arg1) (arg1)->read_registers = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1read_1registers_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_read_registers_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_read_registers_cb) ((arg1)->read_registers);
+  *(debugger_t_read_registers_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1write_1register_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_write_register_cb arg2 = (debugger_t_write_register_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_write_register_cb *)&jarg2; 
+  if (arg1) (arg1)->write_register = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1write_1register_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_write_register_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_write_register_cb) ((arg1)->write_register);
+  *(debugger_t_write_register_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1get_1sreg_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_get_sreg_base_cb arg2 = (debugger_t_thread_get_sreg_base_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_thread_get_sreg_base_cb *)&jarg2; 
+  if (arg1) (arg1)->thread_get_sreg_base = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1thread_1get_1sreg_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_thread_get_sreg_base_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_thread_get_sreg_base_cb) ((arg1)->thread_get_sreg_base);
+  *(debugger_t_thread_get_sreg_base_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1get_1memory_1info_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_get_memory_info_cb arg2 = (debugger_t_get_memory_info_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_get_memory_info_cb *)&jarg2; 
+  if (arg1) (arg1)->get_memory_info = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1get_1memory_1info_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_get_memory_info_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_get_memory_info_cb) ((arg1)->get_memory_info);
+  *(debugger_t_get_memory_info_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1read_1memory_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_read_memory_cb arg2 = (debugger_t_read_memory_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_read_memory_cb *)&jarg2; 
+  if (arg1) (arg1)->read_memory = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1read_1memory_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_read_memory_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_read_memory_cb) ((arg1)->read_memory);
+  *(debugger_t_read_memory_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1write_1memory_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_write_memory_cb arg2 = (debugger_t_write_memory_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_write_memory_cb *)&jarg2; 
+  if (arg1) (arg1)->write_memory = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1write_1memory_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_write_memory_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_write_memory_cb) ((arg1)->write_memory);
+  *(debugger_t_write_memory_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1is_1ok_1bpt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_is_ok_bpt_cb arg2 = (debugger_t_is_ok_bpt_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_is_ok_bpt_cb *)&jarg2; 
+  if (arg1) (arg1)->is_ok_bpt = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1is_1ok_1bpt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_is_ok_bpt_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_is_ok_bpt_cb) ((arg1)->is_ok_bpt);
+  *(debugger_t_is_ok_bpt_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1add_1bpt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_add_bpt_cb arg2 = (debugger_t_add_bpt_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_add_bpt_cb *)&jarg2; 
+  if (arg1) (arg1)->add_bpt = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1add_1bpt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_add_bpt_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_add_bpt_cb) ((arg1)->add_bpt);
+  *(debugger_t_add_bpt_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1del_1bpt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_del_bpt_cb arg2 = (debugger_t_del_bpt_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_del_bpt_cb *)&jarg2; 
+  if (arg1) (arg1)->del_bpt = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1del_1bpt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_del_bpt_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_del_bpt_cb) ((arg1)->del_bpt);
+  *(debugger_t_del_bpt_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1open_1file_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_open_file_cb arg2 = (debugger_t_open_file_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_open_file_cb *)&jarg2; 
+  if (arg1) (arg1)->open_file = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1open_1file_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_open_file_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_open_file_cb) ((arg1)->open_file);
+  *(debugger_t_open_file_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1close_1file_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_close_file_cb arg2 = (debugger_t_close_file_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_close_file_cb *)&jarg2; 
+  if (arg1) (arg1)->close_file = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1close_1file_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_close_file_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_close_file_cb) ((arg1)->close_file);
+  *(debugger_t_close_file_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1read_1file_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_read_file_cb arg2 = (debugger_t_read_file_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_read_file_cb *)&jarg2; 
+  if (arg1) (arg1)->read_file = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1read_1file_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_read_file_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_read_file_cb) ((arg1)->read_file);
+  *(debugger_t_read_file_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1map_1address_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_map_address_cb arg2 = (debugger_t_map_address_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_map_address_cb *)&jarg2; 
+  if (arg1) (arg1)->map_address = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1map_1address_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_map_address_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_map_address_cb) ((arg1)->map_address);
+  *(debugger_t_map_address_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1set_1dbg_1options_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_set_dbg_options_cb arg2 = (debugger_t_set_dbg_options_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_set_dbg_options_cb *)&jarg2; 
+  if (arg1) (arg1)->set_dbg_options = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1set_1dbg_1options_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_set_dbg_options_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_set_dbg_options_cb) ((arg1)->set_dbg_options);
+  *(debugger_t_set_dbg_options_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1get_1debmod_1extensions_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_get_debmod_extensions_cb arg2 = (debugger_t_get_debmod_extensions_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_get_debmod_extensions_cb *)&jarg2; 
+  if (arg1) (arg1)->get_debmod_extensions = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1get_1debmod_1extensions_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_get_debmod_extensions_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_get_debmod_extensions_cb) ((arg1)->get_debmod_extensions);
+  *(debugger_t_get_debmod_extensions_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1update_1call_1stack_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_update_call_stack_cb arg2 = (debugger_t_update_call_stack_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_update_call_stack_cb *)&jarg2; 
+  if (arg1) (arg1)->update_call_stack = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1update_1call_1stack_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_update_call_stack_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_update_call_stack_cb) ((arg1)->update_call_stack);
+  *(debugger_t_update_call_stack_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1appcall_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_appcall_cb arg2 = (debugger_t_appcall_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_appcall_cb *)&jarg2; 
+  if (arg1) (arg1)->appcall = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1appcall_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_appcall_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_appcall_cb) ((arg1)->appcall);
+  *(debugger_t_appcall_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1cleanup_1appcall_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_cleanup_appcall_cb arg2 = (debugger_t_cleanup_appcall_cb) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  arg2 = *(debugger_t_cleanup_appcall_cb *)&jarg2; 
+  if (arg1) (arg1)->cleanup_appcall = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debugger_1t_1cleanup_1appcall_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  debugger_t_cleanup_appcall_cb result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debugger_t **)&jarg1; 
+  result = (debugger_t_cleanup_appcall_cb) ((arg1)->cleanup_appcall);
+  *(debugger_t_cleanup_appcall_cb *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1debugger_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  debugger_t *arg1 = (debugger_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(debugger_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_process_1info_1t_1pid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  process_info_t *arg1 = (process_info_t *) 0 ;
+  pid_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(process_info_t **)&jarg1; 
+  arg2 = (pid_t)jarg2; 
+  if (arg1) (arg1)->pid = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_process_1info_1t_1pid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  process_info_t *arg1 = (process_info_t *) 0 ;
+  pid_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(process_info_t **)&jarg1; 
+  result = (pid_t) ((arg1)->pid);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_process_1info_1t_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  process_info_t *arg1 = (process_info_t *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(process_info_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->name, (const char *)arg2, 1024-1);
+      arg1->name[1024-1] = 0;
+    } else {
+      arg1->name[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_process_1info_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  process_info_t *arg1 = (process_info_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(process_info_t **)&jarg1; 
+  result = (char *)(char *) ((arg1)->name);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1process_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  process_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (process_info_t *)new process_info_t();
+  *(process_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1process_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  process_info_t *arg1 = (process_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(process_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if (arg2) {
+      arg1->name = (char const *) (new char[strlen((const char *)arg2)+1]);
+      strcpy((char *)arg1->name, (const char *)arg2);
+    } else {
+      arg1->name = 0;
+    }
+  }
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  result = (char *) ((arg1)->name);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  result = (uint32) ((arg1)->flags);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1register_1class_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  register_class_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  arg2 = (register_class_t)jarg2; 
+  if (arg1) (arg1)->register_class = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1register_1class_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  register_class_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  result = (register_class_t) ((arg1)->register_class);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1dtyp_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jchar jarg2) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  char arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  arg2 = (char)jarg2; 
+  if (arg1) (arg1)->dtyp = arg2;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1dtyp_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jchar jresult = 0 ;
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  result = (char) ((arg1)->dtyp);
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1bit_1strings_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  char **arg2 = (char **) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  arg2 = *(char ***)&jarg2; 
+  if (arg1) (arg1)->bit_strings = (char const *const *)arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1bit_1strings_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  char **result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  result = (char **) ((arg1)->bit_strings);
+  *(char ***)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1bit_1strings_1default_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->bit_strings_default = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_register_1info_1t_1bit_1strings_1default_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(register_info_t **)&jarg1; 
+  result = (int) ((arg1)->bit_strings_default);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1register_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  register_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (register_info_t *)new register_info_t();
+  *(register_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1register_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  register_info_t *arg1 = (register_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(register_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1memory_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  memory_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (memory_info_t *)new memory_info_t();
+  *(memory_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->name = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->name);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1sclass_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->sclass = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1sclass_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->sclass);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1sbase_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->sbase = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1sbase_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  result = (ea_t) ((arg1)->sbase);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1bitness_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  uchar arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = (uchar)jarg2; 
+  if (arg1) (arg1)->bitness = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1bitness_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  result = (uchar) ((arg1)->bitness);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1perm_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  uchar arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = (uchar)jarg2; 
+  if (arg1) (arg1)->perm = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1perm_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  uchar result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  result = (uchar) ((arg1)->perm);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  memory_info_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = *(memory_info_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "memory_info_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((memory_info_t const *)arg1)->operator ==((memory_info_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  memory_info_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(memory_info_t **)&jarg1; 
+  arg2 = *(memory_info_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "memory_info_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((memory_info_t const *)arg1)->operator !=((memory_info_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1memory_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  memory_info_t *arg1 = (memory_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(memory_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->name, (const char *)arg2, 1024-1);
+      arg1->name[1024-1] = 0;
+    } else {
+      arg1->name[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  result = (char *)(char *) ((arg1)->name);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1base_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->base = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1base_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  result = (ea_t) ((arg1)->base);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1size_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  asize_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  arg2 = (asize_t)jarg2; 
+  if (arg1) (arg1)->size = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1size_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  asize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  result = (asize_t) ((arg1)->size);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1rebase_1to_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->rebase_to = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_module_1info_1t_1rebase_1to_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(module_info_t **)&jarg1; 
+  result = (ea_t) ((arg1)->rebase_to);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1module_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  module_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (module_info_t *)new module_info_t();
+  *(module_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1module_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  module_info_t *arg1 = (module_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(module_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1breakpoint_1t_1hea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  e_breakpoint_t *arg1 = (e_breakpoint_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_breakpoint_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->hea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1breakpoint_1t_1hea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  e_breakpoint_t *arg1 = (e_breakpoint_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_breakpoint_t **)&jarg1; 
+  result = (ea_t) ((arg1)->hea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1breakpoint_1t_1kea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  e_breakpoint_t *arg1 = (e_breakpoint_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_breakpoint_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->kea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1breakpoint_1t_1kea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  e_breakpoint_t *arg1 = (e_breakpoint_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_breakpoint_t **)&jarg1; 
+  result = (ea_t) ((arg1)->kea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1e_1breakpoint_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  e_breakpoint_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (e_breakpoint_t *)new e_breakpoint_t();
+  *(e_breakpoint_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1e_1breakpoint_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  e_breakpoint_t *arg1 = (e_breakpoint_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(e_breakpoint_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1code_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->code = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1code_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  result = (uint32) ((arg1)->code);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1can_1cont_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->can_cont = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1can_1cont_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  result = (bool) ((arg1)->can_cont);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1ea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->ea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1ea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  result = (ea_t) ((arg1)->ea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1info_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->info, (const char *)arg2, 1024-1);
+      arg1->info[1024-1] = 0;
+    } else {
+      arg1->info[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_e_1exception_1t_1info_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(e_exception_t **)&jarg1; 
+  result = (char *)(char *) ((arg1)->info);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1e_1exception_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  e_exception_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (e_exception_t *)new e_exception_t();
+  *(e_exception_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1e_1exception_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  e_exception_t *arg1 = (e_exception_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(e_exception_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1debug_1event_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  debug_event_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (debug_event_t *)new debug_event_t();
+  *(debug_event_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1eid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  event_id_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = (event_id_t)jarg2; 
+  if (arg1) (arg1)->eid = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1eid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  event_id_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (event_id_t) ((arg1)->eid);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1pid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  pid_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = (pid_t)jarg2; 
+  if (arg1) (arg1)->pid = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1pid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  pid_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (pid_t) ((arg1)->pid);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1tid_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  thid_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = (thid_t)jarg2; 
+  if (arg1) (arg1)->tid = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1tid_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  thid_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (thid_t) ((arg1)->tid);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1ea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->ea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1ea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (ea_t) ((arg1)->ea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1handled_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->handled = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1handled_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (bool) ((arg1)->handled);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1modinfo_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  module_info_t *arg2 = (module_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = *(module_info_t **)&jarg2; 
+  if (arg1) (arg1)->modinfo = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1modinfo_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  module_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (module_info_t *)& ((arg1)->modinfo);
+  *(module_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1exit_1code_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->exit_code = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1exit_1code_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (int) ((arg1)->exit_code);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1info_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->info, (const char *)arg2, 1024-1);
+      arg1->info[1024-1] = 0;
+    } else {
+      arg1->info[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1info_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (char *)(char *) ((arg1)->info);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1bpt_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  e_breakpoint_t *arg2 = (e_breakpoint_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = *(e_breakpoint_t **)&jarg2; 
+  if (arg1) (arg1)->bpt = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1bpt_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  e_breakpoint_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (e_breakpoint_t *)& ((arg1)->bpt);
+  *(e_breakpoint_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1exc_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  e_exception_t *arg2 = (e_exception_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = *(e_exception_t **)&jarg2; 
+  if (arg1) (arg1)->exc = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1exc_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  e_exception_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (e_exception_t *)& ((arg1)->exc);
+  *(e_exception_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_debug_1event_1t_1bpt_1ea(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  result = (ea_t)((debug_event_t const *)arg1)->bpt_ea();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1debug_1event_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(debug_event_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_BPT_1EXEC_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bpttype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bpttype_t)(bpttype_t)BPT_EXEC;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_BPT_1WRITE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bpttype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bpttype_t)(bpttype_t)BPT_WRITE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_BPT_1RDWR_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bpttype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bpttype_t)(bpttype_t)BPT_RDWR;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_BPT_1SOFT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bpttype_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bpttype_t)(bpttype_t)BPT_SOFT;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1code_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  uint arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  arg2 = (uint)jarg2; 
+  if (arg1) (arg1)->code = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1code_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  uint result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  result = (uint) ((arg1)->code);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  result = (uint32) ((arg1)->flags);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1break_1on(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  result = (bool)((exception_info_t const *)arg1)->break_on();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1handle(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  result = (bool)((exception_info_t const *)arg1)->handle();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1name_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->name = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1name_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->name);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1desc_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  qstring *arg2 = (qstring *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  arg2 = *(qstring **)&jarg2; 
+  if (arg1) (arg1)->desc = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_exception_1info_1t_1desc_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  qstring *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(exception_info_t **)&jarg1; 
+  result = (qstring *)& ((arg1)->desc);
+  *(qstring **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1exception_1info_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  exception_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (exception_info_t *)new exception_info_t();
+  *(exception_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1exception_1info_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jstring jarg4) {
+  jlong jresult = 0 ;
+  uint arg1 ;
+  uint32 arg2 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  exception_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint)jarg1; 
+  arg2 = (uint32)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = 0;
+  if (jarg4) {
+    arg4 = (char *)jenv->GetStringUTFChars(jarg4, 0);
+    if (!arg4) return 0;
+  }
+  result = (exception_info_t *)new exception_info_t(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  *(exception_info_t **)&jresult = result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  if (arg4) jenv->ReleaseStringUTFChars(jarg4, (const char *)arg4);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1exception_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  exception_info_t *arg1 = (exception_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(exception_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idd_1opinfo_1t_1addr_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->addr = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idd_1opinfo_1t_1addr_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  result = (ea_t) ((arg1)->addr);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idd_1opinfo_1t_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  uval_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  arg2 = (uval_t)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idd_1opinfo_1t_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  result = (uval_t) ((arg1)->value);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idd_1opinfo_1t_1modified_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->modified = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idd_1opinfo_1t_1modified_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  result = (bool) ((arg1)->modified);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1idd_1opinfo_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  idd_opinfo_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (idd_opinfo_t *)new idd_opinfo_t();
+  *(idd_opinfo_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1idd_1opinfo_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  idd_opinfo_t *arg1 = (idd_opinfo_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(idd_opinfo_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1rvtype_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  int32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = (int32)jarg2; 
+  if (arg1) (arg1)->rvtype = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1rvtype_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  int32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = (int32) ((arg1)->rvtype);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1ival_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  uint64 arg2 ;
+  uint64 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  argp2 = *(uint64 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint64");
+    return ;
+  }
+  arg2 = *argp2; 
+  if (arg1) (arg1)->ival = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1ival_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  uint64 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result =  ((arg1)->ival);
+  *(uint64 **)&jresult = new uint64((const uint64 &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1fval_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jintArray jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  uint16 *arg2 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  {
+    size_t ii;
+    uint16 *b = (uint16 *) arg1->fval;
+    for (ii = 0; ii < (size_t)6; ii++) b[ii] = *((uint16 *) arg2 + ii);
+  }
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jintArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1fval_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jintArray jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  uint16 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = (uint16 *)(uint16 *) ((arg1)->fval);
+  jresult = SWIG_JavaArrayOutUshort(jenv, result, 6); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1regval_1t_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  regval_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (regval_t *)new regval_t();
+  *(regval_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1regval_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(regval_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1regval_1t_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = 0 ;
+  regval_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "regval_t const & reference is null");
+    return 0;
+  } 
+  result = (regval_t *)new regval_t((regval_t const &)*arg1);
+  *(regval_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1_1assign_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  regval_t *arg2 = 0 ;
+  regval_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(regval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "regval_t const & reference is null");
+    return 0;
+  } 
+  result = (regval_t *) &(arg1)->operator =((regval_t const &)*arg2);
+  *(regval_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  regval_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(regval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "regval_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((regval_t const *)arg1)->operator ==((regval_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  regval_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(regval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "regval_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((regval_t const *)arg1)->operator !=((regval_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1set_1int(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  uint64 arg2 ;
+  uint64 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  argp2 = *(uint64 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint64");
+    return ;
+  }
+  arg2 = *argp2; 
+  (arg1)->_set_int(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1set_1float(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  ushort *arg2 = (ushort *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(ushort **)&jarg2; 
+  (arg1)->_set_float((ushort const *)arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1set_1int(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  uint64 arg2 ;
+  uint64 *argp2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  argp2 = *(uint64 **)&jarg2; 
+  if (!argp2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint64");
+    return ;
+  }
+  arg2 = *argp2; 
+  (arg1)->set_int(arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1set_1float(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  ushort *arg2 = (ushort *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(ushort **)&jarg2; 
+  (arg1)->set_float((ushort const *)arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1swap(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  regval_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(regval_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "regval_t & reference is null");
+    return ;
+  } 
+  (arg1)->swap(*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1bytes_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  bytevec_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = (bytevec_t *) &(arg1)->bytes();
+  *(bytevec_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1set_1bytes_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  uchar *arg2 = (uchar *) 0 ;
+  size_t arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  (arg1)->_set_bytes((uchar const *)arg2,arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1set_1bytes_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  bytevec_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(bytevec_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "bytevec_t const & reference is null");
+    return ;
+  } 
+  (arg1)->_set_bytes((bytevec_t const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1set_1bytes_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  uchar *arg2 = (uchar *) 0 ;
+  size_t arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  (arg1)->set_bytes((uchar const *)arg2,arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1set_1bytes_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  regval_t *arg1 = (regval_t *) 0 ;
+  bytevec_t *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(regval_t **)&jarg1; 
+  arg2 = *(bytevec_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "bytevec_t const & reference is null");
+    return ;
+  } 
+  (arg1)->set_bytes((bytevec_t const &)*arg2);
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1_1set_1bytes_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  bytevec_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = (bytevec_t *) &(arg1)->_set_bytes();
+  *(bytevec_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1set_1bytes_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  bytevec_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = (bytevec_t *) &(arg1)->set_bytes();
+  *(bytevec_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1get_1data_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  void *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = (void *)(arg1)->get_data();
+  *(void **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regval_1t_1get_1data_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  regval_t *arg1 = (regval_t *) 0 ;
+  size_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(regval_t **)&jarg1; 
+  result = ((regval_t const *)arg1)->get_data_size();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1callea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->callea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1callea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  result = (ea_t) ((arg1)->callea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1funcea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->funcea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1funcea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  result = (ea_t) ((arg1)->funcea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1fp_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->fp = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1fp_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  result = (ea_t) ((arg1)->fp);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1funcok_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->funcok = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1funcok_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  result = (bool) ((arg1)->funcok);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1_1_1eq_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  call_stack_info_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  arg2 = *(call_stack_info_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "call_stack_info_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((call_stack_info_t const *)arg1)->operator ==((call_stack_info_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1info_1t_1_1_1ne_1_1(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  call_stack_info_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  arg2 = *(call_stack_info_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "call_stack_info_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)((call_stack_info_t const *)arg1)->operator !=((call_stack_info_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1call_1stack_1info_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  call_stack_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (call_stack_info_t *)new call_stack_info_t();
+  *(call_stack_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1call_1stack_1info_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  call_stack_info_t *arg1 = (call_stack_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(call_stack_info_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1t_1dirty_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
+  call_stack_t *arg1 = (call_stack_t *) 0 ;
+  bool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_t **)&jarg1; 
+  arg2 = jarg2 ? true : false; 
+  if (arg1) (arg1)->dirty = arg2;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_call_1stack_1t_1dirty_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  call_stack_t *arg1 = (call_stack_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(call_stack_t **)&jarg1; 
+  result = (bool) ((arg1)->dirty);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1call_1stack_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  call_stack_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (call_stack_t *)new call_stack_t();
+  *(call_stack_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1call_1stack_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  call_stack_t *arg1 = (call_stack_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(call_stack_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_appcall(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4, jint jarg5, jlong jarg6, jobject jarg6_, jlong jarg7, jobject jarg7_) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  thid_t arg2 ;
+  type_t *arg3 = (type_t *) 0 ;
+  p_list *arg4 = (p_list *) 0 ;
+  int arg5 ;
+  idc_value_t *arg6 = (idc_value_t *) 0 ;
+  idc_value_t *arg7 = (idc_value_t *) 0 ;
+  error_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg6_;
+  (void)jarg7_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (thid_t)jarg2; 
+  arg3 = *(type_t **)&jarg3; 
+  arg4 = *(p_list **)&jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = *(idc_value_t **)&jarg6; 
+  arg7 = *(idc_value_t **)&jarg7; 
+  result = appcall(arg1,arg2,(unsigned char const *)arg3,(unsigned char const *)arg4,arg5,arg6,arg7);
+  *(error_t **)&jresult = new error_t((const error_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cleanup_1appcall(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jlong jresult = 0 ;
+  thid_t arg1 ;
+  error_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (thid_t)jarg1; 
+  result = cleanup_appcall(arg1);
+  *(error_t **)&jresult = new error_t((const error_t &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_handle_1debug_1event(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jint jresult = 0 ;
+  debug_event_t *arg1 = (debug_event_t *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(debug_event_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)handle_debug_event((debug_event_t const *)arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ieee_1ezero_1set(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  {
+    size_t ii;
+    unsigned short *b = (unsigned short *) ieee_ezero;
+    for (ii = 0; ii < (size_t)6; ii++) b[ii] = *((unsigned short *) arg1 + ii);
+  }
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT jintArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ieee_1ezero_1get(JNIEnv *jenv, jclass jcls) {
+  jintArray jresult = 0 ;
+  uint16 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint16 *)ieee_ezero;
+  jresult = SWIG_JavaArrayOutUshort(jenv, result, 6); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ieee_1eone_1set(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  {
+    size_t ii;
+    unsigned short *b = (unsigned short *) ieee_eone;
+    for (ii = 0; ii < (size_t)6; ii++) b[ii] = *((unsigned short *) arg1 + ii);
+  }
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT jintArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ieee_1eone_1get(JNIEnv *jenv, jclass jcls) {
+  jintArray jresult = 0 ;
+  uint16 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint16 *)ieee_eone;
+  jresult = SWIG_JavaArrayOutUshort(jenv, result, 6); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ecleaz(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != (6+3)) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  ecleaz(arg1);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_emovo(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2) {
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != (6+3)) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  emovo(arg1,arg2);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg1; 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_emovi(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2) {
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != (6+3)) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  emovi(arg1,arg2);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg1; 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eshift(JNIEnv *jenv, jclass jcls, jintArray jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  int arg2 ;
+  jint *jarr1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != (6+3)) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  arg2 = (int)jarg2; 
+  result = (int)eshift(arg1,arg2);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_emdnorm(JNIEnv *jenv, jclass jcls, jintArray jarg1, jint jarg2, jint jarg3, jint jarg4, jint jarg5) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int32 arg4 ;
+  int arg5 ;
+  jint *jarr1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != (6+3)) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  arg2 = (int)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (int32)jarg4; 
+  arg5 = (int)jarg5; 
+  result = (int)emdnorm(arg1,arg2,arg3,arg4,arg5);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_realcvt(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  void *arg1 = (void *) 0 ;
+  uint16 *arg2 ;
+  uint16 arg3 ;
+  jint *jarr2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(void **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  arg3 = (uint16)jarg3; 
+  result = (int)realcvt(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_l_1realcvt(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  void *arg1 = (void *) 0 ;
+  uint16 *arg2 ;
+  uint16 arg3 ;
+  jint *jarr2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(void **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  arg3 = (uint16)jarg3; 
+  result = (int)l_realcvt(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_b_1realcvt(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  void *arg1 = (void *) 0 ;
+  uint16 *arg2 ;
+  uint16 arg3 ;
+  jint *jarr2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(void **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  arg3 = (uint16)jarg3; 
+  result = (int)b_realcvt(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ieee_1realcvt(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2, jint jarg3) {
+  jint jresult = 0 ;
+  void *arg1 = (void *) 0 ;
+  uint16 *arg2 ;
+  uint16 arg3 ;
+  jint *jarr2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(void **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  arg3 = (uint16)jarg3; 
+  result = (int)ieee_realcvt(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_realtoasc(JNIEnv *jenv, jclass jcls, jintArray jarg1, jstring jarg2, jlong jarg3, jlong jarg4) {
+  uint16 *arg1 ;
+  char *arg2 = (char *) 0 ;
+  size_t arg3 ;
+  uint arg4 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  arg3 = (size_t)jarg3; 
+  arg4 = (uint)jarg4; 
+  realtoasc(arg1,arg2,arg3,arg4);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_asctoreal(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2) {
+  jint jresult = 0 ;
+  char **arg1 = (char **) 0 ;
+  uint16 *arg2 ;
+  jint *jarr2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(char ***)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  result = (int)asctoreal((char const **)arg1,arg2);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eltoe(JNIEnv *jenv, jclass jcls, jint jarg1, jintArray jarg2) {
+  sval_t arg1 ;
+  uint16 *arg2 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (sval_t)jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  eltoe(arg1,arg2);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eltoe64(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2) {
+  int64 arg1 ;
+  uint16 *arg2 ;
+  int64 *argp1 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(int64 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null int64");
+    return ;
+  }
+  arg1 = *argp1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  eltoe64(arg1,arg2);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eltoe64u(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2) {
+  uint64 arg1 ;
+  uint16 *arg2 ;
+  uint64 *argp1 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(uint64 **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null uint64");
+    return ;
+  }
+  arg1 = *argp1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  eltoe64u(arg1,arg2);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eetol(JNIEnv *jenv, jclass jcls, jintArray jarg1, jlong jarg2, jboolean jarg3) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  sval_t *arg2 = (sval_t *) 0 ;
+  bool arg3 ;
+  jint *jarr1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  arg2 = *(sval_t **)&jarg2; 
+  arg3 = jarg3 ? true : false; 
+  result = (int)eetol(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eetol64(JNIEnv *jenv, jclass jcls, jintArray jarg1, jlong jarg2, jboolean jarg3) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  int64 *arg2 = (int64 *) 0 ;
+  bool arg3 ;
+  jint *jarr1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  arg2 = *(int64 **)&jarg2; 
+  arg3 = jarg3 ? true : false; 
+  result = (int)eetol64(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eetol64u(JNIEnv *jenv, jclass jcls, jintArray jarg1, jlong jarg2, jboolean jarg3) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  uint64 *arg2 = (uint64 *) 0 ;
+  bool arg3 ;
+  jint *jarr1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  arg2 = *(uint64 **)&jarg2; 
+  arg3 = jarg3 ? true : false; 
+  result = (int)eetol64u(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eldexp(JNIEnv *jenv, jclass jcls, jintArray jarg1, jint jarg2, jintArray jarg3) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  int32 arg2 ;
+  uint16 *arg3 ;
+  jint *jarr1 ;
+  jint *jarr3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  arg2 = (int32)jarg2; 
+  if (jarg3 && jenv->GetArrayLength(jarg3) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr3, &arg3, jarg3)) return 0; 
+  result = (int)eldexp(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr3, arg3, jarg3); 
+  delete [] arg1; 
+  delete [] arg3; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eadd(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2, jintArray jarg3, jint jarg4) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  uint16 *arg3 ;
+  int arg4 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  jint *jarr3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  if (jarg3 && jenv->GetArrayLength(jarg3) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr3, &arg3, jarg3)) return 0; 
+  arg4 = (int)jarg4; 
+  result = (int)eadd(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr3, arg3, jarg3); 
+  delete [] arg1; 
+  delete [] arg2; 
+  delete [] arg3; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_emul(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2, jintArray jarg3) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  uint16 *arg3 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  jint *jarr3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  if (jarg3 && jenv->GetArrayLength(jarg3) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr3, &arg3, jarg3)) return 0; 
+  result = (int)emul(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr3, arg3, jarg3); 
+  delete [] arg1; 
+  delete [] arg2; 
+  delete [] arg3; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ediv(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2, jintArray jarg3) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  uint16 *arg3 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  jint *jarr3 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  if (jarg3 && jenv->GetArrayLength(jarg3) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr3, &arg3, jarg3)) return 0; 
+  result = (int)ediv(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr3, arg3, jarg3); 
+  delete [] arg1; 
+  delete [] arg2; 
+  delete [] arg3; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eclear(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  eclear(arg1);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_emov(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2) {
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return ; 
+  emov(arg1,arg2);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg1; 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eabs(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  eabs(arg1);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_eneg(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return ; 
+  eneg(arg1);
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_esign(JNIEnv *jenv, jclass jcls, jintArray jarg1) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  jint *jarr1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  result = (int)esign(arg1);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ecmp(JNIEnv *jenv, jclass jcls, jintArray jarg1, jintArray jarg2) {
+  jint jresult = 0 ;
+  uint16 *arg1 ;
+  uint16 *arg2 ;
+  jint *jarr1 ;
+  jint *jarr2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr1, &arg1, jarg1)) return 0; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 6) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInUshort(jenv, &jarr2, &arg2, jarg2)) return 0; 
+  result = (int)ecmp(arg1,arg2);
+  jresult = (jint)result; 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUshort(jenv, jarr2, arg2, jarg2); 
+  delete [] arg1; 
+  delete [] arg2; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_tasm_1ideal(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)tasm_ideal();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REX_1W_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)REX_W;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REX_1R_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)REX_R;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REX_1X_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)REX_X;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_REX_1B_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)REX_B;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_insn_1default_1opsize_164(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)insn_default_opsize_64();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mode16(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)mode16();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mode32(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)mode32();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mode64(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)mode64();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_natad(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)natad();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_natop(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)natop();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ad16(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)ad16();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ad32(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)ad32();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ad64(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)ad64();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op16(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)op16();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op32(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)op32();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op64(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)op64();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_sib_1base(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)sib_base((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_sib_1index(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jshort jresult = 0 ;
+  op_t *arg1 = 0 ;
+  regnum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (regnum_t)sib_index((op_t const &)*arg1);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_sib_1scale(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)sib_scale((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_x86_1base(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)x86_base((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_INDEX_1NONE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(int)INDEX_NONE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_x86_1index(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)x86_index((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_x86_1scale(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)x86_scale((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_has_1displ(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)has_displ((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_has_1stack_1displ(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)has_stack_displ((op_t const &)*arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_address_1dtyp(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)address_dtyp();
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_operand_1dtyp(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)operand_dtyp();
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1io_1insn(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)is_io_insn();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1node_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  netnode arg1 ;
+  netnode *argp1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(netnode **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null netnode");
+    return ;
+  }
+  arg1 = *argp1; 
+  intel_node = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1node_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  netnode result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = intel_node;
+  *(netnode **)&jresult = new netnode((const netnode &)result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)fbase_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_frame_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)frame_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_purge_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)purge_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ret_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)ret_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)pushinfo_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1ptr_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)is_ptr_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_finally_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)finally_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_handler_1tag_1get(JNIEnv *jenv, jclass jcls) {
+  jchar jresult = 0 ;
+  char result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char)(char)handler_tag;
+  jresult = (jchar)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1value_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->value = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1value_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  result = (ea_t) ((arg1)->value);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1minea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->minea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1minea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  result = (ea_t) ((arg1)->minea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1reg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  int16 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  arg2 = (int16)jarg2; 
+  if (arg1) (arg1)->reg = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1reg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  int16 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  result = (int16) ((arg1)->reg);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1unused_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  int16 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  arg2 = (int16)jarg2; 
+  if (arg1) (arg1)->unused = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_fbase_1reg_1t_1unused_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  int16 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  result = (int16) ((arg1)->unused);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1fbase_1reg_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  fbase_reg_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (fbase_reg_t *)new fbase_reg_t();
+  *(fbase_reg_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1fbase_1reg_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  fbase_reg_t *arg1 = (fbase_reg_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(fbase_reg_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1fbase_1reg_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  fbase_reg_t *arg2 = (fbase_reg_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(fbase_reg_t **)&jarg2; 
+  result = (bool)get_fbase_reg(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1fbase_1reg_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)get_fbase_reg(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1fbase_1reg(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3, jlong jarg4) {
+  ea_t arg1 ;
+  ea_t arg2 ;
+  int arg3 ;
+  ea_t arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  arg3 = (int)jarg3; 
+  arg4 = (ea_t)jarg4; 
+  set_fbase_reg(arg1,arg2,arg3,arg4);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1ret_1target(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  ea_t *arg2 = (ea_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(ea_t **)&jarg2; 
+  result = (bool)get_ret_target(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_set_1ret_1target(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  set_ret_target(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1ret_1target(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  del_ret_target(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_loading_1complete_1set(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
+  bool arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = jarg1 ? true : false; 
+  loading_complete = arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_loading_1complete_1get(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)loading_complete;
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_prolog_1color_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  bgcolor_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (bgcolor_t)jarg1; 
+  prolog_color = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_prolog_1color_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  bgcolor_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bgcolor_t)prolog_color;
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_epilog_1color_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  bgcolor_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (bgcolor_t)jarg1; 
+  epilog_color = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_epilog_1color_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  bgcolor_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bgcolor_t)epilog_color;
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_switch_1color_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  bgcolor_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (bgcolor_t)jarg1; 
+  switch_color = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_switch_1color_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  bgcolor_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bgcolor_t)switch_color;
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idpflags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  uint32 arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  idpflags = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_idpflags_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint32)idpflags;
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1push(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_push();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1nop(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_nop();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1movoff(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_movoff();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1movoff2(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_movoff2();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1zeroins(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_zeroins();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1brtti(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_brtti();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1urtti(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_urtti();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1fexp(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_fexp();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1difbase(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_difbase();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1nopref(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_nopref();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1vxd(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_vxd();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1fpemu(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_fpemu();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1showrip(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_showrip();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_should_1af_1seh(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)should_af_seh();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_indent_1spaces(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  size_t arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (size_t)jarg1; 
+  result = (int)indent_spaces(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1segreg(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)is_segreg(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1mmxreg(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)is_mmxreg(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1xmmreg(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)is_xmmreg(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cvt_1to_1wholereg(JNIEnv *jenv, jclass jcls, jint jarg1, jboolean jarg2) {
+  jint jresult = 0 ;
+  int arg1 ;
+  bool arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = jarg2 ? true : false; 
+  result = (int)cvt_to_wholereg(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1arith_1lea(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)is_arith_lea((op_t const &)*arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1forbidden_1imul_1flag(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = 0 ;
+  flags_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  arg2 = (flags_t)jarg2; 
+  result = (bool)is_forbidden_imul_flag((op_t const &)*arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1push_1ecx(JNIEnv *jenv, jclass jcls, jshort jarg1) {
+  jboolean jresult = 0 ;
+  uchar arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uchar)jarg1; 
+  result = (bool)is_push_ecx(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1push_1eax(JNIEnv *jenv, jclass jcls, jshort jarg1) {
+  jboolean jresult = 0 ;
+  uchar arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uchar)jarg1; 
+  result = (bool)is_push_eax(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1push_1edx(JNIEnv *jenv, jclass jcls, jshort jarg1) {
+  jboolean jresult = 0 ;
+  uchar arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uchar)jarg1; 
+  result = (bool)is_push_edx(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1push_1ebx(JNIEnv *jenv, jclass jcls, jshort jarg1) {
+  jboolean jresult = 0 ;
+  uchar arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uchar)jarg1; 
+  result = (bool)is_push_ebx(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1volatile_1reg(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)is_volatile_reg(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_getDS(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  sel_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (sel_t)getDS(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_getES(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  sel_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (sel_t)getES(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_getSS(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  sel_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (sel_t)getSS(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_getFS(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  sel_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (sel_t)getFS(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_getGS(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  sel_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (sel_t)getGS(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1header(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  intel_header();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1footer(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  intel_footer();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1assumes(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  intel_assumes(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1segstart(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  intel_segstart(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1segend(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  intel_segend(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_intel_1out(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  intel_out();
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_gen_1stkvar_1def(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2, jlong jarg3, jobject jarg3_, jint jarg4) {
+  char *arg1 = (char *) 0 ;
+  size_t arg2 ;
+  member_t *arg3 = (member_t *) 0 ;
+  sval_t arg4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg3_;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return ;
+  }
+  arg2 = (size_t)jarg2; 
+  arg3 = *(member_t **)&jarg3; 
+  arg4 = (sval_t)jarg4; 
+  gen_stkvar_def(arg1,arg2,(member_t const *)arg3,arg4);
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1type_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  flags_t arg1 ;
+  ea_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (flags_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)get_type_name(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1align_1insn(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (int)is_align_insn(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1segval(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  op_t *arg1 = 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (ea_t)get_segval((op_t const &)*arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1mem_1ea(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  op_t *arg1 = 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (ea_t)get_mem_ea((op_t const &)*arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1imm_1outf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)get_imm_outf((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1displ_1outf(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)get_displ_outf((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1data(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  pc_data(arg1);
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1ana(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)pc_ana();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1emu(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)pc_emu();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1outop(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t & reference is null");
+    return 0;
+  } 
+  result = (bool)pc_outop(*arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1ea_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->ea = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1ea_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  result = (ea_t) ((arg1)->ea);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1off_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  uval_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  arg2 = (uval_t)jarg2; 
+  if (arg1) (arg1)->off = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1off_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  result = (uval_t) ((arg1)->off);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1width_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  uval_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  arg2 = (uval_t)jarg2; 
+  if (arg1) (arg1)->width = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1width_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  result = (uval_t) ((arg1)->width);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1reg_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshort jarg2) {
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  regnum_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  arg2 = (regnum_t)jarg2; 
+  if (arg1) (arg1)->reg = arg2;
+}
+
+
+SWIGEXPORT jshort JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushreg_1t_1reg_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshort jresult = 0 ;
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  regnum_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushreg_t **)&jarg1; 
+  result = (regnum_t) ((arg1)->reg);
+  jresult = (jshort)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1pushreg_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  pushreg_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (pushreg_t *)new pushreg_t();
+  *(pushreg_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1pushreg_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  pushreg_t *arg1 = (pushreg_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(pushreg_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1flags_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->flags = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1flags_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (int) ((arg1)->flags);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1psi_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  qvector< pushreg_t > *arg2 = (qvector< pushreg_t > *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = *(qvector< pushreg_t > **)&jarg2; 
+  if (arg1) (arg1)->psi = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1psi_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  qvector< pushreg_t > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (qvector< pushreg_t > *)& ((arg1)->psi);
+  *(qvector< pushreg_t > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1bpidx_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  ssize_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (ssize_t)jarg2; 
+  if (arg1) (arg1)->bpidx = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1bpidx_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (ssize_t) ((arg1)->bpidx);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1spoiled_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  uint32 arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (uint32)jarg2; 
+  if (arg1) (arg1)->spoiled = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1spoiled_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (uint32) ((arg1)->spoiled);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1prolog_1insns_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  eavec_t *arg2 = (eavec_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = *(eavec_t **)&jarg2; 
+  if (arg1) (arg1)->prolog_insns = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1prolog_1insns_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  eavec_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (eavec_t *)& ((arg1)->prolog_insns);
+  *(eavec_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1pops_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  pushinfo_t::pop_info_t *arg2 = (pushinfo_t::pop_info_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = *(pushinfo_t::pop_info_t **)&jarg2; 
+  if (arg1) (arg1)->pops = *arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1pops_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  pushinfo_t::pop_info_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (pushinfo_t::pop_info_t *)& ((arg1)->pops);
+  *(pushinfo_t::pop_info_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1eh_1type_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  int arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  if (arg1) (arg1)->eh_type = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1eh_1type_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (int) ((arg1)->eh_type);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1eh_1info_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  if (arg1) (arg1)->eh_info = arg2;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1eh_1info_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  result = (ea_t) ((arg1)->eh_info);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1pushinfo_1t(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  pushinfo_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (pushinfo_t *)new pushinfo_t();
+  *(pushinfo_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1verify(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jint jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  func_t *arg2 = (func_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = *(func_t **)&jarg2; 
+  result = (int)(arg1)->verify(arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1save_1to_1idb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  (arg1)->save_to_idb(arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pushinfo_1t_1restore_1from_1idb(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jboolean jresult = 0 ;
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  ea_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  result = (bool)(arg1)->restore_from_idb(arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1pushinfo_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  pushinfo_t *arg1 = (pushinfo_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(pushinfo_t **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1spec_1func_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  sval_t *arg2 = (sval_t *) 0 ;
+  spec_func_type_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(sval_t **)&jarg2; 
+  result = (spec_func_type_t)get_spec_func_type(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_spoils_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  uint32 *arg1 = (uint32 *) 0 ;
+  int arg2 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(uint32 **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (int)spoils((unsigned int const *)arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_spoils_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)spoils(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_find_1reg_1value(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  sval_t *arg2 = (sval_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = *(sval_t **)&jarg2; 
+  result = (bool)find_reg_value(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1switch(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  switch_info_ex_t *arg1 = (switch_info_ex_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(switch_info_ex_t **)&jarg1; 
+  result = (bool)is_switch(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_equal_1ops(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = 0 ;
+  op_t *arg2 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  arg2 = *(op_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (bool)equal_ops((op_t const &)*arg1,(op_t const &)*arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_sp_1based(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  op_t *arg1 = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(op_t **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t const & reference is null");
+    return 0;
+  } 
+  result = (int)sp_based((op_t const &)*arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_create_1func_1frame(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  func_t *arg1 = (func_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  result = (bool)create_func_frame(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1jump_1func(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  func_t *arg1 = (func_t *) 0 ;
+  ea_t *arg2 = (ea_t *) 0 ;
+  ea_t *arg3 = (ea_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  arg2 = *(ea_t **)&jarg2; 
+  arg3 = *(ea_t **)&jarg3; 
+  result = (int)is_jump_func(arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1alloca_1probe(JNIEnv *jenv, jclass jcls, jstring jarg1) {
+  jboolean jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)jenv->GetStringUTFChars(jarg1, 0);
+    if (!arg1) return 0;
+  }
+  result = (bool)is_alloca_probe((char const *)arg1);
+  jresult = (jboolean)result; 
+  if (arg1) jenv->ReleaseStringUTFChars(jarg1, (const char *)arg1);
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_check_1new_1name(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  ea_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  check_new_name(arg1,(char const *)arg2);
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1stack_1changing_1func(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_stack_changing_func(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_verify_1sp(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  func_t *arg1 = (func_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  result = (bool)verify_sp(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_find_1callee_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  bool *arg1 = (bool *) 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(bool **)&jarg1; 
+  result = (ea_t)find_callee(arg1);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_find_1callee_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (ea_t)find_callee();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1calc_1purged_1from_1type(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  type_t *arg1 = (type_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(type_t **)&jarg1; 
+  result = (int)pc_calc_purged_from_type((unsigned char const *)arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1calc_1arglocs(JNIEnv *jenv, jclass jcls, jlong jarg1, jshort jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  type_t *arg1 = (type_t *) 0 ;
+  cm_t arg2 ;
+  uint32 *arg3 = (uint32 *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(type_t **)&jarg1; 
+  arg2 = (cm_t)jarg2; 
+  arg3 = *(uint32 **)&jarg3; 
+  result = (int)pc_calc_arglocs((unsigned char const *)arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1calc_1varglocs(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3, jlong jarg4, jlong jarg5) {
+  jint jresult = 0 ;
+  func_type_info_t *arg1 = (func_type_info_t *) 0 ;
+  int arg2 ;
+  type_t **arg3 = (type_t **) 0 ;
+  argloc_t *arg4 = (argloc_t *) 0 ;
+  regobjs_t *arg5 = (regobjs_t *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(func_type_info_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = *(type_t ***)&jarg3; 
+  arg4 = *(argloc_t **)&jarg4; 
+  arg5 = *(regobjs_t **)&jarg5; 
+  result = (int)pc_calc_varglocs((func_type_info_t const *)arg1,arg2,(unsigned char const *const *)arg3,arg4,arg5);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1calc_1retloc(JNIEnv *jenv, jclass jcls, jlong jarg1, jshort jarg2, jlong jarg3) {
+  jint jresult = 0 ;
+  type_t *arg1 = (type_t *) 0 ;
+  cm_t arg2 ;
+  uint32 *arg3 = (uint32 *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(type_t **)&jarg1; 
+  arg2 = (cm_t)jarg2; 
+  arg3 = *(uint32 **)&jarg3; 
+  result = (int)pc_calc_retloc((unsigned char const *)arg1,arg2,arg3);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1use_1stkvar_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jstring jarg3) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  type_t *arg2 = (type_t *) 0 ;
+  char *arg3 = (char *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(type_t **)&jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  result = (bool)pc_use_stkvar_type(arg1,(unsigned char const *)arg2,(char const *)arg3);
+  jresult = (jboolean)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1use_1regvar_1type(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  type_t **arg2 = (type_t **) 0 ;
+  char **arg3 = (char **) 0 ;
+  uint32 *arg4 = (uint32 *) 0 ;
+  int arg5 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(type_t ***)&jarg2; 
+  arg3 = *(char ***)&jarg3; 
+  arg4 = *(uint32 **)&jarg4; 
+  arg5 = (int)jarg5; 
+  result = (int)pc_use_regvar_type(arg1,(unsigned char const *const *)arg2,(char const *const *)arg3,(unsigned int const *)arg4,arg5);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_use_1pc_1arg_1types(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3, jlong jarg4, jint jarg5, jlong jarg6, jlong jarg7, jlong jarg8, jint jarg9) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  type_t **arg2 = (type_t **) 0 ;
+  char **arg3 = (char **) 0 ;
+  uint32 *arg4 = (uint32 *) 0 ;
+  int arg5 ;
+  type_t **arg6 = (type_t **) 0 ;
+  char **arg7 = (char **) 0 ;
+  uint32 *arg8 = (uint32 *) 0 ;
+  int arg9 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(type_t ***)&jarg2; 
+  arg3 = *(char ***)&jarg3; 
+  arg4 = *(uint32 **)&jarg4; 
+  arg5 = (int)jarg5; 
+  arg6 = *(type_t ***)&jarg6; 
+  arg7 = *(char ***)&jarg7; 
+  arg8 = *(uint32 **)&jarg8; 
+  arg9 = (int)jarg9; 
+  result = (int)use_pc_arg_types(arg1,(unsigned char const *const *)arg2,(char const *const *)arg3,(unsigned int const *)arg4,arg5,(unsigned char const **)arg6,(char const **)arg7,arg8,arg9);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1fastcall_1regs(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  int **arg1 = (int **) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(int ***)&jarg1; 
+  result = (int)get_fastcall_regs((int const **)arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1thiscall_1regs(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  int **arg1 = (int **) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(int ***)&jarg1; 
+  result = (int)get_thiscall_regs((int const **)arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_calc_1cdecl_1purged_1bytes(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  ea_t arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (int)calc_cdecl_purged_bytes(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_calc_1sp_1delta(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  sval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (sval_t)calc_sp_delta();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_analyze_1frame(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4, jlong jarg5, jlong jarg6, jintArray jarg7) {
+  jlong jresult = 0 ;
+  func_t *arg1 = (func_t *) 0 ;
+  bool *arg2 = (bool *) 0 ;
+  uval_t *arg3 = (uval_t *) 0 ;
+  uval_t *arg4 = (uval_t *) 0 ;
+  uval_t *arg5 = (uval_t *) 0 ;
+  sval_t *arg6 = (sval_t *) 0 ;
+  sval_t *arg7 ;
+  jint *jarr7 ;
+  uval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  arg2 = *(bool **)&jarg2; 
+  arg3 = *(uval_t **)&jarg3; 
+  arg4 = *(uval_t **)&jarg4; 
+  arg5 = *(uval_t **)&jarg5; 
+  arg6 = *(sval_t **)&jarg6; 
+  if (jarg7 && jenv->GetArrayLength(jarg7) != 2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return 0;
+  }
+  if (!SWIG_JavaArrayInInt(jenv, &jarr7, &arg7, jarg7)) return 0; 
+  result = (uval_t)analyze_frame(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
+  jresult = (jlong)result; 
+  SWIG_JavaArrayArgoutInt(jenv, jarr7, arg7, jarg7); 
+  delete [] arg7; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1additional_1frame_1info(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  func_t *arg1 = (func_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  del_additional_frame_info(arg1);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_calc_1func_1call_1delta(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3, jlong jarg4) {
+  jboolean jresult = 0 ;
+  func_t *arg1 = (func_t *) 0 ;
+  ea_t arg2 ;
+  sval_t *arg3 = (sval_t *) 0 ;
+  spec_func_type_t *arg4 = (spec_func_type_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  arg2 = (ea_t)jarg2; 
+  arg3 = *(sval_t **)&jarg3; 
+  arg4 = *(spec_func_type_t **)&jarg4; 
+  result = (bool)calc_func_call_delta(arg1,arg2,arg3,arg4);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_calc_1ebp_1phrase(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+  jint jresult = 0 ;
+  func_t *arg1 = (func_t *) 0 ;
+  op_t *arg2 = 0 ;
+  sval_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  arg2 = *(op_t **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "op_t & reference is null");
+    return 0;
+  } 
+  result = (sval_t)calc_ebp_phrase(arg1,*arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1pc_1return(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
+  jboolean jresult = 0 ;
+  bool arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = jarg1 ? true : false; 
+  result = (bool)is_pc_return(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1move_1insn(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)is_move_insn();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_setup_1til(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  setup_til();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1userland_1app(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)is_userland_app();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1userland_1pe(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)is_userland_pe();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1sp_1off_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  ushort arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  arg2 = (ushort)jarg2; 
+  if (arg1) (arg1)->sp_off = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1sp_1off_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  ushort result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  result = (ushort) ((arg1)->sp_off);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1prm_1pos_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  ushort arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  arg2 = (ushort)jarg2; 
+  if (arg1) (arg1)->prm_pos = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1prm_1pos_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  ushort result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  result = (ushort) ((arg1)->prm_pos);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1cmt_1pos_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  ushort arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  arg2 = (ushort)jarg2; 
+  if (arg1) (arg1)->cmt_pos = arg2;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1cmt_1pos_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  ushort result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  result = (ushort) ((arg1)->cmt_pos);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1strings_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  char *arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)jenv->GetStringUTFChars(jarg2, 0);
+    if (!arg2) return ;
+  }
+  {
+    if(arg2) {
+      strncpy((char*)arg1->strings, (const char *)arg2, 1024-1);
+      arg1->strings[1024-1] = 0;
+    } else {
+      arg1->strings[0] = 0;
+    }
+  }
+  
+  if (arg2) jenv->ReleaseStringUTFChars(jarg2, (const char *)arg2);
+}
+
+
+SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1info_1strings_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  result = (char *)(char *) ((arg1)->strings);
+  if (result) jresult = jenv->NewStringUTF((const char *)result);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1vxd_1info(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  vxd_info *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (vxd_info *)new vxd_info();
+  *(vxd_info **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1vxd_1info(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(vxd_info **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1vxd_1interrupt(JNIEnv *jenv, jclass jcls) {
+  jboolean jresult = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (bool)is_vxd_interrupt();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_vxd_1information(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  vxd_info *arg1 = (vxd_info *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(vxd_info **)&jarg1; 
+  result = (bool)vxd_information(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1move_1segm(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jobject jarg2_) {
+  ea_t arg1 ;
+  segment_t *arg2 = (segment_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = (ea_t)jarg1; 
+  arg2 = *(segment_t **)&jarg2; 
+  pc_move_segm(arg1,arg2);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_borland_1template(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  va_list arg1 ;
+  va_list *argp1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(va_list **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null va_list");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = (bool)borland_template(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_borland_1coagulate(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  va_list arg1 ;
+  va_list *argp1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  argp1 = *(va_list **)&jarg1; 
+  if (!argp1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null va_list");
+    return 0;
+  }
+  arg1 = *argp1; 
+  result = (int)borland_coagulate(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_borland_1signature(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  borland_signature();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_get_1codeseq_1target(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jlong jresult = 0 ;
+  ea_t arg1 ;
+  ea_t arg2 ;
+  ea_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  result = (ea_t)get_codeseq_target(arg1,arg2);
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cover_1func_1finalize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  func_t *arg1 = (func_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  cover_func_finalize(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_compiler_1finalize(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  compiler_finalize();
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1sane_1insn(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  jboolean jresult = 0 ;
+  int arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  result = (bool)is_sane_insn(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_may_1be_1func_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jboolean jarg1) {
+  jint jresult = 0 ;
+  bool arg1 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = jarg1 ? true : false; 
+  result = (int)may_be_func(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_may_1be_1func_1_1SWIG_11(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)may_be_func();
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_validate_1flirt_1func(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)validate_flirt_func(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_might_1change_1sp(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)might_change_sp(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_parse_1func_1seh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  func_t *arg1 = (func_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  parse_func_seh(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reattach_1handler_1block_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  ea_t arg1 ;
+  ea_t arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  reattach_handler_block(arg1,arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_reattach_1handler_1block_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  ea_t arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  reattach_handler_block(arg1);
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_label_1seh_1table(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  ea_t arg2 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  arg2 = (ea_t)jarg2; 
+  result = (bool)label_seh_table(arg1,arg2);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1get_1reg_1name(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jstring jarg3, jlong jarg4, jint jarg5) {
+  jint jresult = 0 ;
+  int arg1 ;
+  size_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  int arg5 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (size_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  arg5 = (int)jarg5; 
+  result = (ssize_t)pc_get_reg_name(arg1,arg2,arg3,arg4,arg5);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pc_1get_1one_1reg_1name(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jstring jarg3, jlong jarg4) {
+  jint jresult = 0 ;
+  int arg1 ;
+  size_t arg2 ;
+  char *arg3 = (char *) 0 ;
+  size_t arg4 ;
+  ssize_t result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  arg2 = (size_t)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)jenv->GetStringUTFChars(jarg3, 0);
+    if (!arg3) return 0;
+  }
+  arg4 = (size_t)jarg4; 
+  result = (ssize_t)pc_get_one_reg_name(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+  if (arg3) jenv->ReleaseStringUTFChars(jarg3, (const char *)arg3);
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1segment_1normal(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_segment_normal(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1seh_1entry(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_seh_entry(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is_1local_1label(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  ea_t arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (ea_t)jarg1; 
+  result = (bool)is_local_label(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_del_1func_1seh(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  func_t *arg1 = (func_t *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(func_t **)&jarg1; 
+  del_func_seh(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_procnum_1set(JNIEnv *jenv, jclass jcls, jint jarg1) {
+  int arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (int)jarg1; 
+  procnum = arg1;
+}
+
+
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_procnum_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)procnum;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pflag_1set(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  uint32 arg1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  pflag = arg1;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_pflag_1get(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  uint32 result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (uint32)pflag;
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_isProtected(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)isProtected(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_isAMD(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)isAMD(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_isp4(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)isp4(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_isp3(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)isp3(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is3dnow(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)is3dnow(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_ismmx(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)ismmx(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_isp2(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)isp2(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is686(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)is686(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is586(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)is586(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is486(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)is486(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is386(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)is386(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_is286(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jboolean jresult = 0 ;
+  uint32 arg1 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = (uint32)jarg1; 
+  result = (bool)is286(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Context_1buf_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlongArray jarg2) {
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  uint32 *arg2 ;
+  jlong *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUint(jenv, &jarr2, &arg2, jarg2)) return ; 
+  {
+    size_t ii;
+    uint32 *b = (uint32 *) arg1->buf;
+    for (ii = 0; ii < (size_t)4; ii++) b[ii] = *((uint32 *) arg2 + ii);
+  }
+  SWIG_JavaArrayArgoutUint(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jlongArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Context_1buf_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlongArray jresult = 0 ;
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  uint32 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  result = (uint32 *)(uint32 *) ((arg1)->buf);
+  jresult = SWIG_JavaArrayOutUint(jenv, result, 4); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Context_1bits_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlongArray jarg2) {
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  uint32 *arg2 ;
+  jlong *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUint(jenv, &jarr2, &arg2, jarg2)) return ; 
+  {
+    size_t ii;
+    uint32 *b = (uint32 *) arg1->bits;
+    for (ii = 0; ii < (size_t)2; ii++) b[ii] = *((uint32 *) arg2 + ii);
+  }
+  SWIG_JavaArrayArgoutUint(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jlongArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Context_1bits_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlongArray jresult = 0 ;
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  uint32 *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  result = (uint32 *)(uint32 *) ((arg1)->bits);
+  jresult = SWIG_JavaArrayOutUint(jenv, result, 2); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Context_1in_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jshortArray jarg2) {
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  unsigned char *arg2 ;
+  jshort *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 64) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUchar(jenv, &jarr2, &arg2, jarg2)) return ; 
+  {
+    size_t ii;
+    unsigned char *b = (unsigned char *) arg1->in;
+    for (ii = 0; ii < (size_t)64; ii++) b[ii] = *((unsigned char *) arg2 + ii);
+  }
+  SWIG_JavaArrayArgoutUchar(jenv, jarr2, arg2, jarg2); 
+  delete [] arg2; 
+}
+
+
+SWIGEXPORT jshortArray JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Context_1in_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jshortArray jresult = 0 ;
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  unsigned char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  result = (unsigned char *)(unsigned char *) ((arg1)->in);
+  jresult = SWIG_JavaArrayOutUchar(jenv, result, 64); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_new_1MD5Context(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  MD5Context *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (MD5Context *)new MD5Context();
+  *(MD5Context **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1MD5Context(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(MD5Context **)&jarg1; 
+  delete arg1;
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Init(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  MD5Init(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Update(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jlong jarg3) {
+  MD5Context *arg1 = (MD5Context *) 0 ;
+  uchar *arg2 = (uchar *) 0 ;
+  size_t arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(MD5Context **)&jarg1; 
+  arg2 = *(uchar **)&jarg2; 
+  arg3 = (size_t)jarg3; 
+  MD5Update(arg1,(unsigned char const *)arg2,arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Final(JNIEnv *jenv, jclass jcls, jshortArray jarg1, jlong jarg2, jobject jarg2_) {
+  uchar *arg1 ;
+  MD5Context *arg2 = (MD5Context *) 0 ;
+  jshort *jarr1 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 16) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUchar(jenv, &jarr1, &arg1, jarg1)) return ; 
+  arg2 = *(MD5Context **)&jarg2; 
+  MD5Final(arg1,arg2);
+  SWIG_JavaArrayArgoutUchar(jenv, jarr1, arg1, jarg1); 
+  delete [] arg1; 
+}
+
+
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_MD5Transform(JNIEnv *jenv, jclass jcls, jlongArray jarg1, jlongArray jarg2) {
+  uint32 *arg1 ;
+  uint32 *arg2 ;
+  jlong *jarr1 ;
+  jlong *jarr2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  if (jarg1 && jenv->GetArrayLength(jarg1) != 4) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUint(jenv, &jarr1, &arg1, jarg1)) return ; 
+  if (jarg2 && jenv->GetArrayLength(jarg2) != 16) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "incorrect array size");
+    return ;
+  }
+  if (!SWIG_JavaArrayInUint(jenv, &jarr2, &arg2, jarg2)) return ; 
+  MD5Transform(arg1,(unsigned int const (*))arg2);
+  SWIG_JavaArrayArgoutUint(jenv, jarr1, arg1, jarg1); 
+  SWIG_JavaArrayArgoutUint(jenv, jarr2, arg2, jarg2); 
+  delete [] arg1; 
+  delete [] arg2; 
+}
+
+
 SWIGEXPORT jstring JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_getParameter(JNIEnv *jenv, jclass jcls, jstring jarg1) {
   jstring jresult = 0 ;
   char *arg1 = (char *) 0 ;
@@ -42519,6 +59757,86 @@ SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_regvar_1t_
     (void)jenv;
     (void)jcls;
     *(area_t **)&baseptr = *(regvar_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_node_1set_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(intset_t **)&baseptr = *(node_set_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_cancellable_1graph_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(gdl_graph_t **)&baseptr = *(cancellable_graph_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qbasic_1block_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(area_t **)&baseptr = *(qbasic_block_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_qflow_1chart_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(cancellable_graph_t **)&baseptr = *(qflow_chart_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_basic_1block_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(area_t **)&baseptr = *(basic_block_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_flow_1chart_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(cancellable_graph_t **)&baseptr = *(flow_chart_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_simple_1edge_1typer_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(edge_typer_t **)&baseptr = *(simple_edge_typer_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_abstract_1graph_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(gdl_graph_t **)&baseptr = *(abstract_graph_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_mutable_1graph_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(abstract_graph_t **)&baseptr = *(mutable_graph_t **)&jarg1;
+    return baseptr;
+}
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_memory_1info_1t_1SWIGUpcast(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+    jlong baseptr = 0;
+    (void)jenv;
+    (void)jcls;
+    *(area_t **)&baseptr = *(memory_info_t **)&jarg1;
     return baseptr;
 }
 
