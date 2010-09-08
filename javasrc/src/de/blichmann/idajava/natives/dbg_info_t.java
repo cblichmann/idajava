@@ -44,17 +44,17 @@ public class dbg_info_t {
     return (cPtr == 0) ? null : new plugin_info_t(cPtr, false);
   }
 
-  public void setDbg(SWIGTYPE_p_debugger_t value) {
-    IdaJavaJNI.dbg_info_t_dbg_set(swigCPtr, this, SWIGTYPE_p_debugger_t.getCPtr(value));
+  public void setDbg(debugger_t value) {
+    IdaJavaJNI.dbg_info_t_dbg_set(swigCPtr, this, debugger_t.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_debugger_t getDbg() {
+  public debugger_t getDbg() {
     long cPtr = IdaJavaJNI.dbg_info_t_dbg_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_debugger_t(cPtr, false);
+    return (cPtr == 0) ? null : new debugger_t(cPtr, false);
   }
 
-  public dbg_info_t(plugin_info_t _pi, SWIGTYPE_p_debugger_t _dbg) {
-    this(IdaJavaJNI.new_dbg_info_t(plugin_info_t.getCPtr(_pi), _pi, SWIGTYPE_p_debugger_t.getCPtr(_dbg)), true);
+  public dbg_info_t(plugin_info_t _pi, debugger_t _dbg) {
+    this(IdaJavaJNI.new_dbg_info_t(plugin_info_t.getCPtr(_pi), _pi, debugger_t.getCPtr(_dbg), _dbg), true);
   }
 
 }

@@ -17,4 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+%ignore realcvt; // Not exported in ida.lib
+%ignore l_realcvt; // Not exported in ida.lib
+%ignore b_realcvt; // Not exported in ida.lib
+
 %include <ieee.h>

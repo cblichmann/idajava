@@ -43,13 +43,13 @@ public class regarg_t {
     return IdaJavaJNI.regarg_t_reg_get(swigCPtr, this);
   }
 
-  public void setType(SWIGTYPE_p_type_t value) {
-    IdaJavaJNI.regarg_t_type_set(swigCPtr, this, SWIGTYPE_p_type_t.getCPtr(value));
+  public void setType(SWIGTYPE_p_unsigned_char value) {
+    IdaJavaJNI.regarg_t_type_set(swigCPtr, this, SWIGTYPE_p_unsigned_char.getCPtr(value));
   }
 
-  public SWIGTYPE_p_type_t getType() {
+  public SWIGTYPE_p_unsigned_char getType() {
     long cPtr = IdaJavaJNI.regarg_t_type_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_type_t(cPtr, false);
+    return (cPtr == 0) ? null : new SWIGTYPE_p_unsigned_char(cPtr, false);
   }
 
   public void setName(String value) {

@@ -111,13 +111,13 @@ public class insn_t {
     return IdaJavaJNI.insn_t_insnpref_get(swigCPtr, this);
   }
 
-  public void setOperands(SWIGTYPE_p_op_t value) {
-    IdaJavaJNI.insn_t_Operands_set(swigCPtr, this, SWIGTYPE_p_op_t.getCPtr(value));
+  public void setOperands(op_t value) {
+    IdaJavaJNI.insn_t_Operands_set(swigCPtr, this, op_t.getCPtr(value), value);
   }
 
-  public SWIGTYPE_p_op_t getOperands() {
+  public op_t getOperands() {
     long cPtr = IdaJavaJNI.insn_t_Operands_get(swigCPtr, this);
-    return (cPtr == 0) ? null : new SWIGTYPE_p_op_t(cPtr, false);
+    return (cPtr == 0) ? null : new op_t(cPtr, false);
   }
 
   public void setFlags(char value) {

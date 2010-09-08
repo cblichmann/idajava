@@ -31,14 +31,15 @@
 %ignore node_set_t::add; // Not exported in ida.lib
 %ignore node_set_t::intersect; // Not exported in ida.lib
 %ignore node_set_t::extract; // Not exported in ida.lib
-%ignore gdl_graph_t::gen_gdl; // Not exported in ida.lib
-%ignore gdl_graph_t::path(node_set_t & visited, int m, int n) const; // Not exported in ida.lib
-%ignore gdl_graph_t::path_exists; // Not exported in ida.lib
-%ignore gdl_graph_t::gen_dot; // Not exported in ida.lib
+
+%ignore gdl_graph_t; // Methods not exported in ida.lib
 
 %ignore setup_graph_subsystem; // Called by GUI initially
 %ignore default_graph_format; // Not exported in ida.lib
 
 %ignore cancellable_graph_t::check_cancel; // Not exported in ida.lib
+
+%ignore qflow_chart_t::FC_PRINT; // Avoid duplicate constant
+%ignore qflow_chart_t::FC_NOEXT; // Avoid duplicate constant
 
 %include <gdl.hpp>

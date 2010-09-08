@@ -57,6 +57,14 @@ const intptr_t HOOKDATA_IDAJAVA_COOKIE(0x4944414A); // "IDAJ"
 #define CONFIG_NAME_JVMCLASSPATH  "JvmClassPath"
 #define CONFIG_VALUE_JVMCLASSPATH ".;idajava.jar"
 
+/** Enable or disable JVM debugging */
+#define CONFIG_NAME_JVMDEBUGENABLE "JvmDebugEnable"
+#define CONFIG_VALUE_JVMEBUGENABLE "0"
+
+/** Set JDWP transport */
+#define CONFIG_NAME_JDWPTRANSPORT "JdwpTransport"
+#define CONFIG_VALUE_JDWPTRANSPORT "transport=dt_socket,server=y,suspend=n,address=1044"
+
 /**
  * Directory to switch to just before loading any Java classes. Can specify a
  * relative path. If this option is not set, IdaJava sets the working direcotry

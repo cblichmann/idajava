@@ -116,4 +116,6 @@ struct debugger_t
 };
 %ignore debugger_t;
 
+%ignore handle_debug_event; // Not exported in ida.lib
+
 %include <idd.hpp>

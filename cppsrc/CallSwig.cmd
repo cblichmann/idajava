@@ -10,7 +10,7 @@ cd %SRCDIR%
 
 rem "%SWIGDIR%\swig.exe" --help
 
-rem del /q "%OUTDIR%\*.*"
+del /q "%OUTDIR%\*.*"
 "%SWIGDIR%\swig.exe" ^
 	-c++ -Fstandard ^
 	-java -package de.blichmann.idajava.natives ^

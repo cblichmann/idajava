@@ -151,11 +151,11 @@
 %include "enum.i"
 //%include "err.i" // Not used in IDA
 %include "exehdr.i"
-%include "gdl.i"
+//%include "gdl.i" // TODO: Wrapping incomplete
 %include "graph.i"
 %include "idd.i"
 %include "ieee.i"
-%include "intel.i"
+//%include "intel.i" // TODO: Wrapping incomplete
 %include "lex.i"
 %include "md5.i"
 //%include "moves.i" // Not yet wrapped

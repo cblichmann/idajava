@@ -72,6 +72,14 @@ bool idajava_plugin::read_reg_config(HKEY rootkey, LPCSTR subkey)
 			static_cast<char *>(buf), MAX_PATH))
 		params_[CONFIG_NAME_EMBEDDEDFRAMECLASS] = buf;
 
+	if (RegQueryStringValue(key, CONFIG_NAME_JVMDEBUGENABLE,
+			static_cast<char *>(buf), MAX_PATH))
+		params_[CONFIG_NAME_JVMDEBUGENABLE] = buf;
+
+	if (RegQueryStringValue(key, CONFIG_NAME_JDWPTRANSPORT,
+			static_cast<char *>(buf), MAX_PATH))
+		params_[CONFIG_NAME_JDWPTRANSPORT] = buf;
+
 	{
 	DWORD loglevel(0);
 	if (RegQueryUInt32Value(key, CONFIG_NAME_LOGLEVEL, loglevel)) {
@@ -100,6 +108,8 @@ bool idajava_plugin::read_config()
 	java_plugin_class_name_ = CONFIG_VALUE_PLUGINJAVACLASS;
 	params_[CONFIG_NAME_EMBEDDEDFRAMECLASS] =
 		CONFIG_VALUE_EMBEDDEDFRAMECLASS;
+	params_[CONFIG_NAME_JVMDEBUGENABLE] = CONFIG_VALUE_JVMEBUGENABLE;
+	params_[CONFIG_NAME_JDWPTRANSPORT] = CONFIG_VALUE_JDWPTRANSPORT;
 	params_[CONFIG_NAME_RMIREGISTRY] = CONFIG_VALUE_RMIREGISTRY;
 	params_[CONFIG_NAME_RMIPOOLSERVEROBJECTNAME] =
 		CONFIG_VALUE_RMIPOOLSERVEROBJECTNAME;
@@ -174,6 +184,11 @@ int idajava_plugin::initialize()
 	jvm_builder jvc;
 	jvc.add_vmoption(("-Djava.class.path=" + jvm_class_path_).c_str());
 	jvc.add_vmoption("-Xcheck:jni");
+	if (params_[CONFIG_NAME_JVMDEBUGENABLE] != "0")
+		jvc.add_vmoption("-Xdebug");
+	if (!params_[CONFIG_NAME_JDWPTRANSPORT].empty())
+		jvc.add_vmoption(("-Xrunjdwp:" +
+			params_[CONFIG_NAME_JDWPTRANSPORT]).c_str());
 	if (!jvc.find_jre(MIN_JVM_VERSION))
 	{
 		msg("\nError: Cannot find a suitable Java VM, skipping plugin\n");

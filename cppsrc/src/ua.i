@@ -31,6 +31,31 @@ idaman bool ida_export construct_macro(bool enable, construct_macro_cb build_mac
 %ignore term_ua; // Not exported in ida.lib
 %ignore get_equal_items; // Not exported in ida.lib
 
+class op_t
+{
+public:
+	char n;
+	optype_t type;
+	char offb;
+	char offo;
+	uchar flags;
+	void set_showed() { flags |= OF_SHOW; }
+	void clr_showed() { flags &= ~OF_SHOW; }
+	bool showed() const { return (flags & OF_SHOW) != 0; }
+	char dtyp;
+	uint16 reg; // Omitted union
+	bool is_reg(int r) const { return type == o_reg && reg == r; }
+	uval_t value; // Omitted union
+	bool is_imm(uval_t v) const { return type == o_imm && value == v; }
+	ea_t addr; // Omitted union
+	ea_t specval; // Omitted union
+	char specflag1;
+	char specflag2;
+	char specflag3;
+	char specflag4;
+};
+%ignore op_t;
+
 class insn_t
 {
 public:
