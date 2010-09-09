@@ -57,6 +57,10 @@ const intptr_t HOOKDATA_IDAJAVA_COOKIE(0x4944414A); // "IDAJ"
 #define CONFIG_NAME_JVMCLASSPATH  "JvmClassPath"
 #define CONFIG_VALUE_JVMCLASSPATH ".;idajava.jar"
 
+/** Enable or disable additional JNI checks */
+#define CONFIG_NAME_JNICHECKSENABLE "JniChecksEnable"
+#define CONFIG_VALUE_JNICHECKSENABLE "0"
+
 /** Enable or disable JVM debugging */
 #define CONFIG_NAME_JVMDEBUGENABLE "JvmDebugEnable"
 #define CONFIG_VALUE_JVMEBUGENABLE "0"

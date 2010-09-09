@@ -76,6 +76,10 @@ bool idajava_plugin::read_reg_config(HKEY rootkey, LPCSTR subkey)
 			static_cast<char *>(buf), MAX_PATH))
 		params_[CONFIG_NAME_JVMDEBUGENABLE] = buf;
 
+	if (RegQueryStringValue(key, CONFIG_NAME_JNICHECKSENABLE,
+			static_cast<char *>(buf), MAX_PATH))
+		params_[CONFIG_NAME_JNICHECKSENABLE] = buf;
+
 	if (RegQueryStringValue(key, CONFIG_NAME_JDWPTRANSPORT,
 			static_cast<char *>(buf), MAX_PATH))
 		params_[CONFIG_NAME_JDWPTRANSPORT] = buf;
@@ -108,6 +112,7 @@ bool idajava_plugin::read_config()
 	java_plugin_class_name_ = CONFIG_VALUE_PLUGINJAVACLASS;
 	params_[CONFIG_NAME_EMBEDDEDFRAMECLASS] =
 		CONFIG_VALUE_EMBEDDEDFRAMECLASS;
+	params_[CONFIG_NAME_JNICHECKSENABLE] = CONFIG_VALUE_JNICHECKSENABLE;
 	params_[CONFIG_NAME_JVMDEBUGENABLE] = CONFIG_VALUE_JVMEBUGENABLE;
 	params_[CONFIG_NAME_JDWPTRANSPORT] = CONFIG_VALUE_JDWPTRANSPORT;
 	params_[CONFIG_NAME_RMIREGISTRY] = CONFIG_VALUE_RMIREGISTRY;
@@ -183,7 +188,8 @@ int idajava_plugin::initialize()
 	msg("Initializing in-process Java VM...");
 	jvm_builder jvc;
 	jvc.add_vmoption(("-Djava.class.path=" + jvm_class_path_).c_str());
-	jvc.add_vmoption("-Xcheck:jni");
+	if (params_[CONFIG_NAME_JNICHECKSENABLE] != "0")
+		jvc.add_vmoption("-Xcheck:jni");
 	if (params_[CONFIG_NAME_JVMDEBUGENABLE] != "0")
 		jvc.add_vmoption("-Xdebug");
 	if (!params_[CONFIG_NAME_JDWPTRANSPORT].empty())
@@ -322,19 +328,18 @@ bool idajava_plugin::check_handle_java_exception()
 int idajava_plugin::call_java_plugin_initialize()
 {
 	jvm_thread_autoattach attach(&jvm_, &env_);
+
 	msg("Invoking Java stub plugin...");
 	if (!create_java_plugin())
 		return PLUGIN_SKIP;
 
 	jmethodID mid = env_->GetMethodID(java_plugin_class_, "initialize", "()I");
 
-	// If the initialize()-method was not found, just issue a warning and
-	// assume the plugin needs no initialization and return PLUGIN_KEEP
+	// If the initialize()-method was not found, just issue an error and skip
 	if (mid == 0)
 	{
-		msg("Info: No initialize()-method found for Java plugin, assuming " \
-			"it does not need initialization\n");
-		return PLUGIN_KEEP;
+		msg("Error: No initialize()-method found, skipping plugin\n");
+		return PLUGIN_SKIP;
 	}
 
 	// Call the plugin's initialize()-method
@@ -342,15 +347,19 @@ int idajava_plugin::call_java_plugin_initialize()
 
 	// Skip plugin if there was an exception
 	if (check_handle_java_exception())
+	{
+		msg("Error: Java exception, skipping plugin. See above for "
+			"details.\n");
 		return PLUGIN_SKIP;
+	}
 
-	return PLUGIN_KEEP;//(int) result;
+	return PLUGIN_KEEP;
 }
 
-#include <idp.hpp>
 void idajava_plugin::call_java_plugin_run(int arg)
 {
 //	jvm_thread_autoattach attach(&jvm_, &env_);
+
 	jmethodID mid = env_->GetMethodID(java_plugin_class_, "run", "(I)V");
 	if (mid == 0)
 	{
@@ -366,6 +375,7 @@ void idajava_plugin::call_java_plugin_run(int arg)
 void idajava_plugin::call_java_plugin_terminate(void)
 {
 	jvm_thread_autoattach attach(&jvm_, &env_);
+
 	jmethodID mid = env_->GetMethodID(java_plugin_class_, "terminate", "()V");
 	if (mid == 0)
 	{
