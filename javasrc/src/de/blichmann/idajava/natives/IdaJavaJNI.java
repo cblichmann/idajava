@@ -1335,8 +1335,8 @@ public class IdaJavaJNI {
   public final static native boolean construct_macro(boolean jarg1, long jarg2);
   public final static native void op_t_n_set(long jarg1, op_t jarg1_, char jarg2);
   public final static native char op_t_n_get(long jarg1, op_t jarg1_);
-  public final static native void op_t_type_set(long jarg1, op_t jarg1_, long jarg2);
-  public final static native long op_t_type_get(long jarg1, op_t jarg1_);
+  public final static native void op_t_type_set(long jarg1, op_t jarg1_, int jarg2);
+  public final static native int op_t_type_get(long jarg1, op_t jarg1_);
   public final static native void op_t_offb_set(long jarg1, op_t jarg1_, char jarg2);
   public final static native char op_t_offb_get(long jarg1, op_t jarg1_);
   public final static native void op_t_offo_set(long jarg1, op_t jarg1_, char jarg2);
@@ -1366,6 +1366,7 @@ public class IdaJavaJNI {
   public final static native char op_t_specflag3_get(long jarg1, op_t jarg1_);
   public final static native void op_t_specflag4_set(long jarg1, op_t jarg1_, char jarg2);
   public final static native char op_t_specflag4_get(long jarg1, op_t jarg1_);
+  public final static native boolean op_t_hasSIB(long jarg1, op_t jarg1_);
   public final static native void delete_op_t(long jarg1);
   public final static native void insn_t_cs_set(long jarg1, insn_t jarg1_, long jarg2);
   public final static native long insn_t_cs_get(long jarg1, insn_t jarg1_);
@@ -1391,6 +1392,8 @@ public class IdaJavaJNI {
   public final static native void insn_t_flags_set(long jarg1, insn_t jarg1_, char jarg2);
   public final static native char insn_t_flags_get(long jarg1, insn_t jarg1_);
   public final static native boolean insn_t_is_macro(long jarg1, insn_t jarg1_);
+  public final static native long insn_t_getOperand(long jarg1, insn_t jarg1_, int jarg2);
+  public final static native boolean insn_t_setOperand(long jarg1, insn_t jarg1_, int jarg2, long jarg3, op_t jarg3_);
   public final static native void delete_insn_t(long jarg1);
   public final static native long get_operand_immvals(long jarg1, int jarg2, long jarg3);
   public final static native void cmd_set(long jarg1, insn_t jarg1_);

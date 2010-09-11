@@ -43,12 +43,12 @@ public class op_t {
     return IdaJavaJNI.op_t_n_get(swigCPtr, this);
   }
 
-  public void setType(SWIGTYPE_p_optype_t value) {
-    IdaJavaJNI.op_t_type_set(swigCPtr, this, SWIGTYPE_p_optype_t.getCPtr(value));
+  public void setType(optype_t value) {
+    IdaJavaJNI.op_t_type_set(swigCPtr, this, value.swigValue());
   }
 
-  public SWIGTYPE_p_optype_t getType() {
-    return new SWIGTYPE_p_optype_t(IdaJavaJNI.op_t_type_get(swigCPtr, this), true);
+  public optype_t getType() {
+    return optype_t.swigToEnum(IdaJavaJNI.op_t_type_get(swigCPtr, this));
   }
 
   public void setOffb(char value) {
@@ -165,6 +165,10 @@ public class op_t {
 
   public char getSpecflag4() {
     return IdaJavaJNI.op_t_specflag4_get(swigCPtr, this);
+  }
+
+  public boolean hasSIB() {
+    return IdaJavaJNI.op_t_hasSIB(swigCPtr, this);
   }
 
 }

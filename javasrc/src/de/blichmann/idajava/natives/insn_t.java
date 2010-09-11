@@ -132,4 +132,13 @@ public class insn_t {
     return IdaJavaJNI.insn_t_is_macro(swigCPtr, this);
   }
 
+  public op_t getOperand(int index) {
+    long cPtr = IdaJavaJNI.insn_t_getOperand(swigCPtr, this, index);
+    return (cPtr == 0) ? null : new op_t(cPtr, false);
+  }
+
+  public boolean setOperand(int index, op_t op) {
+    return IdaJavaJNI.insn_t_setOperand(swigCPtr, this, index, op_t.getCPtr(op), op);
+  }
+
 }

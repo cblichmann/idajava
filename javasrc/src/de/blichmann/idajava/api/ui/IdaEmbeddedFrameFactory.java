@@ -100,12 +100,12 @@ public class IdaEmbeddedFrameFactory {
         try {
         	constructor = clazz.getConstructor(new Class[] { int.class });
         	value = constructor.newInstance(new Object[] { handle });
-        } catch (Throwable e1) {
+        } catch (final Throwable e1) {
 			try {
 				constructor = clazz.getConstructor(new Class[] { long.class });
 				value = constructor.newInstance(
 						new Object[] { new Long(handle) });
-			} catch (Throwable e2) {
+			} catch (final Throwable e2) {
 				throw new EmbeddedFrameCreationException(
 						"Failed to pass window handle to constructor on " +
 						"embedded frame class, tried parameter types were: " +
@@ -128,7 +128,7 @@ public class IdaEmbeddedFrameFactory {
 			Field field = clazz.getDeclaredField("winGraphicsConfig");
 			field.setAccessible(true);
 			field.set(frame.getPeer(), frame.getGraphicsConfiguration());
-        } catch (Throwable e3) {
+        } catch (final Throwable e3) {
         }
 
         return frame;

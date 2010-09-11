@@ -216,14 +216,15 @@ public class IdaJavaPlugin extends IdaPlugin {
 
 		IdaConsole.out.println("Loading Java plugins...");
 		File pluginRoot = new File(libPath).getParentFile();
-		List<IdaPlugin> loadedPlugins = loadPluginsFromDirectory(pluginRoot);
+		final List<IdaPlugin> loadedPlugins = loadPluginsFromDirectory(
+				pluginRoot);
 		pluginRoot = new File(pluginRoot.getParentFile(), "java");
 		if (pluginRoot.isDirectory())
 			loadedPlugins.addAll(loadPluginsFromDirectory(pluginRoot));
 
 		for (IdaPlugin plugin : loadedPlugins) {
 			String displayName;
-			String hotkey;
+			final String hotkey;
 			try {
 				if (plugin.initialize() == PLUGIN_SKIP)
 					continue;
@@ -231,7 +232,7 @@ public class IdaJavaPlugin extends IdaPlugin {
 				if (displayName == null)
 					displayName = plugin.getClass().getCanonicalName();
 				hotkey = plugin.getHotkey();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace(IdaConsole.out);
 				continue;
 			}
@@ -242,10 +243,10 @@ public class IdaJavaPlugin extends IdaPlugin {
 					@Override
 					public void actionPerformed() {
 						IdaConsole.out.println("actionPerformed()");
-						IdaPlugin plugin = plugins.get(getIndex());
+						final IdaPlugin plugin = plugins.get(getIndex());
 						try {
 							plugin.run(0);
-						} catch (Exception e) {
+						} catch (final Exception e) {
 							e.printStackTrace(IdaConsole.out);
 						}
 					}
@@ -318,7 +319,9 @@ public class IdaJavaPlugin extends IdaPlugin {
 			if (index < plugins.size()) {
 				try {
 					plugins.get(index).run(0);
-				} catch(Exception e) {
+				} catch(final IndexOutOfBoundsException e) {
+					e.printStackTrace(IdaConsole.out);
+				} catch(final Exception e) {
 					e.printStackTrace(IdaConsole.out);
 				}
 			}
@@ -338,7 +341,7 @@ public class IdaJavaPlugin extends IdaPlugin {
 		for (final IdaPlugin plugin : plugins) {
 			try {
 				plugin.terminate();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace(IdaConsole.out);
 				continue;
 			}

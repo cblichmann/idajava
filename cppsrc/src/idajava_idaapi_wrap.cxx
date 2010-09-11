@@ -1124,6 +1124,24 @@ typedef int (idaapi *enum_plugins_cb)(const char *file, void *ud);
 
 	typedef bool (idaapi *construct_macro_cb)(insn_t &s, bool may_go_forward);
 
+SWIGINTERN bool op_t_hasSIB(op_t *self){
+			return self->specflag1;
+		}
+SWIGINTERN op_t *insn_t_getOperand(insn_t *self,int index){
+			if (index < UA_MAXOP) {
+				return &(self->Operands[index]);
+			} else {
+				return NULL;
+			}
+		}
+SWIGINTERN bool insn_t_setOperand(insn_t *self,int index,op_t op){
+			if (index < UA_MAXOP) {
+				self->Operands[index] = op;
+				return 1;
+			} else {
+				return 0;
+			}
+		}
 
 	typedef area_t *(idaapi *set_dbgmem_source_dbg_get_memory_config_cb)(int *n);
 	typedef int (idaapi *set_dbgmem_source_memory_read_cb)(ea_t ea, void *buffer, int size);
@@ -22923,27 +22941,21 @@ SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1n_1
 }
 
 
-SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1type_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
+SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1type_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
   op_t *arg1 = (op_t *) 0 ;
   optype_t arg2 ;
-  optype_t *argp2 ;
   
   (void)jenv;
   (void)jcls;
   (void)jarg1_;
   arg1 = *(op_t **)&jarg1; 
-  argp2 = *(optype_t **)&jarg2; 
-  if (!argp2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null optype_t");
-    return ;
-  }
-  arg2 = *argp2; 
+  arg2 = (optype_t)jarg2; 
   if (arg1) (arg1)->type = arg2;
 }
 
 
-SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1type_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
+SWIGEXPORT jint JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1type_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
   op_t *arg1 = (op_t *) 0 ;
   optype_t result;
   
@@ -22951,8 +22963,8 @@ SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1typ
   (void)jcls;
   (void)jarg1_;
   arg1 = *(op_t **)&jarg1; 
-  result =  ((arg1)->type);
-  *(optype_t **)&jresult = new optype_t((const optype_t &)result); 
+  result = (optype_t) ((arg1)->type);
+  jresult = (jint)result; 
   return jresult;
 }
 
@@ -23364,6 +23376,21 @@ SWIGEXPORT jchar JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1spe
 }
 
 
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_op_1t_1hasSIB(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  op_t *arg1 = (op_t *) 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(op_t **)&jarg1; 
+  result = (bool)op_t_hasSIB(arg1);
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_delete_1op_1t(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   op_t *arg1 = (op_t *) 0 ;
   
@@ -23715,6 +23742,49 @@ SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_insn_1t
   (void)jarg1_;
   arg1 = *(insn_t **)&jarg1; 
   result = (bool)((insn_t const *)arg1)->is_macro();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_insn_1t_1getOperand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  insn_t *arg1 = (insn_t *) 0 ;
+  int arg2 ;
+  op_t *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(insn_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (op_t *)insn_t_getOperand(arg1,arg2);
+  *(op_t **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_de_blichmann_idajava_natives_IdaJavaJNI_insn_1t_1setOperand(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+  jboolean jresult = 0 ;
+  insn_t *arg1 = (insn_t *) 0 ;
+  int arg2 ;
+  op_t arg3 ;
+  op_t *argp3 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(insn_t **)&jarg1; 
+  arg2 = (int)jarg2; 
+  argp3 = *(op_t **)&jarg3; 
+  if (!argp3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Attempt to dereference null op_t");
+    return 0;
+  }
+  arg3 = *argp3; 
+  result = (bool)insn_t_setOperand(arg1,arg2,arg3);
   jresult = (jboolean)result; 
   return jresult;
 }

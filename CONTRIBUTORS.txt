@@ -1,0 +1,11 @@
+IdaJava
+=======
+
+Initial author:
+Christian Blichmann <feedback@blichmann.de>
+
+
+Contributors
+------------
+
+Alex <kuza55@gmail.com>
