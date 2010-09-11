@@ -31,6 +31,27 @@ idaman bool ida_export construct_macro(bool enable, construct_macro_cb build_mac
 %ignore term_ua; // Not exported in ida.lib
 %ignore get_equal_items; // Not exported in ida.lib
 
+enum optype_t {
+	o_void     =  0,    
+	o_reg      =  1,    
+	o_mem      =  2,    
+	o_phrase   =  3,    
+	o_displ    =  4,    
+	o_imm      =  5,    
+	o_far      =  6,    
+	o_near     =  7,    
+	o_idpspec0 =  8,    
+	o_idpspec1 =  9,    
+	o_idpspec2 = 10,    
+	o_idpspec3 = 11,    
+	o_idpspec4 = 12,    
+	o_idpspec5 = 13,    
+	o_last     = 14
+};
+
+%ignore optype_t;
+
+
 class op_t
 {
 public:
@@ -53,6 +74,13 @@ public:
 	char specflag2;
 	char specflag3;
 	char specflag4;
+
+	%extend {
+		bool hasSIB() {
+			return $self->specflag1;
+		}
+	}
+
 };
 %ignore op_t;
 
@@ -74,6 +102,26 @@ public:
 	op_t Operands[UA_MAXOP];
 	char flags;
 	bool is_macro(void) const { return (flags & INSN_MACRO) != 0; }
+	
+	%extend {
+		op_t *getOperand(int index) {
+			if (index < UA_MAXOP) {
+				return &($self->Operands[index]);
+			} else {
+				return NULL;
+			}
+		}
+	
+		bool setOperand(int index, op_t op) {
+			if (index < UA_MAXOP) {
+				$self->Operands[index] = op;
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
+
 };
 %ignore insn_t;
 
