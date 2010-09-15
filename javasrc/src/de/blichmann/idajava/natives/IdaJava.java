@@ -6474,6 +6474,250 @@ public class IdaJava implements IdaJavaConstants {
     return IdaJavaJNI.ecmp(a, b);
   }
 
+  public static boolean tasm_ideal() {
+    return IdaJavaJNI.tasm_ideal();
+  }
+
+  public static int getREX_W() {
+    return IdaJavaJNI.REX_W_get();
+  }
+
+  public static int getREX_R() {
+    return IdaJavaJNI.REX_R_get();
+  }
+
+  public static int getREX_X() {
+    return IdaJavaJNI.REX_X_get();
+  }
+
+  public static int getREX_B() {
+    return IdaJavaJNI.REX_B_get();
+  }
+
+  public static boolean mode16() {
+    return IdaJavaJNI.mode16();
+  }
+
+  public static boolean mode32() {
+    return IdaJavaJNI.mode32();
+  }
+
+  public static boolean mode64() {
+    return IdaJavaJNI.mode64();
+  }
+
+  public static boolean natad() {
+    return IdaJavaJNI.natad();
+  }
+
+  public static boolean natop() {
+    return IdaJavaJNI.natop();
+  }
+
+  public static boolean ad16() {
+    return IdaJavaJNI.ad16();
+  }
+
+  public static boolean ad32() {
+    return IdaJavaJNI.ad32();
+  }
+
+  public static boolean ad64() {
+    return IdaJavaJNI.ad64();
+  }
+
+  public static boolean op16() {
+    return IdaJavaJNI.op16();
+  }
+
+  public static boolean op32() {
+    return IdaJavaJNI.op32();
+  }
+
+  public static int sib_base(op_t x) {
+    return IdaJavaJNI.sib_base(op_t.getCPtr(x), x);
+  }
+
+  public static short sib_index(op_t x) {
+    return IdaJavaJNI.sib_index(op_t.getCPtr(x), x);
+  }
+
+  public static int sib_scale(op_t x) {
+    return IdaJavaJNI.sib_scale(op_t.getCPtr(x), x);
+  }
+
+  public static int x86_base(op_t x) {
+    return IdaJavaJNI.x86_base(op_t.getCPtr(x), x);
+  }
+
+  public static int getINDEX_NONE() {
+    return IdaJavaJNI.INDEX_NONE_get();
+  }
+
+  public static int x86_index(op_t x) {
+    return IdaJavaJNI.x86_index(op_t.getCPtr(x), x);
+  }
+
+  public static int x86_scale(op_t x) {
+    return IdaJavaJNI.x86_scale(op_t.getCPtr(x), x);
+  }
+
+  public static int has_displ(op_t x) {
+    return IdaJavaJNI.has_displ(op_t.getCPtr(x), x);
+  }
+
+  public static char address_dtyp() {
+    return IdaJavaJNI.address_dtyp();
+  }
+
+  public static boolean is_io_insn() {
+    return IdaJavaJNI.is_io_insn();
+  }
+
+  public static char getFbase_tag() {
+    return IdaJavaJNI.fbase_tag_get();
+  }
+
+  public static char getFrame_tag() {
+    return IdaJavaJNI.frame_tag_get();
+  }
+
+  public static char getPurge_tag() {
+    return IdaJavaJNI.purge_tag_get();
+  }
+
+  public static char getRet_tag() {
+    return IdaJavaJNI.ret_tag_get();
+  }
+
+  public static char getPushinfo_tag() {
+    return IdaJavaJNI.pushinfo_tag_get();
+  }
+
+  public static char getIs_ptr_tag() {
+    return IdaJavaJNI.is_ptr_tag_get();
+  }
+
+  public static char getFinally_tag() {
+    return IdaJavaJNI.finally_tag_get();
+  }
+
+  public static char getHandler_tag() {
+    return IdaJavaJNI.handler_tag_get();
+  }
+
+  public static int indent_spaces(long sz) {
+    return IdaJavaJNI.indent_spaces(sz);
+  }
+
+  public static boolean is_segreg(int r) {
+    return IdaJavaJNI.is_segreg(r);
+  }
+
+  public static boolean is_mmxreg(int r) {
+    return IdaJavaJNI.is_mmxreg(r);
+  }
+
+  public static boolean is_xmmreg(int r) {
+    return IdaJavaJNI.is_xmmreg(r);
+  }
+
+  public static boolean is_arith_lea(op_t x) {
+    return IdaJavaJNI.is_arith_lea(op_t.getCPtr(x), x);
+  }
+
+  public static boolean is_forbidden_imul_flag(op_t x, long F) {
+    return IdaJavaJNI.is_forbidden_imul_flag(op_t.getCPtr(x), x, F);
+  }
+
+  public static boolean is_push_ecx(short b) {
+    return IdaJavaJNI.is_push_ecx(b);
+  }
+
+  public static boolean is_push_eax(short b) {
+    return IdaJavaJNI.is_push_eax(b);
+  }
+
+  public static boolean is_push_edx(short b) {
+    return IdaJavaJNI.is_push_edx(b);
+  }
+
+  public static boolean is_push_ebx(short b) {
+    return IdaJavaJNI.is_push_ebx(b);
+  }
+
+  public static boolean is_volatile_reg(int r) {
+    return IdaJavaJNI.is_volatile_reg(r);
+  }
+
+  public static long getDS(long EA) {
+    return IdaJavaJNI.getDS(EA);
+  }
+
+  public static long getES(long EA) {
+    return IdaJavaJNI.getES(EA);
+  }
+
+  public static long getSS(long EA) {
+    return IdaJavaJNI.getSS(EA);
+  }
+
+  public static long getFS(long EA) {
+    return IdaJavaJNI.getFS(EA);
+  }
+
+  public static long getGS(long EA) {
+    return IdaJavaJNI.getGS(EA);
+  }
+
+  public static boolean isProtected(long type) {
+    return IdaJavaJNI.isProtected(type);
+  }
+
+  public static boolean isAMD(long type) {
+    return IdaJavaJNI.isAMD(type);
+  }
+
+  public static boolean isp4(long type) {
+    return IdaJavaJNI.isp4(type);
+  }
+
+  public static boolean isp3(long type) {
+    return IdaJavaJNI.isp3(type);
+  }
+
+  public static boolean is3dnow(long type) {
+    return IdaJavaJNI.is3dnow(type);
+  }
+
+  public static boolean ismmx(long type) {
+    return IdaJavaJNI.ismmx(type);
+  }
+
+  public static boolean isp2(long type) {
+    return IdaJavaJNI.isp2(type);
+  }
+
+  public static boolean is686(long type) {
+    return IdaJavaJNI.is686(type);
+  }
+
+  public static boolean is586(long type) {
+    return IdaJavaJNI.is586(type);
+  }
+
+  public static boolean is486(long type) {
+    return IdaJavaJNI.is486(type);
+  }
+
+  public static boolean is386(long type) {
+    return IdaJavaJNI.is386(type);
+  }
+
+  public static boolean is286(long type) {
+    return IdaJavaJNI.is286(type);
+  }
+
   public static void MD5Init(MD5Context context) {
     IdaJavaJNI.MD5Init(MD5Context.getCPtr(context), context);
   }

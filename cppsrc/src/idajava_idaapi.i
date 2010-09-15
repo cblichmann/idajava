@@ -155,7 +155,7 @@
 %include "graph.i"
 %include "idd.i"
 %include "ieee.i"
-//%include "intel.i" // TODO: Wrapping incomplete
+%include "intel.i" // TODO: Wrapping incomplete
 %include "lex.i"
 %include "md5.i"
 //%include "moves.i" // Not yet wrapped
