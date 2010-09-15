@@ -21,7 +21,35 @@
 %ignore pc_get_operand_info;
 %ignore getr;
 
-%javaconstvalue(1000) pc_module_t::set_difbase; // Fix SWIG wrapping failure
+//This doesn't create an equivalent structure, so I'm just remaking it entirely.
+//%javaconstvalue(1000) pc_module_t::set_difbase; // Fix SWIG wrapping failure
+//%javaconstvalue(1005) pc_module_t::find_reg_value; // This value just goes missing for some reason...
+//%javaconstvalue(1006) pc_module_t::dbgtools_path;
+
+namespace pc_module_t
+{
+  enum event_codes_t
+  {
+    set_difbase = 1000,
+    restore_pushinfo,
+    save_pushinfo,
+    prolog_analyzed,
+    verify_epilog,
+    find_reg_value,
+    dbgtools_path,
+  };
+}
+
+%ignore pc_module_t;
+%ignore event_codes_t;
+%ignore set_difbase;
+%ignore restore_pushinfo;
+%ignore save_pushinfo;
+%ignore prolog_analyzed;
+%ignore verify_epilog;
+%ignore find_reg_value;
+%ignore dbgtools_path;
+
 
 //These are the symbols which cause linker failure:
 %ignore insn_default_opsize_64;

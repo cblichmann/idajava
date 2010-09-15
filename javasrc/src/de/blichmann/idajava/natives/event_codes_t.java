@@ -14,7 +14,8 @@ public enum event_codes_t {
   save_pushinfo,
   prolog_analyzed,
   verify_epilog,
-  dbgtools_path((verify_epilog) + 2);
+  find_reg_value,
+  dbgtools_path;
 
   public final int swigValue() {
     return swigValue;
