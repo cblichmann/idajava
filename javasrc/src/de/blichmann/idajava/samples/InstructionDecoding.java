@@ -1,3 +1,5 @@
+package de.blichmann.idajava.samples;
+
 import de.blichmann.idajava.api.IdaConsole;
 import de.blichmann.idajava.natives.IdaJava;
 import de.blichmann.idajava.natives.IdaJavaConstants;
@@ -7,7 +9,7 @@ import de.blichmann.idajava.natives.op_t;
 import de.blichmann.idajava.natives.optype_t;
 
 
-public class IDATest extends de.blichmann.idajava.api.plugin.IdaPlugin {
+public class InstructionDecoding extends de.blichmann.idajava.api.plugin.IdaPlugin {
 
 	@Override
 	public String getDisplayName() {
