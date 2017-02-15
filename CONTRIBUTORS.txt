@@ -2,7 +2,7 @@ IdaJava
 =======
 
 Initial author:
-Christian Blichmann <feedback@blichmann.de>
+Christian Blichmann <mail@blichmann.eu>
 
 
 Contributors

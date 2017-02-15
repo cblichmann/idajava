@@ -137,7 +137,7 @@ Copyright/Licensing
 -------------------
 
 IDAJava version 0.3
-Copyright (c)2007-2010 Christian Blichmann <idajava@blichmann.de>
+Copyright (c)2007-2017 Christian Blichmann <idajava@blichmann.de>
 
 IdaJava is subject to the terms of the GPLv2. See LICENSE.txt for details.
 This also applies to all classes in the de.blichmann.framework package.
