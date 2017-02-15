@@ -1,6 +1,6 @@
 /*
  * IdaJava version 0.3
- * Copyright (c)2007-2010 by Christian Blichmann
+ * Copyright (c)2007-2017 by Christian Blichmann
  *
  * Plugin Main header
  *

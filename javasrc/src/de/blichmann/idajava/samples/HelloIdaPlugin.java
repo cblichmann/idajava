@@ -1,6 +1,6 @@
 /*
  * IDAJava version 0.3
- * Copyright (c)2007-2010 Christian Blichmann
+ * Copyright (c)2007-2017 Christian Blichmann
  *
  * HelloIdaPlugin Class
  *

@@ -1,6 +1,6 @@
 /*
  * IDAJava version 0.3
- * Copyright (c)2007-2010 Christian Blichmann
+ * Copyright (c)2007-2017 Christian Blichmann
  *
  * IDAJavaPlugin Class
  *
@@ -286,7 +286,7 @@ public class IdaJavaPlugin extends IdaPlugin {
         yoff += 24;
         versionLabel.setBounds(new Rectangle(32, yoff, 344, 20));
 
-        final JLabel copyrightLabel = new JLabel("Copyright (c)2007-2010 Christian Blichmann");
+        final JLabel copyrightLabel = new JLabel("Copyright (c)2007-2017 Christian Blichmann");
         panel.add(copyrightLabel);
         yoff += 20;
         copyrightLabel.setBounds(new Rectangle(32, yoff, 344, 20));

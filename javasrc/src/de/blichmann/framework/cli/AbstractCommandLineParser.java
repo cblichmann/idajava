@@ -1,12 +1,8 @@
 /*
  * blichmann.de Application Framework for Java version 0.1
- * Copyright (c)2004-2009 Christian Blichmann
+ * Copyright (c)2004-2017 Christian Blichmann
  *
  * AbstractCommandLineParser Class
- *
- * ***********************************************
- * THIS IS PRELIMINARY BETA CODE SUBJECT TO CHANGE
- * ***********************************************
  */
 
 package de.blichmann.framework.cli;
